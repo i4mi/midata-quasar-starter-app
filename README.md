@@ -49,6 +49,7 @@ npm i
 ```
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
+Make sure that port 8080 isn't already in use. You need to be running the webapp on http://localhost:8080, otherwise the MIDATA demo won't work (due to OAuth2 redirect url mismatch).
 ```bash
 npx quasar dev
 ```
