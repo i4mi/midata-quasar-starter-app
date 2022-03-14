@@ -4,7 +4,7 @@ set -eu
 
 repo_uri="https://github.com/drewjosh/midata-quasar-starter-app"
 remote_name="origin"
-main_branch="master"
+main_branch="main"
 target_branch="gh-pages"
 build_dir="dist"
 
