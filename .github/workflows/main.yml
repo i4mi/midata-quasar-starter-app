@@ -48,8 +48,8 @@ jobs:
           cd dist
           git init
           echo git repo initialised
-          git branch -m main
-          echo branch renamed to main
+          git branch -m gh-pages
+          echo branch renamed to gh-pages
           git add -A
           echo added all files
           git commit -m 'deploy'
