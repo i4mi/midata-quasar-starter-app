@@ -40,15 +40,15 @@ jobs:
 
       - name: Prepare git commit for github pages
         run: |
-        cd dist
-        git init
-        echo git repo initialised
-        git branch -m main
-        echo branch renamed to main
-        git add -A
-        echo added all files
-        git commit -m 'deploy'
-        echo created commit
+          cd dist
+          git init
+          echo git repo initialised
+          git branch -m main
+          echo branch renamed to main
+          git add -A
+          echo added all files
+          git commit -m 'deploy'
+          echo created commit
 
       - name: Push to github pages branch
         run: git push -f git@github.com:drewjosh/midata-quasar-starter-app.git gh-pages
