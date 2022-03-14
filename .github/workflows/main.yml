@@ -1,76 +1,14 @@
-# This is a basic workflow to help you get started with Actions
+name: GitHub Pages
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - main
+    push:
+        branches:
+        - main
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: npm i --no-progress
-
-      - name: Build app
-        run: npm run build
-
-      - name: Move generated files to dist folder
-        run: |
-          cp -r dist/spa/* dist
-          rm -r dist/spa
-
-      - name: Set up git config
-        run: |
-          git config --global user.name "$GITHUB_ACTOR"
-          git config --global user.email "${GITHUB_ACTOR}@bots.github.com"
-      
-      - name: Check out github pages & rebase
-        run: |
-          remote_name="origin"
-          main_branch="main"
-          target_branch="gh-pages"
-          git checkout "$target_branch"
-          git rebase "${remote_name}/${main_branch}"
-      
-      - name: Getting files ready for github pages
-        run: |
-          rm -r node_modules
-          cp -r -f dist/* ./
-          rm -r dist
-          ls -la
-
-      - name: Prepare git commit for github pages
-        run: |
-          repo_uri="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          remote_name="origin"
-          main_branch="main"
-          target_branch="gh-pages"
-          build_dir="dist"
-
-          git commit -m "updated GitHub Pages"
-          if [ $? -ne 0 ]; then
-              echo "nothing to commit"
-              exit 0
-          fi
-
-          git remote set-url "$remote_name" "$repo_uri" # includes access token
-          git push --force-with-lease "$remote_name" "$target_branch"
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v2
+        - run: update-gh-pages.sh
+              
