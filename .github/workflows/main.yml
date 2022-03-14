@@ -54,6 +54,4 @@ jobs:
           echo added all files
           git commit -m 'deploy'
           echo created commit
-
-      - name: Push to github pages branch
-        run: git push -f git@github.com:drewjosh/midata-quasar-starter-app.git gh-pages
+          git push -f git@github.com:drewjosh/midata-quasar-starter-app.git gh-pages
