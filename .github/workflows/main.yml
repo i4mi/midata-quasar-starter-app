@@ -40,20 +40,34 @@ jobs:
 
       - name: Set up git config
         run: |
-          git config --global user.name github-actions
-          git config --global user.email github-actions@github.com
+          git config --global user.name "$GITHUB_ACTOR"
+          git config --global user.email "${GITHUB_ACTOR}@bots.github.com"
+      
+      - name: Check out github pages & rebase
+        run: |
+          git checkout "$target_branch"
+          git rebase "${remote_name}/${main_branch}"
+      
+      - name: Getting files ready for github pages
+        run: |
+          rm -r node_modules
+          cp -r -f dist/* ./
+          rm -r dist
+          ls -la
 
       - name: Prepare git commit for github pages
         run: |
-          cd dist
-          git init
-          echo git repo initialised
-          git remote add origin https://github.com/drewjosh/midata-quasar-starter-app
-          echo git remote set
-          git branch -m gh-pages
-          echo branch renamed to gh-pages
-          git add -A
-          echo added all files
-          git commit -m 'deploy'
-          echo created commit
-          git push --set-upstream origin gh-pages
+          repo_uri="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          remote_name="origin"
+          main_branch="main"
+          target_branch="gh-pages"
+          build_dir="dist"
+
+          git commit -m "updated GitHub Pages"
+          if [ $? -ne 0 ]; then
+              echo "nothing to commit"
+              exit 0
+          fi
+
+          git remote set-url "$remote_name" "$repo_uri" # includes access token
+          git push --force-with-lease "$remote_name" "$target_branch"
