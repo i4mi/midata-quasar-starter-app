@@ -29,9 +29,12 @@ jobs:
 
       - name: Install dependencies
         run: npm i --no-progress
+        
+      - name: Make executeable
+        run: chmod +x deploy.sh
 
       - name: Build app & deploy to github pages branch
-        run: ./deploy.sh
+        run: bash deploy.sh
 
       - name: Done
         run: echo It is done!
