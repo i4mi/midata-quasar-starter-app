@@ -38,6 +38,11 @@ jobs:
           cp -r dist/spa/* dist
           rm -r dist/spa
 
+      - name: Set up git config
+        run: |
+          git config user.name drewjosh
+          git config user.email 32765631+drewjosh@users.noreply.github.com
+
       - name: Prepare git commit for github pages
         run: |
           cd dist
