@@ -40,8 +40,8 @@ jobs:
 
       - name: Set up git config
         run: |
-          git config --global user.name drewjosh
-          git config --global user.email 32765631+drewjosh@users.noreply.github.com
+          git config --global user.name github-actions
+          git config --global user.email github-actions@github.com
 
       - name: Prepare git commit for github pages
         run: |
@@ -56,4 +56,4 @@ jobs:
           echo added all files
           git commit -m 'deploy'
           echo created commit
-          git push -f --set-upstream origin gh-pages
+          git push --set-upstream origin gh-pages
