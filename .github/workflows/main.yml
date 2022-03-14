@@ -48,8 +48,8 @@ jobs:
           cd dist
           git init
           echo git repo initialised
-          git remote set-url origin https://github.com/drewjosh/midata-quasar-starter-app
-          git remote set
+          git remote add origin https://github.com/drewjosh/midata-quasar-starter-app
+          echo git remote set
           git branch -m gh-pages
           echo branch renamed to gh-pages
           git add -A
