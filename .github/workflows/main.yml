@@ -29,12 +29,26 @@ jobs:
 
       - name: Install dependencies
         run: npm i --no-progress
-        
-      - name: Make executeable
-        run: chmod +x deploy.sh
 
-      - name: Build app & deploy to github pages branch
-        run: bash deploy.sh
+      - name: Build app
+        run: npm run build
 
-      - name: Done
-        run: echo It is done!
+      - name: Move generated files to dist folder
+        run: |
+          cp -r dist/spa/* dist
+          rm -r dist/spa
+
+      - name: Prepare git commit for github pages
+        run: |
+        cd dist
+        git init
+        echo git repo initialised
+        git branch -m main
+        echo branch renamed to main
+        git add -A
+        echo added all files
+        git commit -m 'deploy'
+        echo created commit
+
+      - name: Push to github pages branch
+        run: git push -f git@github.com:drewjosh/midata-quasar-starter-app.git gh-pages
