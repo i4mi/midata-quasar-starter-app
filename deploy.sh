@@ -7,7 +7,7 @@ set -e
 npm run build
 
 # move generated files out of spa folder as children of dist
-cp -v dist/spa/* dist
+cp -r dist/spa/* dist
 rm -r dist/spa
 
 # if you are deploying to a custom domain
