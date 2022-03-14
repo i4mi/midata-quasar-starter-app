@@ -56,4 +56,4 @@ jobs:
           echo added all files
           git commit -m 'deploy'
           echo created commit
-          git push --set-upstream origin gh-pages
+          git push -f --set-upstream origin gh-pages
