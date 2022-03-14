@@ -31,7 +31,7 @@ jobs:
         run: npm i --no-progress
         
       - name: Make executeable
-      run: chmod +x deploy.sh
+        run: chmod +x deploy.sh
 
       - name: Build app & deploy to github pages branch
         run: bash deploy.sh
