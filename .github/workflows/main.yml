@@ -45,6 +45,9 @@ jobs:
       
       - name: Check out github pages & rebase
         run: |
+          remote_name="origin"
+          main_branch="main"
+          target_branch="gh-pages"
           git checkout "$target_branch"
           git rebase "${remote_name}/${main_branch}"
       
