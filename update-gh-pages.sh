@@ -11,7 +11,7 @@ build_dir="dist"
 git config --global user.name "$GITHUB_ACTOR"
 git config --global user.email "${GITHUB_ACTOR}@bots.github.com"
 
-run: npm i --no-progress
+npm i --no-progress
 
 npm run build
 
