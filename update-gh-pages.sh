@@ -25,19 +25,16 @@ cp -r dist/spa/* dist
 rm -r dist/spa
 
 # change to gh-pages branch and rebase
-#git checkout "$target_branch"
-#git rebase "${remote_name}/${main_branch}"
+git checkout "$target_branch"
+git rebase "${remote_name}/${main_branch}"
 
 # remove unnecessary files
-#rm -r node_modules
-#cp -r -f dist/* ./
-#rm -r dist
-#ls -la
+rm -r node_modules
+cp -r -f dist/* ./
+rm -r dist
+ls -la
 
 # add files to commit
-cd dist
-git init
-git branch -m gh-pages
 git add -A
 
 # commit
