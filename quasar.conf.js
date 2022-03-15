@@ -78,7 +78,7 @@ module.exports = configure(function (ctx) {
           : 'midata_quasar_starter_app',
         VUE_FHIR_REDIRECT_URL: ctx.dev
           ? 'http://localhost:8080/#/midata/demo'
-          : 'https://drewjosh.github.io/midata-quasar-starter-app/#/midata/demo', // enter here production url for midata redirect, this url also has to be declared in the Midata app declaration
+          : 'https://i4mi.github.io/midata-quasar-starter-app/#/midata/demo', // enter here production url for midata redirect, this url also has to be declared in the Midata app declaration
       },
 
       // https://quasar.dev/quasar-cli/handling-webpack
