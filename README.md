@@ -64,6 +64,31 @@ npm run lint
 npx quasar build
 ```
 
+### Automatic deployment to GitHub Pages
+The production build of the app can be deployed automatically to the GitHub Pages by using the GitHub Actions.
+A workflow is already implemented, it just needs a few settings. You can also adjust it to your own needs (for example linting on development branch).
+
+After correct setup, the workflow deploys the app when a push on a branch "main" happens. When you use "master" see the corresponding setting below. When changes are detected the workflow pushes the generated build files to a branch "gh-pages". There the files are picked up by a GitHub-internal job and published to a public, repository specific domain: https://i4mi.github.io/midata-quasar-starter-app/
+
+#### Check publicPath
+When the apps is served in a subdirectory (bla.com/pizza/ instead of bla.com), which is the case for the GitHub Pages, you need to set the variable publicPath in quasar.conf.js to the name of the subdirectory (corresponds to your repository name).
+For this app the production publicPath is "/midata-quasar-starter-app/".
+
+#### Redirect URL for Midata
+The MIDATA service needs to know the URL where to redirect the user after successful login.
+This can be configured in quasar.conf.js with the VUE_FHIR_REDIRECT_URL variable (second entry).
+Make sure it also includes "/#/midata/demo" and it is registered as redirect URI in the MIDATA app declaration.
+
+#### Enable GitHub Pages
+1. If it doesn't exist yet, push a new branch to your repository called "gh-pages"
+2. Open repository settings > Pages
+3. Select Source: gh-pages, /root -> Save
+
+#### Check default branch
+Make sure the name of your default branch is listed as trigger in the workflow file. Currently it uses the branch "main" to trigger the "build_and_deploy" job.
+The workflow file is located here: root/.github/workflows/main.yml
+Note: depending on your ssh token permissions you may only be able to edit files in this location via browser
+
 ### Customize the configuration
 See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).
 
