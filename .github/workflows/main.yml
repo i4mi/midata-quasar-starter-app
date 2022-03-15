@@ -53,19 +53,15 @@ jobs:
     - name: Add files to commit
       run: git add -A
       
-    - name: Check for changes
+    - name: Commit or not commit that is the question
       run: |
         if [ -n "$(git status --porcelain)" ]; then
-          printf "There are changes, continue with script"
+          printf "There are changes \n"
+          
+          git commit -m "updated GitHub Pages"
+          
+          git remote set-url origin "https://github.com/drewjosh/midata-quasar-starter-app"
+          git push --force-with-lease origin gh-pages
         else
           printf "No changes, the job is done"
-          exit 0
         fi
-
-    - name: Commit
-      run: git commit -m "updated GitHub Pages"
-    
-    - name: Set remote url and push!
-      run: |
-        git remote set-url origin "https://github.com/drewjosh/midata-quasar-starter-app"
-        git push --force-with-lease origin gh-pages
