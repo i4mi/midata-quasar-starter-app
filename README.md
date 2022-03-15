@@ -40,7 +40,7 @@ npm install npm -g
 ```
 
 ### Repository
-To download the repo from github, use `git clone https://github.com/i4mi/midata-quasar-starter-app.git` in your terminal. 
+To download the repo from github, use `git clone https://github.com/i4mi/midata-quasar-starter-app.git` in your terminal.
 
 ### Install the dependencies
 Then change the directory with `cd midata-quasar-starter-app` and install the dependencies.
@@ -66,3 +66,4 @@ npx quasar build
 
 ### Customize the configuration
 See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).
+
