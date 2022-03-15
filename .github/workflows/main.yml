@@ -45,7 +45,7 @@ jobs:
         shopt -s dotglob # enable hidden files
         for file in ./*
         do
-            if [[ "${file##*/}" == "dist" || "${file##*/}" == ".git" || "${file##*/}" == ".gitignore" ]]
+            if [[ "${file##*/}" == "dist" || "${file##*/}" == ".git" || "${file##*/}" == ".gitignore" || "${file##*/}" == ".github" ]]
             then
               printf "******* DONT'T delete: ${file##*/}\n"
             else
