@@ -37,9 +37,9 @@ jobs:
         cp -r dist/spa/* dist
         rm -r dist/spa
 
-        # change to gh-pages branch and rebase
+        # change to gh-pages branch
         git checkout "$target_branch"
-        git rebase "${remote_name}/${main_branch}"
+        # git rebase "${remote_name}/${main_branch}"
 
         # remove unnecessary files
         shopt -s dotglob # enable hidden files
