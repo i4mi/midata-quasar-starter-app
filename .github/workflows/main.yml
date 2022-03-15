@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2 # provides access tokens to access repository access with git
       with:
         fetch-depth: 0 # makes ci fetch complete history for all commits etc
     - run: bash update-gh-pages.sh
