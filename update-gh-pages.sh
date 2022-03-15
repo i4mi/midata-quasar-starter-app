@@ -9,10 +9,9 @@ main_branch="main"
 target_branch="gh-pages"
 build_dir="dist"
 
-# set git config
+# set git user info
 git config --global user.name "$GITHUB_ACTOR"
 git config --global user.email "${GITHUB_ACTOR}@bots.github.com"
-git config --global init.defaultBranch "$main_branch"
 
 # install dependencies
 npm i --no-progress
@@ -45,6 +44,5 @@ if [ $? -ne 0 ]; then
 fi
 
 # set remote url and push!
-git remote add origin "$repo_uri"
 git remote set-url "$remote_name" "$repo_uri"
 git push --force-with-lease "$remote_name" "$target_branch"
