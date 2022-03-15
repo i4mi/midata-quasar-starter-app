@@ -60,7 +60,7 @@ jobs:
 
           git commit -m "updated GitHub Pages"
 
-          git remote set-url origin "https://github.com/drewjosh/midata-quasar-starter-app"
+          git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}"
           git push --force-with-lease origin gh-pages
         else
           printf "No changes, the job is done"
