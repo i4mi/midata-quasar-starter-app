@@ -52,14 +52,18 @@ jobs:
 
     - name: Add files to commit
       run: git add -A
+      
+    - name: Check for changes
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          printf "There are changes, continue with script"
+        else
+          printf "No changes, the job is done"
+          exit 0
+        fi
 
     - name: Commit
-      run: |
-        git commit -m "updated GitHub Pages"
-        if [ $? -ne 0 ]; then
-            echo "nothing to commit"
-            exit 0
-        fi
+      run: git commit -m "updated GitHub Pages"
     
     - name: Set remote url and push!
       run: |
