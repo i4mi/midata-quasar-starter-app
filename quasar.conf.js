@@ -53,7 +53,7 @@ module.exports = configure(function (ctx) {
 
       // transpile: false,
       publicPath: process.env.NODE_ENV === 'production'
-        ? '/midata-quasar-starter-app/'
+        ? '/midata-quasar-starter-app/' // necessary if you serve app on GitHub pages, corresponds to repository name
         : '/',
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
