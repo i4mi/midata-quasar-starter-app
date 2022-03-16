@@ -9,20 +9,22 @@ jobs:
   build_and_deploy: # deploys app as single page app to the github pages by building app, git checkout gh-pages and pushing the generated files there.
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2 # provides access tokens to access repository access with git
+    - uses: actions/checkout@v2 # provides access tokens to access repository with git
       with:
         fetch-depth: 0 # makes ci fetch complete history for all commits etc
+        
     - name: Setup git user
       run: |
         git config --global user.name "$GITHUB_ACTOR"
         git config --global user.email "${GITHUB_ACTOR}@bots.github.com"
+        
     - name: Install dependencies
       run: npm i --no-progress
 
     - name: Build app
       run: npm run build
 
-    - name: Move app content one folder to be directly in dist
+    - name: Move app content in hierarchy one folder up to be directly in dist
       run: |
         cp -r dist/spa/* dist
         rm -r dist/spa
@@ -44,7 +46,7 @@ jobs:
             fi
         done
 
-    - name: Copy dist folder content to root
+    - name: Move dist folder content to root
       run: |
         cp -r -f dist/* ./
         rm -r dist
@@ -56,12 +58,12 @@ jobs:
     - name: Commit or not commit that is the question
       run: |
         if [ -n "$(git status --porcelain)" ]; then
-          printf "There are changes \n"
+          printf "There are changes. \n"
 
           git commit -m "updated GitHub Pages"
 
           git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}"
           git push --force-with-lease origin gh-pages
         else
-          printf "No changes, the job is done"
+          printf "No changes, the job is done."
         fi
