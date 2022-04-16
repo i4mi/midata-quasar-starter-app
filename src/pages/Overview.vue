@@ -1,83 +1,148 @@
 <template>
-  <div class="q-pa-md">
-    <q-carousel
-      swipeable
-      animated
-      v-model="slide"
-      :autoplay="autoplay"
-      ref="carousel"
-      infinite
-    >
-      <q-carousel-slide :name="1" class="column no-wrap flex-center">
-        <q-img
-          src="../assets/overview/undraw_pair_programming_re_or4x.svg"
-          height="150px"
-          fit="contain"
-        />
-        <div class="q-mt-md text-center text-h3 text-weight-thin">
-          Web- <br/> entwicklung
+  <div id="q-app" style="min-height: 100vh">
+    <div class="q-pa-md">
+      <div class="row">
+        <div class="col-2"></div>
+        <div class="col">
+          <h3>Impfung Erfassen</h3>
         </div>
-        <q-btn to="/developmentBasics" class="midata-fade text-white">Los gehts!</q-btn>
-      </q-carousel-slide>
-      <q-carousel-slide :name="2" class="column no-wrap flex-center">
-        <q-img
-          src="../assets/overview/undraw_doctors_hwty.svg"
-          height="150px"
-          fit="contain"
-        />
-        <div class="q-mt-md text-center text-h3 text-weight-thin">Midata</div>
-        <q-btn to="/midata/introduction" class="midata-fade text-white">Los gehts!</q-btn>
-      </q-carousel-slide>
-      <template v-slot:control>
-        <q-carousel-control
-          position="top-right"
-          :offset="[5, 5]"
-          class="text-black rounded-borders"
-        >
-          <q-toggle
-            flat
-            dense
-            color="primary"
-            v-model="autoplay"
-            label="Auto Play"
-          />
-        </q-carousel-control>
+      </div>
+      <div class="row">
+        <div class="col-2"><h5>Name Patient</h5></div>
+        <div class="col-8 self-center">
+          <div class="q-pa-md">
+            <div class="q-gutter-y-md column" style="max-width: 500px">
+              <q-input v-model="ph" label="Patient / geimpfte Person" />
+            </div>
+          </div>
+        </div>
 
-        <q-carousel-control
-          position="bottom-right"
-          :offset="[5, 5]"
-          class="q-gutter-xs"
-        >
-          <q-btn
-            flat
-            color="primary"
-            text-color="black"
-            icon="arrow_left"
-            @click="$refs.carousel.previous()"
-          />
-          <q-btn
-            flat
-            color="primary"
-            text-color="black"
-            icon="arrow_right"
-            @click="$refs.carousel.next()"
-          />
-        </q-carousel-control>
-      </template>
-    </q-carousel>
+      </div>
+      <div class="row">
+        <div class="col-2"><h5>Impfstoffname</h5></div>
+        <div class="col-3 ">
+          <!-- https://fhir.ch/ig/ch-vacd/ValueSet-ch-vacd-vaccines-vs.html-->
+          <div class="q-pa-md" style="max-width: 400px">
+            <div class="q-gutter-md">
+              <q-select v-model="model" :options="optionsImpf" label="Impfstoffname" />
+            </div>
+          </div>
+        </div>
+        <div class="col-1 ">
+          <h5>Schutz</h5>
+        </div>
+        <div class="col-4 ">
+          <div class="q-pa-md">
+            <q-option-group :options="options" type="checkbox" v-model="group" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-2 self-center">
+          <h5>Dosisnummer</h5>
+        </div>
+        <div class="col-3 self-center">
+          <div class="q-pa-md">
+            <div class="q-gutter-y-md column" style="max-width: 300px">
+              <q-input v-model="ph" label="Nummer" placeholder hint />
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-2">
+          <h5>Lot-Nr.</h5>
+        </div>
+        <div class="col-3 self-center">
+          <div class="q-pa-md">
+            <div class="q-gutter-y-md column" style="max-width: 300px">
+              <q-input v-model="ph" label="Nummer" placeholder hint />
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-2 self-center">
+          <h5>Impfzeitpunkt</h5>
+        </div>
+        <div class="col-5 self-center">
+          <div class="q-pa-md" style="max-width: 300px">
+            <q-input filled v-model="date" mask="date">
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy
+                    ref="qDateProxy"
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale"
+                  >
+                    <q-date v-model="date">
+                      <div class="row items-center justify-end">
+                        <q-btn v-close-popup label="Close" color="primary" flat />
+                      </div>
+                    </q-date>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-2 self-centers">
+          <h5>Behandelnder Artzt</h5>
+        </div>
+        <div class="col-5 self-center">
+          <div class="q-pa-md">
+            <div class="q-gutter-y-md column" style="max-width: 300px">
+              <q-input v-model="ph" label="Artzt" placeholder hint />
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="row justify-center">
+        <div class="col-7">
+          <div class="q-pa-md q-gutter-sm">
+            <q-btn color="white" text-color="black" label="Impfung Erfassen" style="width: 300px" />
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script>
+import { ref } from 'vue'
 
-export default defineComponent({
-  name: 'Overview',
-  setup() {
+export default {
+
+  setup () {
     return {
-      slide: ref(1),
-      autoplay: ref(true),
-    };
-  },
-});
+      ph: ' ',
+      stoffname: 'hello',
+      date: ref('2022/01/01'),
+      group: ref([]),
+      options: [
+        { label: 'Windpocken', value: 'Windpocken' },
+        { label: 'Masern', value: 'Masern' },
+        { label: 'Mumps', value: 'Mumps' },
+        { label: 'Röteln', value: 'Roeteln' },
+        { label: 'Virale hepatitis, Typ A', value: 'hepA' },
+        { label: 'Virale hepatitis, Typ B', value: 'hepB' },
+        { label: 'Frühsommer-Miningoenzephalithis (FSME)', value: 'FSME' },
+        { label: 'Gelbfieber', value: 'gelb' },
+        { label: 'Starrkrampf', value: 'skrampf' }
+      ],
+      model: ref(null),
+      optionsImpf: [
+        'FSME-Immun CC', 'Encepur N', 'Inflexal V', 'Poliorix'
+      ]
+    }
+  }
+}
 </script>

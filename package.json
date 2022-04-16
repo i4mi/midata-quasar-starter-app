@@ -1,10 +1,10 @@
 {
-  "name": "quasarapp",
+  "name": "impfconnect",
   "version": "0.0.1",
-  "description": "A Quasar Framework app",
-  "productName": "Demo App",
+  "description": "A living case project for the University of applied Sciences",
+  "productName": "Impfconnect",
   "author": {
-    "name": "Marko Miletic @ Institute for Medical Informatics (I4MI) - Bern University of Applied Sciences (BFH)",
+    "name": "Argollo Andre Pitta, Loosli Lukas, Marko Miletic @ Institute for Medical Informatics (I4MI) - Bern University of Applied Sciences (BFH)",
     "email": "medinf.i4mi@bfh.ch"
   },
   "private": true,
