@@ -8,7 +8,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-2"><h5>Name Patient</h5></div>
+        <div class="col-2"></div>
         <div class="col-8 self-center">
           <div class="q-pa-md">
             <div class="q-gutter-y-md column" style="max-width: 500px">
@@ -16,10 +16,10 @@
             </div>
           </div>
         </div>
-
       </div>
+
       <div class="row">
-        <div class="col-2"><h5>Impfstoffname</h5></div>
+        <div class="col-2"></div>
         <div class="col-3 ">
           <!-- https://fhir.ch/ig/ch-vacd/ValueSet-ch-vacd-vaccines-vs.html-->
           <div class="q-pa-md" style="max-width: 400px">
@@ -27,9 +27,9 @@
               <q-select v-model="model" :options="optionsImpf" label="Impfstoffname" />
             </div>
           </div>
-        </div>
+        </div></div><div class="row">
         <div class="col-1 ">
-          <h5>Schutz</h5>
+          <h5 >Schutz</h5>
         </div>
         <div class="col-4 ">
           <div class="q-pa-md">
@@ -37,15 +37,14 @@
           </div>
         </div>
       </div>
-      <div class="row">
 
+      <div class="row">
         <div class="col-2 self-center">
-          <h5>Dosisnummer</h5>
         </div>
         <div class="col-3 self-center">
           <div class="q-pa-md">
             <div class="q-gutter-y-md column" style="max-width: 300px">
-              <q-input v-model="ph" label="Nummer" placeholder hint />
+              <q-input v-model="ph" label="Dosisnummer" placeholder hint />
             </div>
           </div>
         </div>
@@ -53,12 +52,12 @@
       </div>
       <div class="row">
         <div class="col-2">
-          <h5>Lot-Nr.</h5>
+          
         </div>
         <div class="col-3 self-center">
           <div class="q-pa-md">
             <div class="q-gutter-y-md column" style="max-width: 300px">
-              <q-input v-model="ph" label="Nummer" placeholder hint />
+              <q-input v-model="ph" label="Lot-Nr." placeholder hint />
             </div>
           </div>
         </div>
@@ -66,7 +65,7 @@
       </div>
       <div class="row">
         <div class="col-2 self-center">
-          <h5>Impfzeitpunkt</h5>
+          
         </div>
         <div class="col-5 self-center">
           <div class="q-pa-md" style="max-width: 300px">
@@ -79,7 +78,7 @@
                     transition-show="scale"
                     transition-hide="scale"
                   >
-                    <q-date v-model="date">
+                    <q-date v-model="date" label = "Impfdatum">
                       <div class="row items-center justify-end">
                         <q-btn v-close-popup label="Close" color="primary" flat />
                       </div>
@@ -94,12 +93,12 @@
       </div>
       <div class="row">
         <div class="col-2 self-centers">
-          <h5>Behandelnder Artzt</h5>
+          
         </div>
         <div class="col-5 self-center">
           <div class="q-pa-md">
             <div class="q-gutter-y-md column" style="max-width: 300px">
-              <q-input v-model="ph" label="Artzt" placeholder hint />
+              <q-input v-model="ph" label="Behandelnder Arzt" placeholder hint />
             </div>
           </div>
         </div>
