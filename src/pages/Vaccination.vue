@@ -29,10 +29,11 @@
           </div>
         </div></div><div class="row">
         <div class="col-1 ">
-          <h5 >Schutz</h5>
+
         </div>
-        <div class="col-4 ">
+        <div class="col-4 protection">
           <div class="q-pa-md">
+            <h5 class="header-protection">Schutz</h5>
             <q-option-group :options="options" type="checkbox" v-model="group" />
           </div>
         </div>
@@ -52,7 +53,7 @@
       </div>
       <div class="row">
         <div class="col-2">
-          
+
         </div>
         <div class="col-3 self-center">
           <div class="q-pa-md">
@@ -65,7 +66,7 @@
       </div>
       <div class="row">
         <div class="col-2 self-center">
-          
+
         </div>
         <div class="col-5 self-center">
           <div class="q-pa-md" style="max-width: 300px">
@@ -93,7 +94,7 @@
       </div>
       <div class="row">
         <div class="col-2 self-centers">
-          
+
         </div>
         <div class="col-5 self-center">
           <div class="q-pa-md">
@@ -145,3 +146,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.header-protection{
+  font-size: medium;
+  color: rgb(85, 83, 83)
+}
+.protection{
+  padding-left: 70px;
+}
+</style>

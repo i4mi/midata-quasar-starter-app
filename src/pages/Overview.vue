@@ -16,7 +16,8 @@
                 v-model="ph"
                 readonly
                 label="Patient / geimpfte Person"
-              />
+
+              ></q-input>
             </div>
           </div>
         </div>
@@ -128,7 +129,7 @@ const rows = [
 export default {
   setup() {
     return {
-      ph: ' ',
+      ph: ref('Molina Franz' ),
       stoffname: 'hello',
       date: ref('2022/01/01'),
       group: ref([]),
