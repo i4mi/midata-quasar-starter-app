@@ -16,7 +16,6 @@
                 v-model="ph"
                 readonly
                 label="Patient / geimpfte Person"
-
               ></q-input>
             </div>
           </div>
@@ -24,7 +23,45 @@
       </div>
     </div>
     <div class="q-pa-md">
-      <q-table title="Historie" :rows="rows" :columns="columns" row-key="name" />
+      <q-table
+        title="Historie"
+        :rows="rows"
+        :columns="columns"
+        row-key="name"
+        :selected-rows-label="getSelectedString"
+        selection="multiple"
+        v-model:selected="selected"
+      >
+        <template v-slot:top="props">
+          <div v-if="$q.screen.gt.xs" class="col">
+            <q-toggle v-model="visibleColumns" val="epd" label="EPD" />
+            <q-toggle v-model="visibleColumns" val="midata" label="Midata" />
+          </div>
+          <q-select
+            v-else
+            v-model="visibleColumns"
+            multiple
+            borderless
+            dense
+            options-dense
+            :display-value="$q.lang.table.columns"
+            emit-value
+            map-options
+            :options="columns"
+            option-value="name"
+            style="min-width: 150px"
+          />
+
+          <q-btn
+            flat
+            round
+            dense
+            :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+            @click="props.toggleFullscreen"
+            class="q-ml-md"
+          />
+        </template>
+      </q-table>
     </div>
   </div>
 </template>
@@ -40,6 +77,13 @@ const columns = [
     align: 'left',
     field: (row) => row.name,
     format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: 'platform',
+    align: 'center',
+    label: 'Hochgeladen auf',
+    field: 'platform',
     sortable: true,
   },
   {
@@ -67,6 +111,7 @@ const rows = [
     dosageno: 26164,
     vaccinationdate: '02/06/2021',
     practicioner: 'Cornelia Corona',
+    platform: ['EPD'],
   },
   {
     name: 'Ice cream sandwich',
@@ -75,6 +120,7 @@ const rows = [
     dosageno: 37525,
     vaccinationdate: '02/06/2011',
     practicioner: 'Apotheker Alain',
+    platform: ['EPD', 'Midata'].join(' '),
   },
   {
     name: 'Eclair',
@@ -83,6 +129,7 @@ const rows = [
     dosageno: 23442,
     vaccinationdate: '02/06/2014',
     practicioner: 'Pfleger Paul',
+    platform: ['Midata'],
   },
   {
     name: 'Cupcake',
@@ -90,7 +137,7 @@ const rows = [
     protection: 'Gelbfieber',
     dosageno: 64247,
     vaccinationdate: '02/06/2011',
-    practicioner: 'Ingo Impft',
+    practicioner: 'Ingo Impft',platform: ['EPD', ''].join(' '),
   },
   {
     name: 'Gingerbread',
@@ -98,7 +145,7 @@ const rows = [
     protection: 'Röteln',
     dosageno: 49224,
     vaccinationdate: '02/06/2021',
-    practicioner: 'Sandra Sticht',
+    practicioner: 'Sandra Sticht',platform: ['', 'Midata'].join(' '),
   },
   {
     name: 'Jelly bean',
@@ -106,7 +153,7 @@ const rows = [
     protection: 'Windpocken',
     dosageno: 94424,
     vaccinationdate: '02/06/2021',
-    practicioner: 'Lebkuchemann',
+    practicioner: 'Lebkuchemann',platform: ['', 'Midata'].join(' '),
   },
   {
     name: 'Donut',
@@ -114,7 +161,7 @@ const rows = [
     protection: 'Gelbfieber',
     dosageno: 55101,
     vaccinationdate: '02/06/2021',
-    practicioner: 'Apotheker Alain',
+    practicioner: 'Apotheker Alain',platform: ['EPD', ''].join(' '),
   },
   {
     name: 'KitKat',
@@ -122,20 +169,31 @@ const rows = [
     protection: 'Röteln',
     dosageno: 60065,
     vaccinationdate: '02/06/2001',
-    practicioner: 'Doktor Daniela',
+    practicioner: 'Doktor Daniela',platform: ['EPD', 'Midata'].join(' '),
   },
 ];
 
 export default {
   setup() {
+    const selected = ref([]);
+
     return {
-      ph: ref('Molina Franz' ),
+      ph: ref('Molina Franz'),
       stoffname: 'hello',
       date: ref('2022/01/01'),
       group: ref([]),
       model: ref(null),
       columns,
       rows,
+      selected,
+      visibleColumns: ref([]),
+      getSelectedString() {
+        return selected.value.length === 0
+          ? ''
+          : `${selected.value.length} record${
+              selected.value.length > 1 ? 's' : ''
+            } selected of ${rows.length}`;
+      },
     };
   },
 };
