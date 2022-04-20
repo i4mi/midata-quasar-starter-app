@@ -12,7 +12,7 @@
         <div class="col-8 self-center">
           <div class="q-pa-md">
             <div class="q-gutter-y-md column" style="max-width: 500px">
-              <q-input v-model="ph" label="Patient / geimpfte Person" />
+              <q-input v-model="name" label="Patient / geimpfte Person" />
             </div>
           </div>
         </div>
@@ -45,7 +45,7 @@
         <div class="col-3 self-center">
           <div class="q-pa-md">
             <div class="q-gutter-y-md column" style="max-width: 300px">
-              <q-input v-model="ph" label="Dosisnummer" placeholder hint />
+              <q-input v-model="DosisName" label="Dosisnummer" placeholder hint />
             </div>
           </div>
         </div>
@@ -58,7 +58,7 @@
         <div class="col-3 self-center">
           <div class="q-pa-md">
             <div class="q-gutter-y-md column" style="max-width: 300px">
-              <q-input v-model="ph" label="Lot-Nr." placeholder hint />
+              <q-input v-model="Lot" label="Lot-Nr." placeholder hint />
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@
         <div class="col-5 self-center">
           <div class="q-pa-md">
             <div class="q-gutter-y-md column" style="max-width: 300px">
-              <q-input v-model="ph" label="Behandelnder Arzt" placeholder hint />
+              <q-input v-model="arzt" label="Behandelnder Arzt" placeholder hint />
             </div>
           </div>
         </div>
@@ -123,9 +123,13 @@ export default {
 
   setup () {
     return {
-      ph: ' ',
-      stoffname: 'hello',
-      date: ref('2022/01/01'),
+
+      name: ref(''),
+      DosisName:ref(''),
+      Lot:ref(''),
+      arzt:ref(''),
+
+      date: ref(''),
       group: ref([]),
       options: [
         { label: 'Windpocken', value: 'Windpocken' },
