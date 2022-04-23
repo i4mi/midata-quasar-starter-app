@@ -1,7 +1,6 @@
 export const EPR_SPID_OID = 'urn:oid:2.16.756.5.30.1.127.3.10.3';
 export const HOEHEWEG_OID = 'urn:oid:2.16.756.5.30.1.178.1.1';
-
-
+import { JSOnFhir } from '@i4mi/js-on-fhir';
 
 /*
 * Get a patients ID for a given system, defined by the systems OID.
@@ -80,30 +79,4 @@ export function checkAvailability(server: string, timeout: number) {
         // set timeout so were not stuck trying forever
         setTimeout(() => resolve(false), timeout);
     });
-}
-
-/*
-* Generates a EPR-SPID with checksum for a 9 digit long given id.
-* @param idea       - the ID from which the EPR-SPID should be generated, as a string. Must have length of 9.
-* @returns          - a EPR-SPID as a string.
-*/
-export function generateEprSpid(id: string | any[]) {
-    if (id.length !== 9) {
-        throw new Error('ID must be exactly 9 digits. (is: ' + String(id) + ')');
-    }
-    const COUNTRY_CODE_CH = '76';
-    const PARTICIPANT_CODE_BAG = '13376';
-    const PURPOSE_CODE_EPD = '1';
-    let spid = COUNTRY_CODE_CH + PARTICIPANT_CODE_BAG + PURPOSE_CODE_EPD + String(id);
-
-    // calculate checksum according to
-    // https://www.fedlex.admin.ch/eli/cc/2017/205/de#annex_1
-    let sum = 0;
-    for (let i = spid.length - 1; i >= 0; i--) {
-        sum += (i % 2 === 0)
-                ? parseInt(spid[i]) * 3
-                : parseInt(spid[i])
-    }
-    spid += (10 - (sum % 10));
-    return spid;
 }
