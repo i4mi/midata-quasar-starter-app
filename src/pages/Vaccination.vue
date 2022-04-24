@@ -1,32 +1,7 @@
 <template>
   <div id="q-app" style="min-height: 100vh">
     <h3>Impfung Erfassen</h3>
-    <q-input
-        v-model="patientMPI"
-        label="MPI des Patients"
-        hint="Bitte tragen Sie die MPI-Nummer des Patienten ein"
-      >
-        <template v-slot:append>
-          <q-icon
-            v-if="patientMPI !== ''"
-            name="close"
-            @click="patientMPI = ''"
-            class="cursor-pointer"
-          />
-        </template>
-
-        <template v-slot:after>
-          <q-btn
-            v-if="patientMPI !== ''"
-            round
-            dense
-            flat
-            icon="send"
-            @click="getPatient(patientMPI)"
-          />
-        </template>
-      </q-input>
-    <div  v-show="visible">
+    <div>
       <div class="q-pa-md">
         <div class="row">
           <div class="col-2"></div>

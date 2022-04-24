@@ -1,9 +1,21 @@
 import MidataService from './midataService';
 import { Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import { Notify } from 'quasar';
+import { reactive } from 'vue'
 
 const STORAGE_KEY = 'demo-app-storage';
 
+export const patient = reactive({
+  patient: {
+    name: '',
+    mpi: '',
+    spid: '',
+    kisid: '',
+    address:'',
+    gender:'',
+    birthDate:'',
+  }
+})
 export default class Storage {
   private currentLanguage = 'de';
   private observations = new Array<Observation>();

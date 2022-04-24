@@ -25,31 +25,41 @@
         <div class="text-body1">
           Damit sie EPD verwenden können, müssen Sie sich zuerst einloggen.
         </div>
-
       </q-card-section>
       <q-separator inset />
       <q-card-actions>
         <q-btn
-          @click="connectEPD"
+          @click="()=>{prompt(); connectedEpd = true}"
           :disabled="connectedEpd == true"
           flat
           class="epd-fade full-width"
           color="white"
-        > {{labelEPD}}</q-btn>
+        >
+          {{ labelEPD }}</q-btn
+        >
       </q-card-actions>
     </q-card>
   </div>
 </template>
 
-<script lang="ts">
-import { connected } from 'process';
-import { defineComponent } from 'vue';
+<script>
+import { defineComponent, ref } from 'vue';
+import { useQuasar } from 'quasar';
+import { JSOnFhir } from '@i4mi/js-on-fhir';
+import {
+  getIdBySystemOID,
+  EPR_SPID_OID,
+  HOEHEWEG_OID,
+} from '/home/lukas/Documents/VS/Impfconnect/lc2_Argoa1_Loosl1_Impfconnect/src/plugins/helpers';
+import { patient } from '../plugins/storage';
 
 export default defineComponent({
   data: function () {
     return {
-      connectedEpd: false, labelEPD: 'Mit dem EPD verbinden',
-    }
+      patient,
+      labelEPD: 'Mit dem EPD verbinden',
+      connectedEpd: false,
+    };
   },
   name: 'LoginCard',
 
@@ -57,11 +67,110 @@ export default defineComponent({
     connect() {
       this.$midata.authenticate();
     },
-    connectEPD: function() {
-      this.connectedEpd = true;
-      this.labelEPD = 'Sie sind mit EPD verbunden';
-      return this.labelEPD;
-    },
+  },
+  setup() {
+
+
+    const fhir = new JSOnFhir(
+      'https://test.ahdis.ch/mag-bfh',
+      'irrelevant',
+      'irr🐘',
+      true
+    );
+
+    const $q = useQuasar();
+
+    async function getPatient(patientId) {
+      const id = patientId;
+      console.log('KIS-ID', id);
+      patient.spid = await searchSpid(id);
+
+      let patientResource = await loadPatientBySPID(patient.spid);
+
+      console.log('patientResource: ', patientResource);
+
+      patient.name =
+        patientResource.name[0].family + ' ' + patientResource.name[0].given[0];
+      patient.gender = patientResource.gender;
+      patient.birthDate = patientResource.birthDate;
+
+      console.log('Patient Name: ', patient.name);
+
+      
+    }
+
+    async function searchSpid(id) {
+      let eprSPID = ' ';
+      // We search for the patients EPR-SPID as registered on the EPD Playground
+      // by using the local ID (which is also registered in the EPD Playground)
+
+      const SEARCH_PARAMS = {
+        // sourceIdentifier is the ID we know (local ID from Klinik Höheweg)
+        sourceIdentifier: HOEHEWEG_OID + '|' + id,
+        // target system is the ID we want
+        targetSystem: EPR_SPID_OID,
+      };
+
+      await fhir
+        .performOperation('ihe-pix', {}, 'GET', SEARCH_PARAMS, 'Patient')
+        .then((result) => {
+          console.log('Server answer', result);
+          if (
+            result.body &&
+            result.body.parameter &&
+            result.body.parameter[0].valueIdentifier
+          ) {
+            eprSPID = result.body.parameter[0].valueIdentifier.value;
+          } else {
+            eprSPID = 'nicht gefunden';
+          }
+        })
+        .catch((err) => {
+          eprSPID = 'nicht gefunden';
+          console.log(err);
+        });
+      return eprSPID;
+    }
+
+    async function loadPatientBySPID(spid) {
+      const SEARCH_PARAMS = {
+        identifier: EPR_SPID_OID + '|' + spid,
+      };
+      let patientResource = {};
+      let localId = {};
+      await fhir
+        .search('Patient', SEARCH_PARAMS)
+        .then((result) => {
+          if (result.entry && result.entry[0] && result.entry[0].resource) {
+            patientResource = result.entry[0].resource;
+            patient.kisid = getIdBySystemOID(HOEHEWEG_OID, patientResource);
+          }
+        })
+        .catch((err) => {
+          //this.display = 'Oops. Something went wrong.';
+          console.log(err);
+        });
+      return patientResource;
+    }
+
+    return {
+      prompt() {
+        $q.dialog({
+          title: 'MPI des Patients',
+          message: 'Bitte tragen Sie die MPI-Nummer des Patienten ein',
+          prompt: {
+            model: 'PAT.9779.8008',
+            isValid: (val) => val.length > 2,
+            type: 'text',
+          },
+          cancel: true,
+          persistent: true,
+        }).onOk((data) => {
+          getPatient(data);
+        });
+      },
+      fhir,
+    };
   },
 });
 </script>
