@@ -13,7 +13,7 @@
           <div class="q-pa-md">
             <div class="q-gutter-y-md column" style="max-width: 500px">
               <q-input
-                v-model="ph"
+                v-model="patientName"
                 readonly
                 label="Patient / geimpfte Person"
               ></q-input>
@@ -68,6 +68,7 @@
 
 <script>
 import { ref } from 'vue';
+import {patient} from '../plugins/storage';
 
 const columns = [
   {
@@ -178,7 +179,7 @@ export default {
     const selected = ref([]);
 
     return {
-      ph: ref('Molina Franz'),
+      patientName: ref(patient.name),
       stoffname: 'hello',
       date: ref('2022/01/01'),
       group: ref([]),

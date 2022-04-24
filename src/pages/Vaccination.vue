@@ -169,6 +169,7 @@ import { ref } from 'vue';
 import { Patient } from '@i4mi/fhir_r4';
 import { JSOnFhir } from '@i4mi/js-on-fhir';
 import { v4 as uuid } from 'uuid';
+import {patient} from '../plugins/storage';
 import {
   getIdBySystemOID,
   convertToBase64,
@@ -178,12 +179,6 @@ import {
 
 export default {
   setup() {
-    const fhir = new JSOnFhir(
-      'https://test.ahdis.ch/mag-bfh',
-      'irrelevant',
-      'irr🐘',
-      true
-    );
 
     let eprSpid = '';
     function uploadToEpd() {
@@ -192,15 +187,12 @@ export default {
     function uploadToMidata() {
       console.log('Upload to Midata pressed');
     }
-    const patientMPI = ref('PAT.9779.8008');
-    let patientName = ref('');
-    const patient = '';
+   
     return {
       name: ref(''),
       dosisName: ref(''),
       lotNumber: ref(''),
-      patientName,
-      patientMPI,
+      patientName: ref(patient.name),
       healthProfessional: ref(''),
       minuteOptionsTime1: [0, 15, 30, 45],
       date: ref(new Date().toLocaleString('de-CH')),
@@ -217,84 +209,11 @@ export default {
         { label: 'Gelbfieber', value: 'gelb' },
         { label: 'Starrkrampf', value: 'skrampf' },
       ],
-      visible: ref(),
-      eprSpid,
-      patient,
-      fhir,
       model: ref(null),
       optionsImpf: ['FSME-Immun CC', 'Encepur N', 'Inflexal V', 'Poliorix'],
       uploadToEpd,
       uploadToMidata,
     };
-  },
-  methods: {
-    async searchSpid(id) {
-      let eprSPID = ' ';
-      // We search for the patients EPR-SPID as registered on the EPD Playground
-      // by using the local ID (which is also registered in the EPD Playground)
-
-      const SEARCH_PARAMS = {
-        // sourceIdentifier is the ID we know (local ID from Klinik Höheweg)
-        sourceIdentifier: HOEHEWEG_OID + '|' + id,
-        // target system is the ID we want
-        targetSystem: EPR_SPID_OID,
-      };
-
-      await this.fhir
-        .performOperation('ihe-pix', {}, 'GET', SEARCH_PARAMS, 'Patient')
-        .then((result) => {
-          console.log('Server answer', result);
-          if (
-            result.body &&
-            result.body.parameter &&
-            result.body.parameter[0].valueIdentifier
-          ) {
-            eprSPID = result.body.parameter[0].valueIdentifier.value;
-            console.log('1', eprSPID);
-          } else {
-            eprSPID = 'nicht gefunden';
-          }
-        })
-        .catch((err) => {
-          eprSPID = 'nicht gefunden';
-          console.log(err);
-        });
-      console.log('2', eprSPID);
-      return eprSPID;
-    },
-
-    async loadPatientBySPID(spid) {
-      const SEARCH_PARAMS = {
-        identifier: EPR_SPID_OID + '|' + spid,
-      };
-      await this.fhir
-        .search('Patient', SEARCH_PARAMS)
-        .then((result) => {
-          if (result.entry && result.entry[0] && result.entry[0].resource) {
-            this.patient = result.entry[0].resource;
-            this.localId = getIdBySystemOID(HOEHEWEG_OID, this.patient);
-          }
-          console.log('Search result', result);
-        })
-        .catch((err) => {
-          this.display = 'Oops. Something went wrong.';
-          console.log(err);
-        });
-    },
-    async getPatient(patientName) {
-      console.log('getPatient pressed. ID des Patients: ' + patientName);
-      const id = patientName;
-      console.log('KIS-ID', id);
-      this.eprSpid = await this.searchSpid(id);
-      console.log('spid: ', this.eprSpid);
-      await this.loadPatientBySPID(this.eprSpid);
-      console.log('patient: ', this.patient);
-      let name =
-      this.patient.name[0].family + ' ' + this.patient.name[0].given[0];
-      this.patientName = ref(name);
-      console.log(this.patientName);
-      this.visible=true;
-    },
   },
 };
 </script>

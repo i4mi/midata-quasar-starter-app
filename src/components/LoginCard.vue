@@ -29,7 +29,13 @@
       <q-separator inset />
       <q-card-actions>
         <q-btn
-          @click="()=>{prompt(); connectedEpd = true}"
+          @click="
+            () => {
+              prompt();
+              connectedEpd = true;
+            }
+          "
+          v-model="connectedEpd"
           :disabled="connectedEpd == true"
           flat
           class="epd-fade full-width"
@@ -54,10 +60,11 @@ import {
 import { patient } from '../plugins/storage';
 
 export default defineComponent({
+  
+
   data: function () {
     return {
       patient,
-      labelEPD: 'Mit dem EPD verbinden',
       connectedEpd: false,
     };
   },
@@ -69,8 +76,6 @@ export default defineComponent({
     },
   },
   setup() {
-
-
     const fhir = new JSOnFhir(
       'https://test.ahdis.ch/mag-bfh',
       'irrelevant',
@@ -78,6 +83,7 @@ export default defineComponent({
       true
     );
 
+    let labelEPD = ref('Mit dem EPD verbinden');
     const $q = useQuasar();
 
     async function getPatient(patientId) {
@@ -95,8 +101,7 @@ export default defineComponent({
       patient.birthDate = patientResource.birthDate;
 
       console.log('Patient Name: ', patient.name);
-
-      
+      labelEPD.value = patient.name
     }
 
     async function searchSpid(id) {
@@ -169,7 +174,7 @@ export default defineComponent({
           getPatient(data);
         });
       },
-      fhir,
+      fhir, labelEPD
     };
   },
 });
