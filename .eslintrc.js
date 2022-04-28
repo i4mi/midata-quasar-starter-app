@@ -81,8 +81,11 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unsafe-call': 'off',
     '@typescript-eslint/no-unsafe-return': 'off',
-
+    '@typescript-eslint/restrict-template-expressions': 'off',
     '@typescript-eslint/no-floating-promises': 'off',
+    'vue/no-deprecated-slot-attribute': 'off',
+    'vue/no-deprecated-slot-scope-attribute': 'off',
+    '@typescript-eslint/restrict-plus-operands': 'off',
 
     // TypeScript
     quotes: ['warn', 'single', { avoidEscape: true }],

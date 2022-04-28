@@ -1,51 +1,34 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar class="midata-fade">
+      <q-toolbar class="impfconnect-fade">
         <q-btn
           flat
           dense
           round
-          icon="menu"
-          aria-label="Menu"
+          icon="search"
+          aria-label="Search"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title> Impfconnect </q-toolbar-title>
+        <q-toolbar-title> <q-img
+          src="../assets/overview/logo_transparent.png"
+          
+          style="height: 120px; max-width: 280px"
+        /> </q-toolbar-title>
+        <PageLinks v-for="link in pageLinks" :key="link.title" v-bind="link" />
+        <PageLinks
+            v-for="link in midataPageLinks"
+            :key="link.title"
+            v-bind="link"
+          />
       </q-toolbar>
     </q-header>
 
     <q-drawer v-model="drawerExpanded" show-if-above bordered>
       <q-list>
-        <q-item-label header> Menu </q-item-label>
-        <PageLinks v-for="link in pageLinks" :key="link.title" v-bind="link" />
-
-        <q-expansion-item
-          clickable
-          default-opened
-          icon="code"
-          label="Webentwicklung"
-          :content-inset-level="0.5"
-        >
-          <PageLinks
-            v-for="link in developmentLinks"
-            :key="link.title"
-            v-bind="link"
-          ></PageLinks>
-        </q-expansion-item>
-
-        <q-expansion-item
-          clickable
-          default-opened
-          icon="person"
-          label="Midata"
-          :content-inset-level="0.5"
-        >
-          <PageLinks
-            v-for="link in midataPageLinks"
-            :key="link.title"
-            v-bind="link"
-          />
-        </q-expansion-item>
+        <q-item-label header> All entries </q-item-label>
+        
+        
       </q-list>
     </q-drawer>
 
@@ -64,48 +47,21 @@ const linksList = [
     icon: 'dashboard',
     link: '/overview',
   },
+    {
+    title: 'Impfung erfassen',
+    icon: 'vaccines',
+    link: '/vaccination',
+  },
 ];
 
 const midataLinksList = [
   {
-    title: 'Einführung in MIDATA',
-    icon: 'rocket',
-    link: '/midata/introduction',
-  },
-  {
-    title: 'Meine erste MIDATA App',
-    icon: 'terminal',
-    link: '/midata/myFirstApp',
-  },
-  {
-    title: 'Midata Demo',
-    icon: 'auto_fix_high',
+    title: 'Login',
+    icon: 'person',
     link: '/midata/demo',
   },
 ];
 
-const deveelopmentLinksList = [
-  {
-    title: 'Basics',
-    icon: 'keyboard_arrow_right',
-    link: '/developmentBasics',
-  },
-  {
-    title: 'Quasar Framework',
-    icon: 'favorite',
-    link: '/quasar',
-  },
-  {
-    title: 'Versionskontrolle und GitHub',
-    icon: 'upload',
-    link: '/github',
-  },
-  {
-    title: 'Internationalisierung mit Vue-i18n und Moment.js',
-    icon: 'language',
-    link: '/internationalization',
-  },
-];
 
 import { defineComponent, ref } from 'vue';
 
@@ -122,7 +78,6 @@ export default defineComponent({
     return {
       pageLinks: linksList,
       midataPageLinks: midataLinksList,
-      developmentLinks: deveelopmentLinksList,
 
       drawerExpanded,
       toggleLeftDrawer() {
