@@ -39,7 +39,7 @@
                 multiple
                 :options="options"
                 label="Schutz"
-                
+
               />
             </div>
           </div>
@@ -175,7 +175,7 @@ import {
   convertToBase64,
   EPR_SPID_OID,
   HOEHEWEG_OID,
-} from '/home/lukas/Documents/VS/Impfconnect/lc2_Argoa1_Loosl1_Impfconnect/src/plugins/helpers.ts';
+} from '../plugins/helpers.ts';
 
 export default {
   setup() {
@@ -187,7 +187,7 @@ export default {
     function uploadToMidata() {
       console.log('Upload to Midata pressed');
     }
-   
+
     return {
       name: ref(''),
       dosisName: ref(''),

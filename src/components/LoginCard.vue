@@ -56,11 +56,11 @@ import {
   getIdBySystemOID,
   EPR_SPID_OID,
   HOEHEWEG_OID,
-} from '/home/lukas/Documents/VS/Impfconnect/lc2_Argoa1_Loosl1_Impfconnect/src/plugins/helpers';
+} from '../plugins/helpers';
 import { patient } from '../plugins/storage';
 
 export default defineComponent({
-  
+
 
   data: function () {
     return {
