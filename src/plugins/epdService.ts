@@ -1,98 +1,233 @@
 import { JSOnFhir } from '@i4mi/js-on-fhir';
-import { Patient, Bundle, ObservationStatus, Observation } from '@i4mi/fhir_r4';
+import {
+  Patient,
+  Bundle,
+  ObservationStatus,
+  Observation,
+  Immunization,
+  ImmunizationPerformer,
+  Condition, Organization,
+  AllergyIntolerance,
+  Practitioner,
+  DocumentReference,
+  BundleEntry,
+  List,
+  Resource
+} from '@i4mi/fhir_r4';
 import moment from 'moment';
+import { EPR_SPID_OID, HOEHEWEG_OID, CURRENT_DOCUMENT, EPD_PLAYGROUND_OID } from './helpers';
+import { reactive } from 'vue';
+
 
 // import moment library. More information under https://momentjs.com
 const now = moment();
 
-export default class EpdService {
-  jsOnFhir: JSOnFhir;
+const vaccination = {
+  instance: {
+    epd: false,
+    midata: false
+  },
+  name: '',
+  protections: [
+    { chickenpox: false },
+    { measles: false },
+    { mumps: false },
+    { rubella: false },
+    { hepA: false },
+    { hepB: false },
+    { fsma: false },
+    { tetanus: false },
+  ],
+  doseNo: '',
+  lotNo: '',
+  dateTime: '',
+  practitioner: '',
 
+}
+export const loggedInPatient: { loggedIn: Patient | undefined } = reactive({ loggedIn: undefined })
+
+
+export default class EpdService {
+  jsOnFhir: JSOnFhir
+  loggedIn: false
+  practitioner: Practitioner
+  currentPatient: Patient
+  immunization: Immunization
+  immunizationPerformer: ImmunizationPerformer
+  organization: Organization
+  patientSpid: string
+  immunizations: Array<Immunization>
   constructor() {
     this.jsOnFhir = new JSOnFhir(
-      process.env.VUE_FHIR_BASE_URL,
-      process.env.VUE_FHIR_APP_NAME,
-      process.env.VUE_FHIR_REDIRECT_URL
+      'https://test.ahdis.ch/mag-bfh',
+      'irr🐘', // get it? its irrELEVANT!
+      'irr🐘',
+      true
     );
-  }
-
-  /**
-   * Returns the jsOnFhir object for making direct method calls.
-   * @returns the jsOnFhir as JSON.
-   */
-  public getJSonFhir(): JSOnFhir {
-    return this.jsOnFhir;
-  }
-
-  /**
-   * Checks that the token isn't empty and hasn't expired yet. Therefore returns the status of the login status.
-   * @returns true if the user is logged in (token valid and not expired yet) and false otherwise.
-   */
-  public isLoggedIn(): boolean {
-    return this.jsOnFhir.isLoggedIn();
-  }
-
-  /**
-   * Logs the user out by resetting authentification details.
-   */
-  public logout(): void {
-    this.jsOnFhir.logout();
-  }
-
-  /**
-   * Initiates the oAuth process.
-   * @param params
-   */
-  public authenticate(params?: Record<string, unknown>): void {
-    this.jsOnFhir.authenticate(params);
-  }
-
-  /**
-   * Handles the response of oAuth portal (server).
-   * @returns a promise:
-   *              - if successfull -> response of the oAuth portal (server) includes: token, refreshtoken etc.
-   *              - if not successfull -> error response.
-   */
-  public handleAuthResponse(): Promise<any> {
-    return this.jsOnFhir.handleAuthResponse();
   }
 
   /**
    * Gets the patient resource from the fhir endpoint.
    * @returns patient resource as JSON
    */
-  public getPatientResource(): Promise<Patient> {
-    return new Promise((resolve, reject) => {
-      this.jsOnFhir
-        .search('Patient', { _id: this.jsOnFhir.getPatient() })
-        .then((result) => {
-          const patientBundle = result as Bundle;
-          (patientBundle.entry?.length !== undefined && patientBundle.entry?.length > 0 && patientBundle.entry[0].resource)
-            ? resolve(patientBundle.entry[0].resource as Patient)
-            : reject('No entry in patient bundle found!');
-        })
-        .catch((error) => reject(error));
-    });
+  getPatientResource(spid: string): void {
+    const SEARCH_PARAMS = {
+
+      // target system is the ID we want
+      identifier: EPR_SPID_OID + '|' + spid,
+    };
+
+    this.jsOnFhir
+      .search('Patient', SEARCH_PARAMS)
+      .then((result) => {
+        const bundle = result as Bundle;
+        loggedInPatient.loggedIn = bundle.entry[0].resource as Patient
+      })
   }
 
   /**
-   * Gets the observation resources as bundle from the fhir endpoint.
-   * @returns bundle with observation resources as JSON.
-   */
-  getObservationResourcesAsBundle(): Promise<Bundle> {
+ * Gets the vaccination resources as bundle from the fhir endpoint.
+ * @returns bundle with observation resources as JSON.
+ */
+
+  async getVaccinations(): Promise<void> {
+    const SEARCH_PARAMS = {
+      status: 'current',
+      'patient.identifier': EPD_PLAYGROUND_OID + '|7de95899-1e73-4ee2-8632-13987ee67ed6'
+    };
+
+    const vaccinationRecordDocumentBundle = await this.getDocumentReference().then(res => {
+      return res;
+    });
+
+    const docsAmount = vaccinationRecordDocumentBundle.entry.length
+
+    console.log('Amount of current Documents: ', docsAmount)
+
+    const vacdDocuments = vaccinationRecordDocumentBundle
+      .entry
+
+    const vacdVaccinationRecordDocuments = vacdDocuments.filter(document =>
+      (document.resource as DocumentReference)
+        .type
+        .coding[0]
+        .display === 'Impfausweis'
+    )
+
+    vacdVaccinationRecordDocuments.sort(function (a, b) {
+      return new Date((b.resource as DocumentReference)
+        .content[0]
+        .attachment
+        .creation).getTime() -
+        new Date((a.resource as DocumentReference)
+          .content[0]
+          .attachment
+          .creation).getTime();
+    });
+
+    const urlOfMostCurrentDocument = (vacdVaccinationRecordDocuments[0].resource as DocumentReference)
+      .content[0]
+      .attachment
+      .url
+
+    console.log('urlOfMostCurrentDocument: ', urlOfMostCurrentDocument)
+
+    const response = await fetch(urlOfMostCurrentDocument);
+    const data = await response.json();
+
+    this.practitioner = data.entry.find((entry: BundleEntry) => {
+      return entry
+        .resource
+        .resourceType === 'Practitioner'
+    }).resource as Practitioner
+
+    this.currentPatient = data.entry.find((entry: BundleEntry) => {
+      return entry
+        .resource
+        .resourceType === 'Patient'
+    }).resource as Patient
+
+    console.log('Patient ', this.currentPatient)
+
+    this.organization = data.entry.find((entry: BundleEntry) => {
+      return entry
+        .resource
+        .resourceType === 'Organization'
+    }).resource as Organization
+
+    console.log('Organization ', this.organization)
+
+    this.immunizations = data.entry.filter((entry: BundleEntry) => {
+      return entry
+        .resource
+        .resourceType === 'Immunization'
+    }).map(x => x.resource as Immunization)
+
+    console.log('Immunizations ', this.immunizations)
+
+    this.createVaccinationTable()
+    //zuerst array mit allen imunizations und dann durch das array durchiterieren, practitioner etc dazuführen und dann in eigenes Objekt
+  }
+  //.catch((error) => console.log(error));
+
+  async getDocumentReference(): Promise<Bundle> {
+    const SEARCH_PARAMS = {
+      status: 'current',
+      'patient.identifier': EPD_PLAYGROUND_OID + '|7de95899-1e73-4ee2-8632-13987ee67ed6'
+    };
     return new Promise((resolve, reject) => {
       this.jsOnFhir
-        .search('Observation')
+        .search('DocumentReference', SEARCH_PARAMS)
         .then((result) => {
-          const observationBundle = result as Bundle;
-          observationBundle.entry?.length > 0
-            ? resolve(observationBundle)
-            : reject('No entries in observation bundle found!');
+          const documentBundle = result as Bundle;
+          documentBundle.entry?.length > 0
+            ? resolve(documentBundle)
+            : reject('No entries in bundle found!');
         })
         .catch((error) => reject(error));
     });
   }
 
+  handleVaccinationResourcesAsBundle(): void {
+    const vaccinationRecordDocumentBundle = this.getVaccinations();
+  }
+
+  createVaccinationTable(): void {
+    interface Row {
+      name: string,
+      lotNo: string,
+      protection: Array<string>,
+      dosageno: string,
+      vaccinationdate: string,
+      practicioner: string,
+      platform: Array<string>,
+    }
+
+    this.immunizations.forEach(element => {
+
+      const protections: Array<string> = []
+      element
+        .protocolApplied[0]
+        .targetDisease
+        .forEach(target => {
+          protections.push(target.coding[0].display)
+        }
+        )
+
+      const row: Row = {
+        name: element.vaccineCode.coding[0].display,
+        lotNo: element.identifier[0].value.toString(),
+        protection: protections,
+        dosageno: element.protocolApplied[0].doseNumberPositiveInt,
+        vaccinationdate: element.occurrenceDateTime,
+        practicioner: this.practitioner.name.toString(),
+        platform: ["EPD"]
+      }
+
+      
+    });
+
+  }
   /**
    * Gets all observations from the fhir endpoint.
    * @returns bundle with observations
@@ -102,12 +237,12 @@ export default class EpdService {
       this.jsOnFhir.search('Observation').then((result) => {
         result
           ? resolve(
-              (result as Bundle).entry?.map(
-                (entry) => entry.resource as Observation
-              ) || []
-            )
+            (result as Bundle).entry?.map(
+              (entry) => entry.resource as Observation
+            ) || []
+          )
           : reject('Error');
-      }).catch((error)=> reject(error));
+      }).catch((error) => reject(error));
     });
   }
 
@@ -123,7 +258,7 @@ export default class EpdService {
     return new Promise((resolve, reject) => {
       this.jsOnFhir.search(resourceType, params).then((result) => {
         result ? resolve(result) : reject('Error');
-      }).catch((error)=> reject(error));
+      }).catch((error) => reject(error));
     });
   }
 
@@ -145,7 +280,7 @@ export default class EpdService {
       const observation = this.newBtObservation(_status, bodySite, value);
       this.jsOnFhir.create(observation).then((result) => {
         result ? resolve(result as Observation) : reject('internal error');
-      }).catch((error)=> reject(error));
+      }).catch((error) => reject(error));
     });
   }
 
@@ -187,7 +322,7 @@ export default class EpdService {
             )
           );
         }
-      }).catch((error)=> reject(error));
+      }).catch((error) => reject(error));
     });
   }
 
