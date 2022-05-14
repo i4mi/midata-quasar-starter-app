@@ -96,6 +96,7 @@ export default defineComponent({
         })
         .onOk((data) => {
            this.$epd.getPatientResource('761337619779800896')
+           this.$epd.getVaccinations()
           this.labelEPD = 'Connected'
         });
     },

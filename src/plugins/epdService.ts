@@ -18,34 +18,12 @@ import moment from 'moment';
 import { EPR_SPID_OID, HOEHEWEG_OID, CURRENT_DOCUMENT, EPD_PLAYGROUND_OID } from './helpers';
 import { reactive } from 'vue';
 
-
 // import moment library. More information under https://momentjs.com
 const now = moment();
 
-const vaccination = {
-  instance: {
-    epd: false,
-    midata: false
-  },
-  name: '',
-  protections: [
-    { chickenpox: false },
-    { measles: false },
-    { mumps: false },
-    { rubella: false },
-    { hepA: false },
-    { hepB: false },
-    { fsma: false },
-    { tetanus: false },
-  ],
-  doseNo: '',
-  lotNo: '',
-  dateTime: '',
-  practitioner: '',
-
-}
 export const loggedInPatient: { loggedIn: Patient | undefined } = reactive({ loggedIn: undefined })
 
+export const vaccinations = []
 
 export default class EpdService {
   jsOnFhir: JSOnFhir
@@ -141,6 +119,8 @@ export default class EpdService {
         .resourceType === 'Practitioner'
     }).resource as Practitioner
 
+    console.log('Practitioner ', this.practitioner)
+
     this.currentPatient = data.entry.find((entry: BundleEntry) => {
       return entry
         .resource
@@ -168,7 +148,6 @@ export default class EpdService {
     this.createVaccinationTable()
     //zuerst array mit allen imunizations und dann durch das array durchiterieren, practitioner etc dazuführen und dann in eigenes Objekt
   }
-  //.catch((error) => console.log(error));
 
   async getDocumentReference(): Promise<Bundle> {
     const SEARCH_PARAMS = {
@@ -196,7 +175,7 @@ export default class EpdService {
     interface Row {
       name: string,
       lotNo: string,
-      protection: Array<string>,
+      protection: string,
       dosageno: string,
       vaccinationdate: string,
       practicioner: string,
@@ -216,18 +195,17 @@ export default class EpdService {
 
       const row: Row = {
         name: element.vaccineCode.coding[0].display,
-        lotNo: element.identifier[0].value.toString(),
-        protection: protections,
-        dosageno: element.protocolApplied[0].doseNumberPositiveInt,
-        vaccinationdate: element.occurrenceDateTime,
-        practicioner: this.practitioner.name.toString(),
+        lotNo: element.lotNumber,
+        protection: protections.join(', '),
+        dosageno: element.identifier[0].value,
+        vaccinationdate: moment(element.occurrenceDateTime).format('MMMM Do YYYY, h:mm a'),
+        practicioner: this.practitioner.name[0].family+' '+this.practitioner.name[0].given[0],
         platform: ["EPD"]
       }
-
-      
+      vaccinations.push(row)
     });
-
   }
+
   /**
    * Gets all observations from the fhir endpoint.
    * @returns bundle with observations

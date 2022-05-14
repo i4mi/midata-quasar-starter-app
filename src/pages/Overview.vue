@@ -74,6 +74,7 @@ import {
   loggedInPatient,
   immunizations,
   EpdService,
+  vaccinations
 } from '../plugins/epdService.ts';
 const columns = [
   {
@@ -90,7 +91,6 @@ const columns = [
     align: 'center',
     label: 'Hochgeladen auf',
     field: 'platform',
-    sortable: true,
   },
   {
     name: 'producer',
@@ -104,12 +104,12 @@ const columns = [
   {
     name: 'vaccinationdate',
     label: 'Verabreichungsdatum',
-    field: 'vaccinationdate',
+    field: 'vaccinationdate',sortable: true,
   },
   { name: 'practicioner', label: 'Behandelnder Arzt', field: 'practicioner' },
 ];
 
-const rows = [
+/* const rows = [
   {
     name: 'Frozen Yogurt',
     lotNo: 'Moderna',
@@ -182,19 +182,9 @@ const rows = [
     practicioner: 'Doktor Daniela',
     platform: ['EPD', 'Midata'].join(' '),
   },
-];
+]; */
 
-const rows2 = [
-  {
-    name: '', //EpdService.immunizations.vaccineCode.coding[0].display,
-    producer: 'Moderna',
-    protection: 'Röteln',
-    dosageno: 26164,
-    vaccinationdate: '02/06/2021',
-    practicioner: 'Cornelia Corona',
-    platform: ['EPD'],
-  },
-];
+const rows = vaccinations;
 
 export default defineComponent({
   data() {
