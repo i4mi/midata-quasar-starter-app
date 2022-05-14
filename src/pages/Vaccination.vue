@@ -8,7 +8,11 @@
           <div class="col-8 self-center">
             <div class="q-pa-md">
               <div class="q-gutter-y-md column" style="max-width: 500px">
-                <q-input v-model="patientName" readonly label="Name des Patients">
+                <q-input
+                  v-model="patientName"
+                  readonly
+                  label="Name des Patients"
+                >
                 </q-input>
               </div>
             </div>
@@ -39,7 +43,6 @@
                 multiple
                 :options="options"
                 label="Schutz"
-                
               />
             </div>
           </div>
@@ -166,20 +169,13 @@
 
 <script>
 import { ref } from 'vue';
-import { Patient } from '@i4mi/fhir_r4';
 import { JSOnFhir } from '@i4mi/js-on-fhir';
 import { v4 as uuid } from 'uuid';
-import {patient} from '../plugins/storage';
-import {
-  getIdBySystemOID,
-  convertToBase64,
-  EPR_SPID_OID,
-  HOEHEWEG_OID,
-} from '/home/lukas/Documents/VS/Impfconnect/lc2_Argoa1_Loosl1_Impfconnect/src/plugins/helpers.ts';
+import { loggedInPatient, immunizations } from '../plugins/epdService.ts';
+
 
 export default {
   setup() {
-
     let eprSpid = '';
     function uploadToEpd() {
       console.log('Upload to EPD pressed');
@@ -187,12 +183,12 @@ export default {
     function uploadToMidata() {
       console.log('Upload to Midata pressed');
     }
-   
+
     return {
       name: ref(''),
       dosisName: ref(''),
       lotNumber: ref(''),
-      patientName: ref(patient.name),
+      patientName: ref(loggedInPatient.loggedIn?.name[0].family ?? 'Bitte Patient erfassen'),
       healthProfessional: ref(''),
       minuteOptionsTime1: [0, 15, 30, 45],
       date: ref(new Date().toLocaleString('de-CH')),
