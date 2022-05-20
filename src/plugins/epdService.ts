@@ -12,11 +12,15 @@ import {
   DocumentReference,
   BundleEntry,
   List,
-  Resource
+  Resource,
+  Coding,
+  Composition
 } from '@i4mi/fhir_r4';
 import moment from 'moment';
 import { EPR_SPID_OID, HOEHEWEG_OID, CURRENT_DOCUMENT, EPD_PLAYGROUND_OID } from './helpers';
 import { reactive } from 'vue';
+import { VACD_COMPOSITION_ENTRY, VACD_IMMUNIZATION_ENTRY, FHIR_DOCUMENT_BUNLDE, VACD_RECORD_DOCUMENT } from '../plugins/VACD RECORD DOCUMENT'
+import { number } from '@intlify/core-base';
 
 // import moment library. More information under https://momentjs.com
 const now = moment();
@@ -35,6 +39,27 @@ export default class EpdService {
   organization: Organization
   patientSpid: string
   immunizations: Array<Immunization>
+
+  vaccCodeName = new Map<string, number>([
+    ['FSME-Immun CC', 450],
+    ['Encepur N', 627],
+    ['Inflexal V', 614],
+    ['Poliorix', 669]
+  ])
+
+  diseaseCodeName = new Map<string, number>([
+    ['Windpocken', 38907003],
+    ['Masern', 14189004],
+    ['Mumps', 36989005],
+    ['Röteln', 36989005],
+    ['Virale hepatitis, Typ A', 40468003],
+    ['Virale hepatitis, Typ B', 66071002],
+    ['Frühsommer-Miningoenzephalithis (FSME)', 32323003],
+    ['Gelbfieber', 16541001],
+    ['Starrkrampf', 76902006]
+  ])
+
+
   constructor() {
     this.jsOnFhir = new JSOnFhir(
       'https://test.ahdis.ch/mag-bfh',
@@ -199,8 +224,8 @@ export default class EpdService {
         protection: protections.join(', '),
         dosageno: element.identifier[0].value,
         vaccinationdate: moment(element.occurrenceDateTime).format('MMMM Do YYYY, h:mm a'),
-        practicioner: this.practitioner.name[0].family+' '+this.practitioner.name[0].given[0],
-        platform: ["EPD"]
+        practicioner: this.practitioner.name[0].family + ' ' + this.practitioner.name[0].given[0],
+        platform: ['EPD']
       }
       vaccinations.push(row)
     });
@@ -551,5 +576,118 @@ export default class EpdService {
           ],
         };
     }
+  }
+
+  /**
+   * creates a immunization FHIR resource https://build.fhir.org/immunization.html 
+   * @param immunizationName the name of the vaccination
+   * @param illnesses a list of the illnesses that the immunization tackles
+   * @param doseNo the number of the dose
+   * @param lotNo the Lot number of the dose
+   * @param date the date in which the vaccination was performed
+   */
+  setVaccinationEntry(
+    immunizationName: string,
+    illnesses: Array<string>,
+    doseNo: string,
+    lotNo: string,
+    date: Date): void {
+    const entry = VACD_IMMUNIZATION_ENTRY
+    const entryResource = entry.resource
+    const id: string = 'Immunization-' + this.makeid(4)
+    entry.fullUrl = 'http://test.fhir.ch/r4/Immunization/' + id
+    entryResource.id = id
+
+    const vaccineCode = this.setVaccineCode(immunizationName)
+    entryResource.vaccineCode.coding[0] = vaccineCode
+
+    entryResource.occurrenceDateTime = date.toString()
+
+    entryResource.recorded = new Date().toDateString()
+
+    entryResource.lotNumber = lotNo
+
+    const targetDiseases = this.setTargetDiseases(illnesses)
+
+    entryResource.protocolApplied[0].targetDisease = targetDiseases
+
+    entry.resource = entryResource
+    console.log('entry: ', JSON.stringify(entry))
+    this.setVaccinationComposition(entry)
+  }
+
+  setVaccinationComposition(vaccinationEntry) {
+    const entry = VACD_COMPOSITION_ENTRY
+
+
+
+  }
+
+  /**
+   * Sets the code of the diseases according to the snomed code system
+   * @param illnesses the names of the illnesses as string
+   * @returns a FHIR object array 
+   */
+  setTargetDiseases(illnesses: Array<string>): Array<{ coding: { system: string, code: string, display: string }[] }> {
+    const diseaseCode = {
+      'system': 'http://snomed.info/sct',
+      'code': 'placeholder',
+      'display': 'placeholder'
+    }
+    const targetDiseases = []
+
+    illnesses.forEach(element => {
+
+      if (this.diseaseCodeName.has(element)) {
+        diseaseCode.code = this.diseaseCodeName.get(element).toString()
+        diseaseCode.display = element
+      } else {
+        throw new Error('Wrong name provided')
+      }
+
+      targetDiseases.push({ 'coding': [diseaseCode] })
+    });
+
+    return targetDiseases
+  }
+
+  /**
+   * sets the correct vaccination code of the standard from http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs
+   * @param name the name of the vaccine
+   * @returns a FHIR Object that contains a system, a code, and a display value
+   */
+  setVaccineCode(name: string): { system: string, code: string, display: string } {
+    const vaccineCode = {
+      'system': 'http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs',
+      'code': 'placeholder',
+      'display': 'placeholder'
+    }
+
+    if (this.vaccCodeName.has(name)) {
+      vaccineCode.code = this.vaccCodeName.get(name).toString()
+      vaccineCode.display = name
+    }
+    return vaccineCode
+  }
+
+
+  /**
+  copyright of the user csharptest.net
+  
+  generates a hash out of the characters in @param characters 
+  The length is determined by the number provided to the method
+  
+  @param length the length of the hash 
+  @returns hash value of a certain length as string
+   */
+  makeid(length: number): string {
+    let result = '';
+    const characters = '0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() *
+        charactersLength));
+    }
+    return result;
   }
 }

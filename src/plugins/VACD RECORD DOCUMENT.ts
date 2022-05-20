@@ -1,4 +1,4 @@
-{
+export const VACD_RECORD_DOCUMENT={
   "resourceType" : "Bundle",
   "id" : "1-3-VaccinationRecord",
   "meta" : {
@@ -665,437 +665,6 @@
       }
     },
     {
-      "fullUrl" : "http://test.fhir.ch/r4/Immunization/7-2-Immunization",
-      "resource" : {
-        "resourceType" : "Immunization",
-        "id" : "7-2-Immunization",
-        "meta" : {
-          "profile" : [
-            "http://fhir.ch/ig/ch-vacd/StructureDefinition/ch-vacd-immunization"
-          ]
-        },
-        "text" : {
-          "status" : "generated",
-          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource \"7-2-Immunization\" </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-ch-vacd-immunization.html\">CH VACD Immunization Profile</a></p></div><p><b>identifier</b>: id: 12345</p><p><b>status</b>: completed</p><p><b>vaccineCode</b>: Boostrix <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ch-vacd-swissmedic-cs.html\">Swiss Medic Authorized Vaccines Codesystem</a>#637)</span></p><p><b>patient</b>: <a href=\"#Patient_3-1-Patient\">See above (Patient/3-1-Patient)</a></p><p><b>occurrence</b>: 2013-09-15T00:00:00+02:00</p><p><b>recorded</b>: 2013-09-15T00:00:00+02:00</p><p><b>lotNumber</b>: 12-34244</p><p><b>route</b>: Intramuscular use <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (standardterms.edqm.eu#20035000)</span></p><h3>Performers</h3><table class=\"grid\"><tr><td>-</td><td><b>Actor</b></td></tr><tr><td>*</td><td><a href=\"#PractitionerRole_6-2-PractitionerRole\">See above (PractitionerRole/6-2-PractitionerRole)</a></td></tr></table><h3>ProtocolApplieds</h3><table class=\"grid\"><tr><td>-</td><td><b>TargetDisease</b></td><td><b>DoseNumber[x]</b></td></tr><tr><td>*</td><td>Diphtheria caused by Corynebacterium diphtheriae (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#397430003)</span>, Tetanus (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#76902006)</span>, Pertussis (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#27836007)</span></td><td>1</td></tr></table></div>"
-        },
-        "identifier" : [
-          {
-            "system" : "urn:oid:2.16.756.5.30.1.147.1.3.1",
-            "value" : "12345"
-          }
-        ],
-        "status" : "completed",
-        "vaccineCode" : {
-          "coding" : [
-            {
-              "system" : "http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs",
-              "code" : "637",
-              "display" : "Boostrix"
-            }
-          ]
-        },
-        "patient" : {
-          "reference" : "Patient/3-1-Patient"
-        },
-        "occurrenceDateTime" : "2013-09-15T00:00:00+02:00",
-        "recorded" : "2013-09-15T00:00:00+02:00",
-        "lotNumber" : "12-34244",
-        "route" : {
-          "coding" : [
-            {
-              "system" : "http://standardterms.edqm.eu",
-              "code" : "20035000",
-              "display" : "Intramuscular use"
-            }
-          ]
-        },
-        "performer" : [
-          {
-            "actor" : {
-              "reference" : "PractitionerRole/6-2-PractitionerRole"
-            }
-          }
-        ],
-        "protocolApplied" : [
-          {
-            "targetDisease" : [
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "397430003",
-                    "display" : "Diphtheria caused by Corynebacterium diphtheriae (disorder)"
-                  }
-                ]
-              },
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "76902006",
-                    "display" : "Tetanus (disorder)"
-                  }
-                ]
-              },
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "27836007",
-                    "display" : "Pertussis (disorder)"
-                  }
-                ]
-              }
-            ],
-            "doseNumberPositiveInt" : 1
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl" : "http://test.fhir.ch/r4/Immunization/7-3-Immunization",
-      "resource" : {
-        "resourceType" : "Immunization",
-        "id" : "7-3-Immunization",
-        "meta" : {
-          "profile" : [
-            "http://fhir.ch/ig/ch-vacd/StructureDefinition/ch-vacd-immunization"
-          ]
-        },
-        "text" : {
-          "status" : "generated",
-          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource \"7-3-Immunization\" </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-ch-vacd-immunization.html\">CH VACD Immunization Profile</a></p></div><p><b>identifier</b>: id: 23456</p><p><b>status</b>: completed</p><p><b>vaccineCode</b>: Boostrix <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ch-vacd-swissmedic-cs.html\">Swiss Medic Authorized Vaccines Codesystem</a>#637)</span></p><p><b>patient</b>: <a href=\"#Patient_3-1-Patient\">See above (Patient/3-1-Patient)</a></p><p><b>occurrence</b>: 2014-08-12T00:00:00+02:00</p><p><b>recorded</b>: 2014-08-12T00:00:00+02:00</p><p><b>lotNumber</b>: 12-34244</p><p><b>route</b>: Intramuscular use <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (standardterms.edqm.eu#20035000)</span></p><h3>Performers</h3><table class=\"grid\"><tr><td>-</td><td><b>Actor</b></td></tr><tr><td>*</td><td><a href=\"#PractitionerRole_6-2-PractitionerRole\">See above (PractitionerRole/6-2-PractitionerRole)</a></td></tr></table><h3>ProtocolApplieds</h3><table class=\"grid\"><tr><td>-</td><td><b>TargetDisease</b></td><td><b>DoseNumber[x]</b></td></tr><tr><td>*</td><td>Diphtheria caused by Corynebacterium diphtheriae (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#397430003)</span>, Tetanus (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#76902006)</span>, Pertussis (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#27836007)</span></td><td>1</td></tr></table></div>"
-        },
-        "identifier" : [
-          {
-            "system" : "urn:oid:2.16.756.5.30.1.147.1.3.1",
-            "value" : "23456"
-          }
-        ],
-        "status" : "completed",
-        "vaccineCode" : {
-          "coding" : [
-            {
-              "system" : "http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs",
-              "code" : "637",
-              "display" : "Boostrix"
-            }
-          ]
-        },
-        "patient" : {
-          "reference" : "Patient/3-1-Patient"
-        },
-        "occurrenceDateTime" : "2014-08-12T00:00:00+02:00",
-        "recorded" : "2014-08-12T00:00:00+02:00",
-        "lotNumber" : "12-34244",
-        "route" : {
-          "coding" : [
-            {
-              "system" : "http://standardterms.edqm.eu",
-              "code" : "20035000",
-              "display" : "Intramuscular use"
-            }
-          ]
-        },
-        "performer" : [
-          {
-            "actor" : {
-              "reference" : "PractitionerRole/6-2-PractitionerRole"
-            }
-          }
-        ],
-        "protocolApplied" : [
-          {
-            "targetDisease" : [
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "397430003",
-                    "display" : "Diphtheria caused by Corynebacterium diphtheriae (disorder)"
-                  }
-                ]
-              },
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "76902006",
-                    "display" : "Tetanus (disorder)"
-                  }
-                ]
-              },
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "27836007",
-                    "display" : "Pertussis (disorder)"
-                  }
-                ]
-              }
-            ],
-            "doseNumberPositiveInt" : 1
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl" : "http://test.fhir.ch/r4/Immunization/7-4-Immunization",
-      "resource" : {
-        "resourceType" : "Immunization",
-        "id" : "7-4-Immunization",
-        "meta" : {
-          "profile" : [
-            "http://fhir.ch/ig/ch-vacd/StructureDefinition/ch-vacd-immunization"
-          ]
-        },
-        "text" : {
-          "status" : "generated",
-          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource \"7-4-Immunization\" </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-ch-vacd-immunization.html\">CH VACD Immunization Profile</a></p></div><p><b>identifier</b>: id: 34567</p><p><b>status</b>: completed</p><p><b>vaccineCode</b>: Boostrix <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ch-vacd-swissmedic-cs.html\">Swiss Medic Authorized Vaccines Codesystem</a>#637)</span></p><p><b>patient</b>: <a href=\"#Patient_3-1-Patient\">See above (Patient/3-1-Patient)</a></p><p><b>occurrence</b>: 2015-11-01T00:00:00+01:00</p><p><b>recorded</b>: 2015-11-01T00:00:00+01:00</p><p><b>lotNumber</b>: 12-34244</p><p><b>route</b>: Intramuscular use <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (standardterms.edqm.eu#20035000)</span></p><h3>Performers</h3><table class=\"grid\"><tr><td>-</td><td><b>Actor</b></td></tr><tr><td>*</td><td><a href=\"#PractitionerRole_6-2-PractitionerRole\">See above (PractitionerRole/6-2-PractitionerRole)</a></td></tr></table><h3>ProtocolApplieds</h3><table class=\"grid\"><tr><td>-</td><td><b>TargetDisease</b></td><td><b>DoseNumber[x]</b></td></tr><tr><td>*</td><td>Diphtheria caused by Corynebacterium diphtheriae (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#397430003)</span>, Tetanus (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#76902006)</span>, Pertussis (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#27836007)</span></td><td>1</td></tr></table></div>"
-        },
-        "identifier" : [
-          {
-            "system" : "urn:oid:2.16.756.5.30.1.147.1.3.1",
-            "value" : "34567"
-          }
-        ],
-        "status" : "completed",
-        "vaccineCode" : {
-          "coding" : [
-            {
-              "system" : "http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs",
-              "code" : "637",
-              "display" : "Boostrix"
-            }
-          ]
-        },
-        "patient" : {
-          "reference" : "Patient/3-1-Patient"
-        },
-        "occurrenceDateTime" : "2015-11-01T00:00:00+01:00",
-        "recorded" : "2015-11-01T00:00:00+01:00",
-        "lotNumber" : "12-34244",
-        "route" : {
-          "coding" : [
-            {
-              "system" : "http://standardterms.edqm.eu",
-              "code" : "20035000",
-              "display" : "Intramuscular use"
-            }
-          ]
-        },
-        "performer" : [
-          {
-            "actor" : {
-              "reference" : "PractitionerRole/6-2-PractitionerRole"
-            }
-          }
-        ],
-        "protocolApplied" : [
-          {
-            "targetDisease" : [
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "397430003",
-                    "display" : "Diphtheria caused by Corynebacterium diphtheriae (disorder)"
-                  }
-                ]
-              },
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "76902006",
-                    "display" : "Tetanus (disorder)"
-                  }
-                ]
-              },
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "27836007",
-                    "display" : "Pertussis (disorder)"
-                  }
-                ]
-              }
-            ],
-            "doseNumberPositiveInt" : 1
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl" : "http://test.fhir.ch/r4/Immunization/7-5-Immunization",
-      "resource" : {
-        "resourceType" : "Immunization",
-        "id" : "7-5-Immunization",
-        "meta" : {
-          "profile" : [
-            "http://fhir.ch/ig/ch-vacd/StructureDefinition/ch-vacd-immunization"
-          ]
-        },
-        "text" : {
-          "status" : "generated",
-          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource \"7-5-Immunization\" </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-ch-vacd-immunization.html\">CH VACD Immunization Profile</a></p></div><p><b>identifier</b>: id: 45678</p><p><b>status</b>: completed</p><p><b>vaccineCode</b>: MMR-II <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ch-vacd-swissmedic-cs.html\">Swiss Medic Authorized Vaccines Codesystem</a>#268)</span></p><p><b>patient</b>: <a href=\"#Patient_3-1-Patient\">See above (Patient/3-1-Patient)</a></p><p><b>occurrence</b>: 2016-03-05T00:00:00+01:00</p><p><b>recorded</b>: 2016-03-05T00:00:00+01:00</p><p><b>lotNumber</b>: 12-34244</p><p><b>route</b>: Intramuscular use <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (standardterms.edqm.eu#20035000)</span></p><h3>Performers</h3><table class=\"grid\"><tr><td>-</td><td><b>Actor</b></td></tr><tr><td>*</td><td><a href=\"#PractitionerRole_6-3-PractitionerRole\">See above (PractitionerRole/6-3-PractitionerRole)</a></td></tr></table><h3>ProtocolApplieds</h3><table class=\"grid\"><tr><td>-</td><td><b>TargetDisease</b></td><td><b>DoseNumber[x]</b></td></tr><tr><td>*</td><td>Measles (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#14189004)</span>, Mumps (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#36989005)</span>, Rubella (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#36653000)</span></td><td>1</td></tr></table></div>"
-        },
-        "identifier" : [
-          {
-            "system" : "urn:oid:2.16.756.5.30.1.147.1.3.1",
-            "value" : "45678"
-          }
-        ],
-        "status" : "completed",
-        "vaccineCode" : {
-          "coding" : [
-            {
-              "system" : "http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs",
-              "code" : "268",
-              "display" : "MMR-II"
-            }
-          ]
-        },
-        "patient" : {
-          "reference" : "Patient/3-1-Patient"
-        },
-        "occurrenceDateTime" : "2016-03-05T00:00:00+01:00",
-        "recorded" : "2016-03-05T00:00:00+01:00",
-        "lotNumber" : "12-34244",
-        "route" : {
-          "coding" : [
-            {
-              "system" : "http://standardterms.edqm.eu",
-              "code" : "20035000",
-              "display" : "Intramuscular use"
-            }
-          ]
-        },
-        "performer" : [
-          {
-            "actor" : {
-              "reference" : "PractitionerRole/6-3-PractitionerRole"
-            }
-          }
-        ],
-        "protocolApplied" : [
-          {
-            "targetDisease" : [
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "14189004",
-                    "display" : "Measles (disorder)"
-                  }
-                ]
-              },
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "36989005",
-                    "display" : "Mumps (disorder)"
-                  }
-                ]
-              },
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "36653000",
-                    "display" : "Rubella (disorder)"
-                  }
-                ]
-              }
-            ],
-            "doseNumberPositiveInt" : 1
-          }
-        ]
-      }
-    },
-    {
-      "fullUrl" : "http://test.fhir.ch/r4/Immunization/7-6-Immunization",
-      "resource" : {
-        "resourceType" : "Immunization",
-        "id" : "7-6-Immunization",
-        "meta" : {
-          "profile" : [
-            "http://fhir.ch/ig/ch-vacd/StructureDefinition/ch-vacd-immunization"
-          ]
-        },
-        "text" : {
-          "status" : "generated",
-          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource \"7-6-Immunization\" </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-ch-vacd-immunization.html\">CH VACD Immunization Profile</a></p></div><p><b>identifier</b>: id: 12312</p><p><b>status</b>: completed</p><p><b>statusReason</b>: Patient objection <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/3.0.0/CodeSystem-v3-ActReason.html\">ActReason</a>#PATOBJ)</span></p><p><b>vaccineCode</b>: HBVAXPRO 40 <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ch-vacd-swissmedic-cs.html\">Swiss Medic Authorized Vaccines Codesystem</a>#545)</span></p><p><b>patient</b>: <a href=\"#Patient_3-1-Patient\">See above (Patient/3-1-Patient)</a></p><p><b>occurrence</b>: 2012-02-26T00:00:00+01:00</p><p><b>recorded</b>: 2012-02-26T00:00:00+01:00</p><p><b>lotNumber</b>: 12-34244</p><p><b>route</b>: Intramuscular use <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (standardterms.edqm.eu#20035000)</span></p><h3>Performers</h3><table class=\"grid\"><tr><td>-</td><td><b>Actor</b></td></tr><tr><td>*</td><td><a href=\"#PractitionerRole_6-3-PractitionerRole\">See above (PractitionerRole/6-3-PractitionerRole)</a></td></tr></table><h3>ProtocolApplieds</h3><table class=\"grid\"><tr><td>-</td><td><b>TargetDisease</b></td><td><b>DoseNumber[x]</b></td></tr><tr><td>*</td><td>Viral hepatitis type B (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#66071002)</span></td><td>1</td></tr></table></div>"
-        },
-        "identifier" : [
-          {
-            "system" : "urn:oid:2.16.756.5.30.1.147.1.3.1",
-            "value" : "12312"
-          }
-        ],
-        "status" : "completed",
-        "statusReason" : {
-          "coding" : [
-            {
-              "system" : "http://terminology.hl7.org/CodeSystem/v3-ActReason",
-              "code" : "PATOBJ",
-              "display" : "Patient objection"
-            }
-          ]
-        },
-        "vaccineCode" : {
-          "coding" : [
-            {
-              "system" : "http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs",
-              "code" : "545",
-              "display" : "HBVAXPRO 40"
-            }
-          ]
-        },
-        "patient" : {
-          "reference" : "Patient/3-1-Patient"
-        },
-        "occurrenceDateTime" : "2012-02-26T00:00:00+01:00",
-        "recorded" : "2012-02-26T00:00:00+01:00",
-        "lotNumber" : "12-34244",
-        "route" : {
-          "coding" : [
-            {
-              "system" : "http://standardterms.edqm.eu",
-              "code" : "20035000",
-              "display" : "Intramuscular use"
-            }
-          ]
-        },
-        "performer" : [
-          {
-            "actor" : {
-              "reference" : "PractitionerRole/6-3-PractitionerRole"
-            }
-          }
-        ],
-        "protocolApplied" : [
-          {
-            "targetDisease" : [
-              {
-                "coding" : [
-                  {
-                    "system" : "http://snomed.info/sct",
-                    "code" : "66071002",
-                    "display" : "Viral hepatitis type B (disorder)"
-                  }
-                ]
-              }
-            ],
-            "doseNumberPositiveInt" : 1
-          }
-        ]
-      }
-    },
-    {
       "fullUrl" : "http://test.fhir.ch/r4/Condition/8-2-Condition",
       "resource" : {
         "resourceType" : "Condition",
@@ -1395,5 +964,557 @@
         }
       }
     }
+  ]
+}
+
+export const VACD_COMPOSITION_ENTRY = {
+  "fullUrl" : "http://test.fhir.ch/r4/Composition/2-3-VaccinationRecordComposition",
+  "resource" : {
+    "resourceType" : "Composition",
+    "id" : "2-3-VaccinationRecordComposition",
+    "meta" : {
+      "profile" : [
+        "http://fhir.ch/ig/ch-vacd/StructureDefinition/ch-vacd-composition-vaccination-record"
+      ]
+    },
+    "language" : "en-US",
+    "text" : {
+      "status" : "extensions",
+      "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-US\" lang=\"en-US\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource \"2-3-VaccinationRecordComposition\"  (Language \"en-US\") </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-ch-vacd-composition-vaccination-record.html\">CH VACD VaccinationRecord Composition Profile</a></p></div><p><b>EPR Version Number</b>: 1</p><p><b>identifier</b>: id: urn:uuid:00ae697d-3635-4c21-af13-4eaa8018c135</p><p><b>status</b>: final</p><p><b>type</b>: Immunization record <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#41000179103)</span></p><p><b>date</b>: 2021-06-01T00:00:00+02:00</p><p><b>author</b>: <a href=\"#PractitionerRole_6-1-PractitionerRole\">See above (PractitionerRole/6-1-PractitionerRole)</a></p><p><b>title</b>: Vaccination Record</p><p><b>confidentiality</b>: N</p><p><b>custodian</b>: <a href=\"#Organization_5-1-Organization\">See above (Organization/5-1-Organization)</a></p></div>"
+    },
+    "extension" : [
+      {
+        "id" : "versionNumber",
+        "url" : "http://fhir.ch/ig/ch-core/StructureDefinition/ch-ext-epr-versionnumber",
+        "valueUnsignedInt" : 1
+      }
+    ],
+    "identifier" : {
+      "system" : "urn:ietf:rfc:3986",
+      "value" : "urn:uuid:00ae697d-3635-4c21-af13-4eaa8018c135"
+    },
+    "status" : "final",
+    "type" : {
+      "coding" : [
+        {
+          "system" : "http://snomed.info/sct",
+          "code" : "41000179103",
+          "display" : "Immunization record"
+        }
+      ]
+    },
+    "subject" : {
+      "reference" : "Patient/3-1-Patient"
+    },
+    "date" : "2021-06-01T00:00:00+02:00",
+    "author" : [
+      {
+        "reference" : "PractitionerRole/6-1-PractitionerRole"
+      }
+    ],
+    "title" : "Vaccination Record",
+    "confidentiality" : "N",
+    "_confidentiality" : {
+      "extension" : [
+        {
+          "url" : "http://fhir.ch/ig/ch-core/StructureDefinition/ch-ext-epr-confidentialitycode",
+          "valueCodeableConcept" : {
+            "coding" : [
+              {
+                "system" : "http://snomed.info/sct",
+                "code" : "17621005",
+                "display" : "Normal (qualifier value)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "custodian" : {
+      "reference" : "Organization/5-1-Organization"
+    },
+    "section" : [
+      {
+        "id" : "administration",
+        "title" : "Immunization Administration",
+        "code" : {
+          "coding" : [
+            {
+              "system" : "http://loinc.org",
+              "code" : "11369-6",
+              "display" : "Hx of Immunization"
+            }
+          ]
+        },
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-US\" lang=\"en-US\">This is the section containing all immunization entries.</div>"
+        },
+        "entry" : [
+        ]
+      },
+      {
+        "id" : "medicalproblems",
+        "title" : "Other Relevant Observations",
+        "code" : {
+          "coding" : [
+            {
+              "system" : "http://loinc.org",
+              "code" : "11450-4",
+              "display" : "Problem list Reported"
+            }
+          ]
+        },
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-US\" lang=\"en-US\">This is the section containing the medical problem entries.</div>"
+        },
+        "entry" : [
+          {
+            "reference" : "Condition/8-2-Condition"
+          },
+          {
+            "reference" : "Condition/8-3-Condition"
+          }
+        ]
+      },
+      {
+        "id" : "sectionIlnessesUndergondeForImmunization1",
+        "title" : "Undergone illnesses for immunization",
+        "code" : {
+          "coding" : [
+            {
+              "system" : "http://loinc.org",
+              "code" : "11348-0",
+              "display" : "Hx of Past illness"
+            }
+          ]
+        },
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-US\" lang=\"en-US\">This is the section containing the undergone illnesses for immunization entries.</div>"
+        },
+        "entry" : [
+          {
+            "reference" : "Condition/8-4-Condition"
+          }
+        ]
+      },
+      {
+        "id" : "allergies",
+        "title" : "Allergies",
+        "code" : {
+          "coding" : [
+            {
+              "system" : "http://loinc.org",
+              "code" : "48765-2",
+              "display" : "Allergies and adverse reactions Document"
+            }
+          ]
+        },
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-US\">This is the section containing the allergy entries.</div>"
+        },
+        "entry" : [
+          {
+            "reference" : "AllergyIntolerance/11-1-AllergyIntolerance"
+          },
+          {
+            "reference" : "AllergyIntolerance/11-2-AllergyIntolerance"
+          }
+        ]
+      },
+      {
+        "id" : "otherRelevantObservations",
+        "title" : "Other Relevant Observations",
+        "code" : {
+          "coding" : [
+            {
+              "system" : "http://loinc.org",
+              "code" : "30954-2",
+              "display" : "Relevant diagnostic tests/laboratory data Narrative"
+            }
+          ]
+        },
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-US\" lang=\"en-US\">This section MAY contain relevant coded results of a patient for the given document context. The section MUST contain at least one Problem entry. In case of no relevant results, one of the 'special case' codes MUST be used. In the context of immunizations, this section may indicate the gestational age of a child if relevant for immunization of the child. In the context of lab reports, this section may indicate the gestational age of a child if relevant for the observation interpretation.</div>"
+        },
+        "entry" : [
+          {
+            "reference" : "Condition/8-9-Condition"
+          }
+        ]
+      },
+      {
+        "id" : "sectionLab1",
+        "title" : "Lab",
+        "code" : {
+          "coding" : [
+            {
+              "system" : "http://loinc.org",
+              "code" : "18727-8",
+              "display" : "Serology studies (set)"
+            }
+          ]
+        },
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-US\" lang=\"en-US\">This is the section containing the lab entries.</div>"
+        },
+        "entry" : [
+          {
+            "reference" : "Observation/9-1-Observation"
+          }
+        ]
+      },
+      {
+        "id" : "pregnancy",
+        "title" : "Pregnancy",
+        "code" : {
+          "coding" : [
+            {
+              "system" : "http://loinc.org",
+              "code" : "10162-6",
+              "display" : "Pregnancies Hx"
+            }
+          ]
+        },
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-US\" lang=\"en-US\">This is the section containing the pregnancy status entry.</div>"
+        },
+        "entry" : [
+          {
+            "reference" : "Condition/8-1-Condition"
+          }
+        ]
+      },
+      {
+        "id" : "annotation",
+        "title" : "Comments",
+        "code" : {
+          "coding" : [
+            {
+              "system" : "http://loinc.org",
+              "code" : "48767-8",
+              "display" : "Annotation comment [Interpretation] Narrative"
+            }
+          ]
+        },
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en-US\">This is the section containing all immunization entries.</div>"
+        }
+      }
+    ]
+  }
+}
+
+export const VACD_IMMUNIZATION_ENTRY = {
+  "fullUrl" : "http://test.fhir.ch/r4/Immunization/7-4-Immunization",
+  "resource" : {
+    "resourceType" : "Immunization",
+    "id" : "7-4-Immunization",
+    "meta" : {
+      "profile" : [
+        "http://fhir.ch/ig/ch-vacd/StructureDefinition/ch-vacd-immunization"
+      ]
+    },
+    "text" : {
+      "status" : "generated",
+      "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource \"7-4-Immunization\" </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-ch-vacd-immunization.html\">CH VACD Immunization Profile</a></p></div><p><b>identifier</b>: id: 34567</p><p><b>status</b>: completed</p><p><b>vaccineCode</b>: Boostrix <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ch-vacd-swissmedic-cs.html\">Swiss Medic Authorized Vaccines Codesystem</a>#637)</span></p><p><b>patient</b>: <a href=\"#Patient_3-1-Patient\">See above (Patient/3-1-Patient)</a></p><p><b>occurrence</b>: 2015-11-01T00:00:00+01:00</p><p><b>recorded</b>: 2015-11-01T00:00:00+01:00</p><p><b>lotNumber</b>: 12-34244</p><p><b>route</b>: Intramuscular use <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (standardterms.edqm.eu#20035000)</span></p><h3>Performers</h3><table class=\"grid\"><tr><td>-</td><td><b>Actor</b></td></tr><tr><td>*</td><td><a href=\"#PractitionerRole_6-2-PractitionerRole\">See above (PractitionerRole/6-2-PractitionerRole)</a></td></tr></table><h3>ProtocolApplieds</h3><table class=\"grid\"><tr><td>-</td><td><b>TargetDisease</b></td><td><b>DoseNumber[x]</b></td></tr><tr><td>*</td><td>Diphtheria caused by Corynebacterium diphtheriae (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#397430003)</span>, Tetanus (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#76902006)</span>, Pertussis (disorder) <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#27836007)</span></td><td>1</td></tr></table></div>"
+    },
+    "identifier" : [
+      {
+        "system" : "urn:oid:2.16.756.5.30.1.147.1.3.1",
+        "value" : "34567"
+      }
+    ],
+    "status" : "completed",
+    "vaccineCode" : {
+      "coding" : [
+        {
+          "system" : "http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs",
+          "code" : "637",
+          "display" : "Boostrix"
+        }
+      ]
+    },
+    "patient" : {
+      "reference" : "Patient/3-1-Patient"
+    },
+    "occurrenceDateTime" : "2015-11-01T00:00:00+01:00",
+    "recorded" : "2015-11-01T00:00:00+01:00",
+    "lotNumber" : "12-34244",
+    "route" : {
+      "coding" : [
+        {
+          "system" : "http://standardterms.edqm.eu",
+          "code" : "20035000",
+          "display" : "Intramuscular use"
+        }
+      ]
+    },
+    "performer" : [
+      {
+        "actor" : {
+          "reference" : "PractitionerRole/6-2-PractitionerRole"
+        }
+      }
+    ],
+    "protocolApplied" : [
+      {
+        "targetDisease" : [
+          {
+            "coding" : [
+              {
+                "system" : "http://snomed.info/sct",
+                "code" : "397430003",
+                "display" : "Diphtheria caused by Corynebacterium diphtheriae (disorder)"
+              }
+            ]
+          },
+          {
+            "coding" : [
+              {
+                "system" : "http://snomed.info/sct",
+                "code" : "76902006",
+                "display" : "Tetanus (disorder)"
+              }
+            ]
+          },
+          {
+            "coding" : [
+              {
+                "system" : "http://snomed.info/sct",
+                "code" : "27836007",
+                "display" : "Pertussis (disorder)"
+              }
+            ]
+          }
+        ],
+        "doseNumberPositiveInt" : 1
+      }
+    ]
+  }
+}
+
+export const FHIR_DOCUMENT_BUNLDE = {
+  "id": "bundle-id-e37e3dd8-798c-4c51-a412-b5cbdbf07ab5",
+  "resourceType": "Bundle",
+  "meta": {
+      "profile": [
+          "http://profiles.ihe.net/ITI/MHD/StructureDefinition/IHE.MHD.Comprehensive.ProvideBundle"
+      ]
+  },
+  "type": "transaction",
+  "entry": [
+      {
+          "fullUrl": "urn:uuid:0281a69f-47b6-4b76-ab25-8cd137ba3fa6",
+          "resource": {
+              "resourceType": "Binary",
+              "contentType": "application/fhir+json",
+              "data": ""
+          },
+          "request": {
+              "method": "POST",
+              "url": "urn:uuid:0281a69f-47b6-4b76-ab25-8cd137ba3fa6"
+          }
+      },
+      {
+          "fullUrl": "urn:uuid:2eeb97d6-ee16-4aac-94d0-27b217259b24",
+          "resource": {
+              "resourceType": "List",
+              "id": "urn:uuid:2eeb97d6-ee16-4aac-94d0-27b217259b24",
+              "meta": {
+                  "profile": [
+                      "http://profiles.ihe.net/ITI/MHD/StructureDefinition/IHE.MHD.Comprehensive.SubmissionSet"
+                  ]
+              },
+              "extension": [
+                  {
+                      "url": "http://profiles.ihe.net/ITI/MHD/StructureDefinition/ihe-designationType",
+                      "valueCodeableConcept": {
+                          "coding": [
+                              {
+                                  "system": "http://snomed.info/sct",
+                                  "code": "71388002",
+                                  "display": "Procedure (procedure)"
+                              }
+                          ]
+                      }
+                  },
+                  {
+                      "url": "http://profiles.ihe.net/ITI/MHD/StructureDefinition/ihe-sourceId",
+                      "valueIdentifier": {
+                          "value": "urn:oid:1.3.6.1.4.1.12559.11.13.2.5"
+                      }
+                  }
+              ],
+              "identifier": [
+                  {
+                      "use": "official",
+                      "system": "urn:ietf:rfc:3986",
+                      "value": "urn:uuid:2eeb97d6-ee16-4aac-94d0-27b217259b24"
+                  }
+              ],
+              "status": "current",
+              "mode": "working",
+              "title": "VACDUploadDoc",
+              "code": {
+                  "coding": [
+                      {
+                          "system": "http://profiles.ihe.net/ITI/MHD/CodeSystem/MHDlistTypes",
+                          "code": "submissionset",
+                          "display": "Submission Set"
+                      }
+                  ]
+              },
+              "subject": {
+                  "reference": "https://test.ahdis.ch/mag-bfh/fhir/Patient/urn:oid:1.1.1.99.1-7de95899-1e73-4ee2-8632-13987ee67ed6"
+              },
+              "entry": [
+                  {
+                      "item": {
+                          "reference": "urn:uuid:6e4a7068-b107-40dd-89bb-" // needs to be unique and add 12 chars
+                      }
+                  }
+              ],
+              "date": "2022-06-13"
+          },
+          "request": {
+              "method": "POST",
+              "url": "urn:uuid:2eeb97d6-ee16-4aac-94d0-27b217259b24"
+          }
+      },
+      {
+          "fullUrl": "urn:uuid:6e4a7068-b107-40dd-89bb-" // needs to be unique and add 12 chars
+          ,
+          "resource": {
+              "resourceType": "DocumentReference",
+              "contained": [
+                  {
+                      "resourceType": "Patient",
+                      "id": "1.1.1.99.1-7de95899-1e73-4ee2-8632-13987ee67ed6",
+                      "identifier": [
+                          {
+                              "system": "urn:oid:1.1.1.99.1",
+                              "value": "7de95899-1e73-4ee2-8632-13987ee67ed6"
+                          },
+                          {
+                              "system": "urn:oid:2.16.756.5.30.1.127.3.10.3",
+                              "value": "761337619779800896"
+                          },
+                          {
+                              "system": "urn:oid:2.16.756.5.30.1.178.1.1",
+                              "value": "PAT.9779.8008"
+                          }
+                      ],
+                      "active": true,
+                      "name": [
+                          {
+                              "family": "Molina",
+                              "given": [
+                                  "Franz"
+                              ]
+                          }
+                      ],
+                      "gender": "male",
+                      "birthDate": "1972-09-20"
+                  }
+              ],
+              "masterIdentifier": {
+                  "value": "urn:oid:89913ac4-f8a3-4eee-9e41-" // needs to be unique and add 12 chars
+              },
+              "identifier": [
+                  {
+                      "use": "official",
+                      "system": "urn:ietf:rfc:3986",
+                      "value": "urn:uuid:6e4a7068-b107-40dd-89bb-" // needs to be unique and add 12 chars
+                  }
+              ],
+              "status": "current",
+              "type": {
+                  "coding": [
+                      {
+                          "system": "http://snomed.info/sct",
+                          "code": "41000179103",
+                          "display": "Impfausweis"
+                      }
+                  ]
+              },
+              "category": [
+                  {
+                      "coding": [
+                          {
+                              "system": "http://snomed.info/sct",
+                              "code": "184216000",
+                              "display": "Langzeitdokumentation"
+                          }
+                      ]
+                  }
+              ],
+              "subject": {
+                  "reference": "https://test.ahdis.ch/mag-bfh/fhir/Patient/urn:oid:1.1.1.99.1-7de95899-1e73-4ee2-8632-13987ee67ed6"
+              },
+              "source": "urn:oid:1.3.6.1.4.1.12559.11.13.2.5",
+              "date": "2022-05-13",
+              "description": "Impfdokument",
+              "securityLabel": [
+                  {
+                      "coding": [
+                          {
+                              "system": "http://snomed.info/sct",
+                              "code": "17621005",
+                              "display": "Normal (qualifier value)"
+                          }
+                      ]
+                  }
+              ],
+              "content": [
+                  {
+                      "attachment": {
+                          "contentType": "application/fhir+json",
+                          "language": "de-CH",
+                          "url": "urn:uuid:0281a69f-47b6-4b76-ab25-8cd137ba3fa6"
+                      },
+                      "format": {
+                          "system": "urn:oid:1.3.6.1.4.1.19376.1.2.3",
+                          "code": "urn:ihe:pcc:ic:2009",
+                          "display": "Immunization Content (IC)"
+                      }
+                  }
+              ],
+              "context": {
+                  "facilityType": {
+                      "coding": [
+                          {
+                              "system": "http://snomed.info/sct",
+                              "code": "66280005",
+                              "display": "Private home-based care (environment)"
+                          }
+                      ]
+                  },
+                  "practiceSetting": {
+                      "coding": [
+                          {
+                              "system": "http://snomed.info/sct",
+                              "code": "394658006",
+                              "display": "Other clinical specialty"
+                          }
+                      ]
+                  },
+                  "sourcePatientInfo": {
+                      "reference": "#1.1.1.99.1-7de95899-1e73-4ee2-8632-13987ee67ed6"
+                  }
+              }
+          },
+          "request": {
+              "method": "POST",
+              "url": "urn:uuid:6e4a7068-b107-40dd-89bb-" // needs to be unique and add 12 chars
+          }
+      }
   ]
 }

@@ -236,9 +236,7 @@ export default {
         '\nBehandelnder Arzt',
         this?.healthProfessional
       );
-      if(!this?.immunizationName||!illnessArray){
-        console.log('test')
-      }
+      this.$epd.setVaccinationEntry(this.immunizationName,illnessArray,this.dosisName,this.lotNumber,this.date)
     },
     uploadToMidata() {
       console.log('Upload to Midata pressed');
