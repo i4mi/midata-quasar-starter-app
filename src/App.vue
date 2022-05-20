@@ -5,7 +5,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'App',
+  name: 'Impfconnect',
   methods: {
     setLanguage(_lang: string): void {
       this.$i18n.locale = _lang;

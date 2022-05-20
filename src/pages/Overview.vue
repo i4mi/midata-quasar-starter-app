@@ -1,82 +1,223 @@
 <template>
-  <div class="q-pa-md">
-    <q-carousel
-      swipeable
-      animated
-      v-model="slide"
-      :autoplay="autoplay"
-      ref="carousel"
-      infinite
-    >
-      <q-carousel-slide :name="1" class="column no-wrap flex-center">
-        <q-img
-          src="../assets/overview/undraw_pair_programming_re_or4x.svg"
-          height="150px"
-          fit="contain"
-        />
-        <div class="q-mt-md text-center text-h3 text-weight-thin">
-          Web- <br/> entwicklung
+  <div id="q-app" style="min-height: 100vh">
+    <div class="q-pa-md">
+      <div class="row">
+        <div class="col-2"></div>
+        <div class="col">
+          <h3>Übersicht</h3>
         </div>
-        <q-btn to="/developmentBasics" class="midata-fade text-white">Los gehts!</q-btn>
-      </q-carousel-slide>
-      <q-carousel-slide :name="2" class="column no-wrap flex-center">
-        <q-img
-          src="../assets/overview/undraw_doctors_hwty.svg"
-          height="150px"
-          fit="contain"
-        />
-        <div class="q-mt-md text-center text-h3 text-weight-thin">Midata</div>
-        <q-btn to="/midata/introduction" class="midata-fade text-white">Los gehts!</q-btn>
-      </q-carousel-slide>
-      <template v-slot:control>
-        <q-carousel-control
-          position="top-right"
-          :offset="[5, 5]"
-          class="text-black rounded-borders"
-        >
-          <q-toggle
-            flat
+      </div>
+      <q-btn round @click="test" label="Test" />
+      <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8 self-center">
+          <div class="q-pa-md">
+            <div class="q-gutter-y-md column" style="max-width: 500px">
+              <q-input
+                v-model="patientName"
+                readonly
+                label="Patient / geimpfte Person"
+              ></q-input>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="q-pa-md">
+      <q-table
+        title="Historie"
+        :rows="rows"
+        :columns="columns"
+        row-key="name"
+        :selected-rows-label="getSelectedString"
+        selection="multiple"
+        v-model:selected="selected"
+      >
+        <template v-slot:top="props">
+          <div v-if="$q.screen.gt.xs" class="col">
+            <q-toggle v-model="visibleColumns" val="epd" label="EPD" />
+            <q-toggle v-model="visibleColumns" val="midata" label="Midata" />
+          </div>
+          <q-select
+            v-else
+            v-model="visibleColumns"
+            multiple
+            borderless
             dense
-            color="primary"
-            v-model="autoplay"
-            label="Auto Play"
+            options-dense
+            :display-value="$q.lang.table.columns"
+            emit-value
+            map-options
+            :options="columns"
+            option-value="name"
+            style="min-width: 150px"
           />
-        </q-carousel-control>
 
-        <q-carousel-control
-          position="bottom-right"
-          :offset="[5, 5]"
-          class="q-gutter-xs"
-        >
           <q-btn
             flat
-            color="primary"
-            text-color="black"
-            icon="arrow_left"
-            @click="$refs.carousel.previous()"
+            round
+            dense
+            :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+            @click="props.toggleFullscreen"
+            class="q-ml-md"
           />
-          <q-btn
-            flat
-            color="primary"
-            text-color="black"
-            icon="arrow_right"
-            @click="$refs.carousel.next()"
-          />
-        </q-carousel-control>
-      </template>
-    </q-carousel>
+        </template>
+      </q-table>
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script>
+import { ref } from 'vue';
+import { defineComponent } from 'vue';
+import {
+  loggedInPatient,
+  immunizations,
+  EpdService,
+  vaccinations
+} from '../plugins/epdService.ts';
+const columns = [
+  {
+    name: 'name',
+    required: true,
+    label: 'Impfstoffname',
+    align: 'left',
+    field: (row) => row.name,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: 'platform',
+    align: 'center',
+    label: 'Hochgeladen auf',
+    field: 'platform',
+  },
+  {
+    name: 'producer',
+    align: 'center',
+    label: 'Lot Nummer',
+    field: 'lotNo',
+    sortable: true,
+  },
+  { name: 'protection', label: 'Schutz', field: 'protection', sortable: true },
+  { name: 'dosageno', label: 'Dosisnummer', field: 'dosageno' },
+  {
+    name: 'vaccinationdate',
+    label: 'Verabreichungsdatum',
+    field: 'vaccinationdate',sortable: true,
+  },
+  { name: 'practicioner', label: 'Behandelnder Arzt', field: 'practicioner' },
+];
+
+/* const rows = [
+  {
+    name: 'Frozen Yogurt',
+    lotNo: 'Moderna',
+    protection: 'Röteln',
+    dosageno: 26164,
+    vaccinationdate: '02/06/2021',
+    practicioner: 'Cornelia Corona',
+    platform: ['EPD'],
+  },
+  {
+    name: 'Ice cream sandwich',
+    producer: 'Coop',
+    protection: 'Virale hepatitis, Typ B',
+    dosageno: 37525,
+    vaccinationdate: '02/06/2011',
+    practicioner: 'Apotheker Alain',
+    platform: ['EPD', 'Midata'].join(' '),
+  },
+  {
+    name: 'Eclair',
+    producer: 'Migros',
+    protection: 'Röteln',
+    dosageno: 23442,
+    vaccinationdate: '02/06/2014',
+    practicioner: 'Pfleger Paul',
+    platform: ['Midata'],
+  },
+  {
+    name: 'Cupcake',
+    producer: 'Migros',
+    protection: 'Gelbfieber',
+    dosageno: 64247,
+    vaccinationdate: '02/06/2011',
+    practicioner: 'Ingo Impft',
+    platform: ['EPD', ''].join(' '),
+  },
+  {
+    name: 'Gingerbread',
+    producer: 'Nestle',
+    protection: 'Röteln',
+    dosageno: 49224,
+    vaccinationdate: '02/06/2021',
+    practicioner: 'Sandra Sticht',
+    platform: ['', 'Midata'].join(' '),
+  },
+  {
+    name: 'Jelly bean',
+    producer: 'Moderna',
+    protection: 'Windpocken',
+    dosageno: 94424,
+    vaccinationdate: '02/06/2021',
+    practicioner: 'Lebkuchemann',
+    platform: ['', 'Midata'].join(' '),
+  },
+  {
+    name: 'Donut',
+    producer: 'Pfizer',
+    protection: 'Gelbfieber',
+    dosageno: 55101,
+    vaccinationdate: '02/06/2021',
+    practicioner: 'Apotheker Alain',
+    platform: ['EPD', ''].join(' '),
+  },
+  {
+    name: 'KitKat',
+    producer: 'Moderna',
+    protection: 'Röteln',
+    dosageno: 60065,
+    vaccinationdate: '02/06/2001',
+    practicioner: 'Doktor Daniela',
+    platform: ['EPD', 'Midata'].join(' '),
+  },
+]; */
+
+const rows = vaccinations;
 
 export default defineComponent({
-  name: 'Overview',
-  setup() {
+  data() {
     return {
-      slide: ref(1),
-      autoplay: ref(true),
+      patientName: ref(loggedInPatient.loggedIn?.name[0].family +
+        ' ' +
+        loggedInPatient.loggedIn?.name[0].given[0])
+    }
+  },
+  methods: {
+    test() {
+      this.$epd.getPatientResource('761337619779800896');
+      this.$epd.handleVaccinationResourcesAsBundle();
+    },
+  },
+  setup() {
+    const selected = ref([]);
+    return {
+      stoffname: 'hello',
+      date: ref('2022/01/01'),
+      group: ref([]),
+      model: ref(null),
+      columns,
+      rows,
+      selected,
+      visibleColumns: ref([]),
+      getSelectedString() {
+        return selected.value.length === 0
+          ? ''
+          : `${selected.value.length} record${
+              selected.value.length > 1 ? 's' : ''
+            } selected of ${rows.length}`;
+      },
     };
   },
 });

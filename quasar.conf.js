@@ -52,7 +52,9 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 
       // transpile: false,
-      // publicPath: '/',
+      publicPath: process.env.NODE_ENV === 'production'
+        ? '/midata-quasar-starter-app/' // necessary if you serve app on GitHub pages, corresponds to repository name
+        : '/',
 
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
@@ -76,7 +78,7 @@ module.exports = configure(function (ctx) {
           : 'midata_quasar_starter_app',
         VUE_FHIR_REDIRECT_URL: ctx.dev
           ? 'http://localhost:8080/#/midata/demo'
-          : 'http://localhost:8080/#/midata/demo',
+          : 'https://i4mi.github.io/midata-quasar-starter-app/#/midata/demo', // enter here production url for midata redirect, this url also has to be declared in the Midata app declaration
       },
 
       // https://quasar.dev/quasar-cli/handling-webpack
@@ -114,7 +116,7 @@ module.exports = configure(function (ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Notify'],
+      plugins: ['Notify','Dialog'],
     },
 
     // animations: 'all', // --- includes all animations

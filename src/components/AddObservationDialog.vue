@@ -81,8 +81,8 @@ export default defineComponent({
   data: () => ({}),
   computed: {
     show: {
-      get() {
-        return this.visible;
+      get(): boolean {
+        return this.visible as boolean;
       },
       set(value: any) {
         if (!value) {
