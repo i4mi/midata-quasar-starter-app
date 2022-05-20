@@ -7,6 +7,25 @@
     </div>
 
     <div class="row justify-end">
+
+
+      <q-btn
+        @click="
+          getImmunization();
+          flag = true;
+        "
+        flat
+        text-color="white"
+        class="gt-xs midata-fade"
+      >
+        <q-icon left name="person"></q-icon>
+        Immunizations
+      </q-btn>
+
+
+
+
+
       <q-btn
         @click="
           getPatient();
@@ -30,6 +49,7 @@
         class="lt-sm midata-fade"
         label="Patienten Ressource abfragen"
       >
+
       </q-btn>
       <q-space />
       <q-btn
@@ -213,6 +233,10 @@ import bodySites from '../../data/bodySites.json';
 import EditObservationDialog from '../../components/EditObservationDialog.vue';
 import AddObservationDialog from '../../components/AddObservationDialog.vue';
 
+import axios from 'axios';
+
+
+
 export default defineComponent({
   name: 'MidataDemo',
   components: {
@@ -248,6 +272,18 @@ export default defineComponent({
   }),
   computed: {},
   methods: {
+    //Get the imunizations records and print them in the console.
+    getImmunization() {
+      axios.get('http://jsonplaceholder.typicode.com/posts')
+        .then((response) => { console.log(response.data)
+        })
+        .catch((error)=>{
+          console.log(error)
+          })
+
+
+    },
+
     getFullPatientName() {
       let name = this.$storage.getPatient().name;
       return name[0].given.toString() + ' ' + name[0].family;
