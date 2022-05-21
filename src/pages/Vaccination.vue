@@ -198,7 +198,6 @@ import {
 export default {
   setup() {
     let eprSpid = '';
-
     function uploadToEpd() {
       console.log('Upload to EPD pressed');
     }
