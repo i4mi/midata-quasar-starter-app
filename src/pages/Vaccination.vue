@@ -181,6 +181,8 @@
 </template>
 
 <script>
+import actSites from '../data/actSites.json';
+import { Patient } from '@i4mi/fhir_r4';
 import { ref } from 'vue';
 import { JSOnFhir } from '@i4mi/js-on-fhir';
 import { v4 as uuid } from 'uuid';
@@ -233,6 +235,8 @@ export default {
       optionsImpf: ['FSME-Immun CC', 'Encepur N', 'Inflexal V', 'Poliorix'],
     };
   },
+
+
   methods: {
     uploadToEpd() {
 
@@ -260,6 +264,12 @@ export default {
     uploadToMidata() {
       console.log('Upload to Midata pressed');
     },
+
+    getPatient() {
+          this.patientResource = this.$storage.getPatient();
+          console.log(this.patientResource);
+        },
+
   },
 };
 </script>

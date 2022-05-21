@@ -506,6 +506,15 @@ export default class MidataService {
       resourceType: 'Immunization',
       status: ImmunizationStatus.COMPLETED,
 
+      /**
+       * vacinationCode: string
+       * dateAndTime: date
+       * primarySource: booleam
+       * lotnumber:string
+       * expirationDate:date
+       * site: array ( hast to have part of the body and a code)
+      */
+
       vaccineCode: {
               coding: [
                 {
@@ -577,6 +586,53 @@ export default class MidataService {
 
 
     };
+  }
+  /**
+   * Helper function that creates a Method of measurement to be used in an observation.
+   * @param bodySite the body site where the bodytemperature was measured.
+   * @returns method of temperature taking with coding as JSON.
+   */
+   getImmunizationSite(bodySite: string) {
+    switch (bodySite) {
+      case 'left arm':
+        return {
+          coding: [
+            {
+              system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
+              code: 'LA',
+              display: 'left arm'
+            }
+          ]
+        };
+      case 'left gluteus':
+        return {
+
+            system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
+            code: 'LG',
+            display: 'left gluteus medius'
+
+
+        };
+      case 'right gluteus':
+        return {
+          system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
+            code: 'RG',
+            display: 'right gluteus medius'
+        };
+        case 'right arm':
+          return {
+            system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
+              code: 'RA',
+              display: 'right arm'
+          };
+      default:
+        return {
+          system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
+              code: '_HumanSubstanceAdministrationSite',
+              display: 'Human Substance Administration Site'
+
+        };
+    }
   }
 
 }
