@@ -1,5 +1,5 @@
 import MidataService from './midataService';
-import { Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
+import { Immunization, ImmunizationStatus, Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import { Notify } from 'quasar';
 import { reactive } from 'vue'
 
@@ -19,8 +19,10 @@ export const patient = reactive({
 export default class Storage {
   private currentLanguage = 'de';
   private observations = new Array<Observation>();
+  private immunizations = new Array<Immunization>();
   private patientResource = {} as Patient;
   private currentObservation = {} as Observation;
+  private currentImmunization = {} as Immunization;
 
   midata: MidataService;
 
@@ -46,6 +48,7 @@ export default class Storage {
       this.currentLanguage = storage.currentLanguage;
       this.observations = storage.observations;
       this.patientResource = storage.patientResource;
+      this.immunizations = storage.immunizations;
     } else if (this.midata.isLoggedIn()) {
       void this.restoreFromMidata();
     } else {
@@ -64,10 +67,12 @@ export default class Storage {
       Promise.all([
         this.midata.getPatientResource(),
         this.midata.loadObservations(),
+        this.midata.loadImmunizations(),
       ])
         .then((results) => {
           this.patientResource = results[0];
           this.observations = results[1] as Array<Observation>;
+          this.immunizations = results[2] as Array<Immunization>;
           this.persist();
           resolve();
         })
@@ -122,6 +127,14 @@ export default class Storage {
     return this.observations;
   }
 
+   /**
+   * Gets all Immunizations from the store.
+   * @returns
+   */
+    public getImmunizations(): Array<Immunization> {
+      return this.immunizations;
+    }
+
   /**
    * Creates a new Observation
    * @param _status
@@ -166,6 +179,55 @@ export default class Storage {
         .catch((error) => reject(error));
     });
   }
+
+/**
+   * Creates a new Observation
+   * @param _status
+   * @param bodySite
+   * @param value
+   * @returns
+   */
+ public createImmunization(
+  _status: ImmunizationStatus,
+
+): Promise<Immunization> {
+  return new Promise((resolve, reject) => {
+    this.midata
+      .createImmunization()
+      .then((result) => {
+        if (result) {
+          this.midata
+            .loadImmunizations()
+            .then((res) => {
+              this.immunizations = res as Array<Immunization>;
+              this.persist();
+              Notify.create({
+                message: 'Immunization erfolgreich gespeichert',
+                color: 'green',
+                position: 'top',
+                icon: 'announcement',
+              });
+              resolve(result);
+            })
+            .catch((error) => reject(error));
+        } else {
+          Notify.create({
+            message: 'Die Immunization konnte nicht erstellt werden',
+            color: 'red',
+            position: 'top',
+            icon: 'announcement',
+          });
+          reject('Error');
+        }
+      })
+      .catch((error) => reject(error));
+  });
+}
+
+
+
+
+
 
   /**
    *
@@ -230,4 +292,24 @@ export default class Storage {
   public getCurrentObservation(): Observation {
     return this.currentObservation;
   }
+
+//Immunizations Setter and Getter
+  /**
+   *
+   * @param _id
+   */
+   public setCurrentImmunization(_id: string): void {
+    void this.midata.search('Immunization/' + _id).then((result) => {
+      this.currentImmunization = result as Immunization;
+      this.persist();
+    });
+  }
+/**
+   *
+   * @returns
+   */
+ public getCurrentimmunization(): Immunization {
+  return this.currentImmunization;
+}
+
 }

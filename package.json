@@ -20,7 +20,6 @@
     "@i4mi/fhir_r4": "^1.0.10",
     "@i4mi/js-on-fhir": "^0.2.1",
     "@quasar/extras": "^1.0.0",
-    "axios": "^0.27.2",
     "core-js": "^3.6.5",
     "highlight.js": "^11.3.1",
     "moment": "^2.29.1",
@@ -29,7 +28,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
-    "@quasar/app": "^2.3.0",
+    "@quasar/app": "^3.0.0",
     "@types/node": "^12.20.21",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",

@@ -1,4 +1,4 @@
-<template id="q-app">
+<template>
   <router-view />
 </template>
 <script lang="ts">

@@ -1,5 +1,5 @@
 import { JSOnFhir } from '@i4mi/js-on-fhir';
-import { Patient, Bundle, ObservationStatus, Observation } from '@i4mi/fhir_r4';
+import { Patient, Bundle, ObservationStatus, Observation, Immunization, ImmunizationStatus  } from '@i4mi/fhir_r4';
 import moment from 'moment';
 
 // import moment library. More information under https://momentjs.com
@@ -92,6 +92,7 @@ export default class MidataService {
         .catch((error) => reject(error));
     });
   }
+
 
   /**
    * Gets all observations from the fhir endpoint.
@@ -439,4 +440,147 @@ export default class MidataService {
         };
     }
   }
+
+
+
+
+/**
+   * ---------------------------------------------------------------
+   * Gets the Immunization resources as bundle from the fhir endpoint.
+   * @returns bundle with Immunization resources as JSON.
+   * ----------------------------------------------------------------
+   */
+ getImmunizationResourcesAsBundle(): Promise<Bundle> {
+  return new Promise((resolve, reject) => {
+    this.jsOnFhir
+      .search('Immunization')
+      .then((result) => {
+        const immunizationBundle = result as Bundle;
+
+        immunizationBundle.entry?.length > 0
+          ? resolve(immunizationBundle)
+          : reject('No entries in Immunization bundle found!');
+      })
+      .catch((error) => reject(error));
+  });
 }
+
+  /**
+     * Gets all immunizations from the fhir endpoint.
+     * @returns bundle with observations
+     */
+  public loadImmunizations() {
+    return new Promise((resolve, reject) => {
+      this.jsOnFhir.search('Immunization').then((result) => {
+        result
+          ? resolve(
+              (result as Bundle).entry?.map(
+                (entry) => entry.resource as Immunization
+              ) || []
+            )
+          : reject('Error');
+      }).catch((error)=> reject(error));
+    });
+  }
+  /**
+   * Creates a Immunization (of type bodytemperature) resource on the fhir server
+   *              - if successfull -> response with the created resource as JSON
+   *              - if not successfull -> error message
+   */
+   public createImmunization(
+    ): Promise<Immunization> {
+      return new Promise((resolve, reject) => {
+        const immunization = this.newImmunization();
+        this.jsOnFhir.create(immunization).then((result) => {
+          result ? resolve(result as Immunization) : reject('internal error');
+        }).catch((error)=> reject(error));
+      });
+    }
+
+    /**
+   * Creates immunization with status (compleated as default), vacination code, patient, date, lot number, performer and dose quantity
+   */
+   newImmunization():Immunization {
+    return {
+
+      resourceType: 'Immunization',
+      status: ImmunizationStatus.COMPLETED,
+
+      vaccineCode: {
+              coding: [
+                {
+                  system: 'urn:oid:1.2.36.1.2001.1005.17',
+                  code: 'FLUVAX',
+                }
+                ],
+                text: 'Fluvax (In fluenza)',
+          },
+
+      occurrenceDateTime: '2013-01-10',
+      primarySource: true,
+      lotNumber: 'AAJN11K',
+      expirationDate: '2015-02-15',
+
+      site: {
+          coding: [
+                    {
+                      system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
+                      code: 'LA',
+                      display: 'left arm'
+                    }
+                  ]
+              },
+
+          patient: {
+        display: '',
+        reference: 'Patient/' + this.jsOnFhir.getPatient(),
+      },
+
+      occurrenceString: '2022-02-16',
+
+      route: {
+          coding: [
+                    {
+                      system: 'http://terminology.hl7.org/CodeSystem/v3-RouteOfAdministration',
+                      code: 'IM',
+                      display: 'Injection, intramuscular'
+                    }
+                  ]
+              },
+
+
+      doseQuantity: {
+                  value: 5,
+                  system: 'http://unitsofmeasure.org',
+                  code: 'mg'
+                },
+
+
+      performer: [
+                    {
+                    actor: {
+                      identifier:
+                      {
+                        system : 'http://www.gs1.org/gln',
+                        value: '7640166732204'
+                      },
+                      display : 'Dr. med. Hanspeter Wenger'
+                    }
+                    }
+                ],
+                note: [
+                        {
+                          text: 'if you are reading this, your code worked'
+                        }
+                      ]
+
+
+
+    };
+  }
+
+}
+
+
+
+
