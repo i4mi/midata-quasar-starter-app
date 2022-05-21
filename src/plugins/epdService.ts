@@ -1,95 +1,233 @@
 import { JSOnFhir } from '@i4mi/js-on-fhir';
-import { Patient, Bundle, ObservationStatus, Observation } from '@i4mi/fhir_r4';
+import {
+  Patient,
+  Bundle,
+  ObservationStatus,
+  Observation,
+  Immunization,
+  ImmunizationPerformer,
+  Condition, Organization,
+  AllergyIntolerance,
+  Practitioner,
+  DocumentReference,
+  BundleEntry,
+  List,
+  Resource,
+  Coding,
+  Composition
+} from '@i4mi/fhir_r4';
 import moment from 'moment';
+import { EPR_SPID_OID, HOEHEWEG_OID, CURRENT_DOCUMENT, EPD_PLAYGROUND_OID } from './helpers';
+import { reactive } from 'vue';
+import { VACD_COMPOSITION_ENTRY, VACD_IMMUNIZATION_ENTRY, FHIR_DOCUMENT_BUNLDE, VACD_RECORD_DOCUMENT } from '../plugins/VACD RECORD DOCUMENT'
+import { number } from '@intlify/core-base';
 
 // import moment library. More information under https://momentjs.com
 const now = moment();
 
+export const loggedInPatient: { loggedIn: Patient | undefined } = reactive({ loggedIn: undefined })
+
+export const vaccinations = []
+
 export default class EpdService {
-  jsOnFhir: JSOnFhir;
+  jsOnFhir: JSOnFhir
+  loggedIn: false
+  practitioner: Practitioner
+  currentPatient: Patient
+  immunization: Immunization
+  immunizationPerformer: ImmunizationPerformer
+  organization: Organization
+  patientSpid: string
+  immunizations: Array<Immunization>
+
+  vaccCodeName = new Map<string, number>([
+    ['FSME-Immun CC', 450],
+    ['Encepur N', 627],
+    ['Inflexal V', 614],
+    ['Poliorix', 669]
+  ])
+
+  diseaseCodeName = new Map<string, number>([
+    ['Windpocken', 38907003],
+    ['Masern', 14189004],
+    ['Mumps', 36989005],
+    ['Röteln', 36989005],
+    ['Virale hepatitis, Typ A', 40468003],
+    ['Virale hepatitis, Typ B', 66071002],
+    ['Frühsommer-Miningoenzephalithis (FSME)', 32323003],
+    ['Gelbfieber', 16541001],
+    ['Starrkrampf', 76902006]
+  ])
+
 
   constructor() {
     this.jsOnFhir = new JSOnFhir(
-      process.env.VUE_FHIR_BASE_URL,
-      process.env.VUE_FHIR_APP_NAME,
-      process.env.VUE_FHIR_REDIRECT_URL
+      'https://test.ahdis.ch/mag-bfh',
+      'irr🐘', // get it? its irrELEVANT!
+      'irr🐘',
+      true
     );
-  }
-
-  /**
-   * Returns the jsOnFhir object for making direct method calls.
-   * @returns the jsOnFhir as JSON.
-   */
-  public getJSonFhir(): JSOnFhir {
-    return this.jsOnFhir;
-  }
-
-  /**
-   * Checks that the token isn't empty and hasn't expired yet. Therefore returns the status of the login status.
-   * @returns true if the user is logged in (token valid and not expired yet) and false otherwise.
-   */
-  public isLoggedIn(): boolean {
-    return this.jsOnFhir.isLoggedIn();
-  }
-
-  /**
-   * Logs the user out by resetting authentification details.
-   */
-  public logout(): void {
-    this.jsOnFhir.logout();
-  }
-
-  /**
-   * Initiates the oAuth process.
-   * @param params
-   */
-  public authenticate(params?: Record<string, unknown>): void {
-    this.jsOnFhir.authenticate(params);
-  }
-
-  /**
-   * Handles the response of oAuth portal (server).
-   * @returns a promise:
-   *              - if successfull -> response of the oAuth portal (server) includes: token, refreshtoken etc.
-   *              - if not successfull -> error response.
-   */
-  public handleAuthResponse(): Promise<any> {
-    return this.jsOnFhir.handleAuthResponse();
   }
 
   /**
    * Gets the patient resource from the fhir endpoint.
    * @returns patient resource as JSON
    */
-  public getPatientResource(): Promise<Patient> {
+  getPatientResource(spid: string): void {
+    const SEARCH_PARAMS = {
+
+      // target system is the ID we want
+      identifier: EPR_SPID_OID + '|' + spid,
+    };
+
+    this.jsOnFhir
+      .search('Patient', SEARCH_PARAMS)
+      .then((result) => {
+        const bundle = result as Bundle;
+        loggedInPatient.loggedIn = bundle.entry[0].resource as Patient
+      })
+  }
+
+  /**
+ * Gets the vaccination resources as bundle from the fhir endpoint.
+ * @returns bundle with observation resources as JSON.
+ */
+
+  async getVaccinations(): Promise<void> {
+    const SEARCH_PARAMS = {
+      status: 'current',
+      'patient.identifier': EPD_PLAYGROUND_OID + '|7de95899-1e73-4ee2-8632-13987ee67ed6'
+    };
+
+    const vaccinationRecordDocumentBundle = await this.getDocumentReference().then(res => {
+      return res;
+    });
+
+    const docsAmount = vaccinationRecordDocumentBundle.entry.length
+
+    console.log('Amount of current Documents: ', docsAmount)
+
+    const vacdDocuments = vaccinationRecordDocumentBundle
+      .entry
+
+    const vacdVaccinationRecordDocuments = vacdDocuments.filter(document =>
+      (document.resource as DocumentReference)
+        .type
+        .coding[0]
+        .display === 'Impfausweis'
+    )
+
+    vacdVaccinationRecordDocuments.sort(function (a, b) {
+      return new Date((b.resource as DocumentReference)
+        .content[0]
+        .attachment
+        .creation).getTime() -
+        new Date((a.resource as DocumentReference)
+          .content[0]
+          .attachment
+          .creation).getTime();
+    });
+
+    const urlOfMostCurrentDocument = (vacdVaccinationRecordDocuments[0].resource as DocumentReference)
+      .content[0]
+      .attachment
+      .url
+
+    console.log('urlOfMostCurrentDocument: ', urlOfMostCurrentDocument)
+
+    const response = await fetch(urlOfMostCurrentDocument);
+    const data = await response.json();
+
+    this.practitioner = data.entry.find((entry: BundleEntry) => {
+      return entry
+        .resource
+        .resourceType === 'Practitioner'
+    }).resource as Practitioner
+
+    console.log('Practitioner ', this.practitioner)
+
+    this.currentPatient = data.entry.find((entry: BundleEntry) => {
+      return entry
+        .resource
+        .resourceType === 'Patient'
+    }).resource as Patient
+
+    console.log('Patient ', this.currentPatient)
+
+    this.organization = data.entry.find((entry: BundleEntry) => {
+      return entry
+        .resource
+        .resourceType === 'Organization'
+    }).resource as Organization
+
+    console.log('Organization ', this.organization)
+
+    this.immunizations = data.entry.filter((entry: BundleEntry) => {
+      return entry
+        .resource
+        .resourceType === 'Immunization'
+    }).map(x => x.resource as Immunization)
+
+    console.log('Immunizations ', this.immunizations)
+
+    this.createVaccinationTable()
+    //zuerst array mit allen imunizations und dann durch das array durchiterieren, practitioner etc dazuführen und dann in eigenes Objekt
+  }
+
+  async getDocumentReference(): Promise<Bundle> {
+    const SEARCH_PARAMS = {
+      status: 'current',
+      'patient.identifier': EPD_PLAYGROUND_OID + '|7de95899-1e73-4ee2-8632-13987ee67ed6'
+    };
     return new Promise((resolve, reject) => {
       this.jsOnFhir
-        .search('Patient', { _id: this.jsOnFhir.getPatient() })
+        .search('DocumentReference', SEARCH_PARAMS)
         .then((result) => {
-          const patientBundle = result as Bundle;
-          (patientBundle.entry?.length !== undefined && patientBundle.entry?.length > 0 && patientBundle.entry[0].resource)
-            ? resolve(patientBundle.entry[0].resource as Patient)
-            : reject('No entry in patient bundle found!');
+          const documentBundle = result as Bundle;
+          documentBundle.entry?.length > 0
+            ? resolve(documentBundle)
+            : reject('No entries in bundle found!');
         })
         .catch((error) => reject(error));
     });
   }
 
-  /**
-   * Gets the observation resources as bundle from the fhir endpoint.
-   * @returns bundle with observation resources as JSON.
-   */
-  getObservationResourcesAsBundle(): Promise<Bundle> {
-    return new Promise((resolve, reject) => {
-      this.jsOnFhir
-        .search('Observation')
-        .then((result) => {
-          const observationBundle = result as Bundle;
-          observationBundle.entry?.length > 0
-            ? resolve(observationBundle)
-            : reject('No entries in observation bundle found!');
-        })
-        .catch((error) => reject(error));
+  handleVaccinationResourcesAsBundle(): void {
+    const vaccinationRecordDocumentBundle = this.getVaccinations();
+  }
+
+  createVaccinationTable(): void {
+    interface Row {
+      name: string,
+      lotNo: string,
+      protection: string,
+      dosageno: string,
+      vaccinationdate: string,
+      practicioner: string,
+      platform: Array<string>,
+    }
+
+    this.immunizations.forEach(element => {
+
+      const protections: Array<string> = []
+      element
+        .protocolApplied[0]
+        .targetDisease
+        .forEach(target => {
+          protections.push(target.coding[0].display)
+        }
+        )
+
+      const row: Row = {
+        name: element.vaccineCode.coding[0].display,
+        lotNo: element.lotNumber,
+        protection: protections.join(', '),
+        dosageno: element.identifier[0].value,
+        vaccinationdate: moment(element.occurrenceDateTime).format('MMMM Do YYYY, h:mm a'),
+        practicioner: this.practitioner.name[0].family + ' ' + this.practitioner.name[0].given[0],
+        platform: ['EPD']
+      }
+      vaccinations.push(row)
     });
   }
 
@@ -102,12 +240,12 @@ export default class EpdService {
       this.jsOnFhir.search('Observation').then((result) => {
         result
           ? resolve(
-              (result as Bundle).entry?.map(
-                (entry) => entry.resource as Observation
-              ) || []
-            )
+            (result as Bundle).entry?.map(
+              (entry) => entry.resource as Observation
+            ) || []
+          )
           : reject('Error');
-      }).catch((error)=> reject(error));
+      }).catch((error) => reject(error));
     });
   }
 
@@ -123,7 +261,7 @@ export default class EpdService {
     return new Promise((resolve, reject) => {
       this.jsOnFhir.search(resourceType, params).then((result) => {
         result ? resolve(result) : reject('Error');
-      }).catch((error)=> reject(error));
+      }).catch((error) => reject(error));
     });
   }
 
@@ -145,7 +283,7 @@ export default class EpdService {
       const observation = this.newBtObservation(_status, bodySite, value);
       this.jsOnFhir.create(observation).then((result) => {
         result ? resolve(result as Observation) : reject('internal error');
-      }).catch((error)=> reject(error));
+      }).catch((error) => reject(error));
     });
   }
 
@@ -187,7 +325,7 @@ export default class EpdService {
             )
           );
         }
-      }).catch((error)=> reject(error));
+      }).catch((error) => reject(error));
     });
   }
 
@@ -438,5 +576,118 @@ export default class EpdService {
           ],
         };
     }
+  }
+
+  /**
+   * creates a immunization FHIR resource https://build.fhir.org/immunization.html 
+   * @param immunizationName the name of the vaccination
+   * @param illnesses a list of the illnesses that the immunization tackles
+   * @param doseNo the number of the dose
+   * @param lotNo the Lot number of the dose
+   * @param date the date in which the vaccination was performed
+   */
+  setVaccinationEntry(
+    immunizationName: string,
+    illnesses: Array<string>,
+    doseNo: string,
+    lotNo: string,
+    date: Date): void {
+    const entry = VACD_IMMUNIZATION_ENTRY
+    const entryResource = entry.resource
+    const id: string = 'Immunization-' + this.makeid(4)
+    entry.fullUrl = 'http://test.fhir.ch/r4/Immunization/' + id
+    entryResource.id = id
+
+    const vaccineCode = this.setVaccineCode(immunizationName)
+    entryResource.vaccineCode.coding[0] = vaccineCode
+
+    entryResource.occurrenceDateTime = date.toString()
+
+    entryResource.recorded = new Date().toDateString()
+
+    entryResource.lotNumber = lotNo
+
+    const targetDiseases = this.setTargetDiseases(illnesses)
+
+    entryResource.protocolApplied[0].targetDisease = targetDiseases
+
+    entry.resource = entryResource
+    console.log('entry: ', JSON.stringify(entry))
+    this.setVaccinationComposition(entry)
+  }
+
+  setVaccinationComposition(vaccinationEntry) {
+    const entry = VACD_COMPOSITION_ENTRY
+
+
+
+  }
+
+  /**
+   * Sets the code of the diseases according to the snomed code system
+   * @param illnesses the names of the illnesses as string
+   * @returns a FHIR object array 
+   */
+  setTargetDiseases(illnesses: Array<string>): Array<{ coding: { system: string, code: string, display: string }[] }> {
+    const diseaseCode = {
+      'system': 'http://snomed.info/sct',
+      'code': 'placeholder',
+      'display': 'placeholder'
+    }
+    const targetDiseases = []
+
+    illnesses.forEach(element => {
+
+      if (this.diseaseCodeName.has(element)) {
+        diseaseCode.code = this.diseaseCodeName.get(element).toString()
+        diseaseCode.display = element
+      } else {
+        throw new Error('Wrong name provided')
+      }
+
+      targetDiseases.push({ 'coding': [diseaseCode] })
+    });
+
+    return targetDiseases
+  }
+
+  /**
+   * sets the correct vaccination code of the standard from http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs
+   * @param name the name of the vaccine
+   * @returns a FHIR Object that contains a system, a code, and a display value
+   */
+  setVaccineCode(name: string): { system: string, code: string, display: string } {
+    const vaccineCode = {
+      'system': 'http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs',
+      'code': 'placeholder',
+      'display': 'placeholder'
+    }
+
+    if (this.vaccCodeName.has(name)) {
+      vaccineCode.code = this.vaccCodeName.get(name).toString()
+      vaccineCode.display = name
+    }
+    return vaccineCode
+  }
+
+
+  /**
+  copyright of the user csharptest.net
+  
+  generates a hash out of the characters in @param characters 
+  The length is determined by the number provided to the method
+  
+  @param length the length of the hash 
+  @returns hash value of a certain length as string
+   */
+  makeid(length: number): string {
+    let result = '';
+    const characters = '0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() *
+        charactersLength));
+    }
+    return result;
   }
 }

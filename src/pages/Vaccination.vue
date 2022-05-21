@@ -8,7 +8,12 @@
           <div class="col-8 self-center">
             <div class="q-pa-md">
               <div class="q-gutter-y-md column" style="max-width: 500px">
-                <q-input v-model="patientName" readonly label="Name des Patients">
+                <q-input
+                  v-model="patientName"
+                  readonly
+                  label="Name des Patients"
+                  :rules="[(val) => !!val || 'Field is required']"
+                >
                 </q-input>
               </div>
             </div>
@@ -21,9 +26,10 @@
             <div class="q-pa-md" style="max-width: 500px">
               <div class="q-gutter-md">
                 <q-select
-                  v-model="model"
+                  v-model="immunizationName"
                   :options="optionsImpf"
                   label="Impfstoffname"
+                  :rules="[(val) => !!val || 'Field is required']"
                 />
               </div>
             </div>
@@ -35,10 +41,12 @@
             <div class="q-pa-md" style="max-width: 500px">
               <q-select
                 filled
-                v-model="multiple"
+                v-model="protections"
                 multiple
                 :options="options"
                 label="Schutz"
+
+                :rules="[(val) => !!val || 'Field is required']"
 
               />
             </div>
@@ -54,6 +62,7 @@
                   label="Dosisnummer"
                   placeholder
                   hint
+                  :rules="[(val) => !!val || 'Field is required']"
                 />
               </div>
             </div>
@@ -64,7 +73,13 @@
           <div class="col-3 self-center">
             <div class="q-pa-md">
               <div class="q-gutter-y-md column" style="max-width: 300px">
-                <q-input v-model="lotNumber" label="Lot-Nr." placeholder hint />
+                <q-input
+                  v-model="lotNumber"
+                  label="Lot-Nr."
+                  placeholder
+                  hint
+                  :rules="[(val) => !!val || 'Field is required']"
+                />
               </div>
             </div>
           </div>
@@ -134,6 +149,7 @@
                   label="Behandelnder Arzt"
                   placeholder
                   hint
+                  :rules="[(val) => !!val || 'Field is required']"
                 />
               </div>
             </div>
@@ -166,9 +182,9 @@
 
 <script>
 import { ref } from 'vue';
-import { Patient } from '@i4mi/fhir_r4';
 import { JSOnFhir } from '@i4mi/js-on-fhir';
 import { v4 as uuid } from 'uuid';
+import { loggedInPatient, immunizations } from '../plugins/epdService.ts';
 import {patient} from '../plugins/storage';
 import {
   getIdBySystemOID,
@@ -177,10 +193,12 @@ import {
   HOEHEWEG_OID,
 } from '../plugins/helpers.ts';
 
+
+
 export default {
   setup() {
-
     let eprSpid = '';
+
     function uploadToEpd() {
       console.log('Upload to EPD pressed');
     }
@@ -188,16 +206,19 @@ export default {
       console.log('Upload to Midata pressed');
     }
 
+
     return {
       name: ref(''),
       dosisName: ref(''),
       lotNumber: ref(''),
-      patientName: ref(patient.name),
+      patientName: ref(
+        loggedInPatient.loggedIn?.name[0].family ?? 'Bitte Patient erfassen'
+      ),
       healthProfessional: ref(''),
       minuteOptionsTime1: [0, 15, 30, 45],
       date: ref(new Date().toLocaleString('de-CH')),
       group: ref([]),
-      multiple: ref(null),
+      protections: ref(null),
       options: [
         { label: 'Windpocken', value: 'Windpocken' },
         { label: 'Masern', value: 'Masern' },
@@ -209,11 +230,37 @@ export default {
         { label: 'Gelbfieber', value: 'gelb' },
         { label: 'Starrkrampf', value: 'skrampf' },
       ],
-      model: ref(null),
+      immunizationName: ref(null),
       optionsImpf: ['FSME-Immun CC', 'Encepur N', 'Inflexal V', 'Poliorix'],
-      uploadToEpd,
-      uploadToMidata,
     };
+  },
+  methods: {
+    uploadToEpd() {
+
+        const illnessArray = !this?.protections?[]:Object.keys(this?.protections)?.map((index) => {
+        let illness = this?.protections[index];
+        return illness.label;
+      })
+      console.log(
+        'Upload to EPD pressed',
+        '\nImpfstoffname',
+        this?.immunizationName,
+        '\nSchutz vor',
+        illnessArray?.join(', '),
+        '\nDosisnummer',
+        this?.dosisName,
+        '\nLot-Nr.',
+        this?.lotNumber,
+        '\nDatum',
+        this?.date,
+        '\nBehandelnder Arzt',
+        this?.healthProfessional
+      );
+      this.$epd.setVaccinationEntry(this.immunizationName,illnessArray,this.dosisName,this.lotNumber,this.date)
+    },
+    uploadToMidata() {
+      console.log('Upload to Midata pressed');
+    },
   },
 };
 </script>

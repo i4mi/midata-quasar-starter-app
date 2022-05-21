@@ -80,7 +80,7 @@ export default defineComponent({
   computed: {
     show: {
       get() {
-        return this.visible;
+        return this.visible as boolean;
       },
       set(value: any) {
         if (!value) {

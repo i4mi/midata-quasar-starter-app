@@ -283,6 +283,7 @@ export default defineComponent({
   name: 'Internationalization',
   setup() {
     return {
+    
       rrziel3: ref(null),
       model: ref({ label: 'sun' }),
       locale: ref('de-ch'),

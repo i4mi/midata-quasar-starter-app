@@ -1,34 +1,69 @@
 import MidataService from './midataService';
-import { Immunization, ImmunizationStatus, Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
+import { Immunization, ImmunizationStatus, Observation, ObservationStatus, Patient, ImmunizationPerformer, Condition, AllergyIntolerance } from '@i4mi/fhir_r4';
+import EpdService from './epdService';
 import { Notify } from 'quasar';
 import { reactive } from 'vue'
 
 const STORAGE_KEY = 'demo-app-storage';
 
-export const patient = reactive({
-  patient: {
+
+export const vaccination = reactive({
+  vaccination: {
+    instance: {
+      epd: false,
+      midata: false
+    },
     name: '',
-    mpi: '',
-    spid: '',
-    kisid: '',
-    address:'',
-    gender:'',
-    birthDate:'',
+    protections: [
+      { chickenpox: false },
+      { measles: false },
+      { mumps: false },
+      { rubella: false },
+      { hepA: false },
+      { hepB: false },
+      { fsma: false },
+      { tetanus: false },
+    ],
+    doseNo: '',
+    lotNo: '',
+    dateTime: '',
+    practicioner: '',
   }
 })
+
+export const vaccinations = reactive({
+  id: [{ id: 0, vaccination: vaccination }]
+})
+
 export default class Storage {
+
   private currentLanguage = 'de';
+  private currentObservation: Observation
   private observations = new Array<Observation>();
-  private immunizations = new Array<Immunization>();
+
   private patientResource = {} as Patient;
-  private currentObservation = {} as Observation;
+  private performerResource = {} as ImmunizationPerformer;
+
   private currentImmunization = {} as Immunization;
+  private immunizations = new Array<Immunization>();
+
+  private medicalProblem = {} as Condition;
+  private medicalProblems = new Array<Condition>();
+
+  private pastIllness = {} as Condition;
+  private pastIllnesses = new Array<Condition>();
+
+  private allergy = {} as AllergyIntolerance;
+  private allergies = new Array<AllergyIntolerance>();
+
 
   midata: MidataService;
+  epd: EpdService;
 
-  constructor(_midataService: MidataService) {
+  constructor(_midataService: MidataService, _epdService: EpdService) {
     this.midata = _midataService;
     this.restoreFromStorage();
+    this.epd = _epdService;
   }
 
   /**
@@ -36,6 +71,7 @@ export default class Storage {
    */
   private persist(): void {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(this));
+
   }
 
   /**
@@ -45,15 +81,23 @@ export default class Storage {
     const persisted = sessionStorage.getItem(STORAGE_KEY);
     if (persisted) {
       const storage = JSON.parse(persisted);
+
       this.currentLanguage = storage.currentLanguage;
       this.observations = storage.observations;
+      this.immunizations = storage.immunizations;
+      this.medicalProblems = storage.medicalProblems;
+      this.pastIllnesses = storage.pastIllnesses;
+      this.allergies = storage.allergies;
+      this.performerResource = storage.performerResource;
       this.patientResource = storage.patientResource;
       this.immunizations = storage.immunizations;
+
     } else if (this.midata.isLoggedIn()) {
       void this.restoreFromMidata();
     } else {
       console.log('Could not restore from storage. Log in first.');
     }
+
   }
 
   /**
