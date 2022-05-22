@@ -51,8 +51,11 @@
 import { defineComponent, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { JSOnFhir } from '@i4mi/js-on-fhir';
+import { storage } from 'src/boot/plugins';
+
 
 export default defineComponent({
+
   data: function () {
     return {
       $q: useQuasar(),

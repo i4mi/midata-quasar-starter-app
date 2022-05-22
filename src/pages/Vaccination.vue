@@ -45,7 +45,9 @@
                 multiple
                 :options="options"
                 label="Schutz"
+
                 :rules="[(val) => !!val || 'Field is required']"
+
               />
             </div>
           </div>
@@ -179,12 +181,16 @@
 </template>
 
 <script>
+import actSites from '../data/actSites.json';
+import { Patient } from '@i4mi/fhir_r4';
 import { ref } from 'vue';
+
 import { loggedInPatient } from '../plugins/epdService.ts';
 
 export default {
   setup() {
     let patName = loggedInPatient.loggedIn?.name[0].family
+
     return {
       name: ref(''),
       dosisName: ref(''),
@@ -212,6 +218,8 @@ export default {
       optionsImpf: ['FSME-Immun CC', 'Encepur N', 'Inflexal V', 'Poliorix'],
     };
   },
+
+
   methods: {
     uploadToEpd() {
 
@@ -240,6 +248,12 @@ export default {
     uploadToMidata() {
       console.log('Upload to Midata pressed');
     },
+
+    getPatient() {
+          this.patientResource = this.$storage.getPatient();
+          console.log(this.patientResource);
+        },
+
   },
 };
 </script>
