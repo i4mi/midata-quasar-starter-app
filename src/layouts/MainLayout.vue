@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import PageLinks from 'components/PageLinks.vue';
+import PageLinks from '../components/PageLinks.vue';
 
 const linksList = [
   {
@@ -63,7 +63,7 @@ const midataLinksList = [
 ];
 
 
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'MainLayout',
@@ -73,16 +73,11 @@ export default defineComponent({
   },
 
   setup() {
-    const drawerExpanded = ref(false);
 
     return {
       pageLinks: linksList,
       midataPageLinks: midataLinksList,
 
-/*      drawerExpanded,
-       toggleLeftDrawer() {
-        drawerExpanded.value = !drawerExpanded.value;
-      }, */
     };
   },
 });

@@ -2,25 +2,18 @@ import { JSOnFhir } from '@i4mi/js-on-fhir';
 import {
   Patient,
   Bundle,
-  ObservationStatus,
-  Observation,
   Immunization,
   ImmunizationPerformer,
-  Condition, Organization,
-  AllergyIntolerance,
+  Organization,
   Practitioner,
   DocumentReference,
   BundleEntry,
-  List,
-  Resource,
-  Coding,
-  Composition
+  Composition,
 } from '@i4mi/fhir_r4';
 import moment from 'moment';
-import { EPR_SPID_OID, HOEHEWEG_OID, CURRENT_DOCUMENT, EPD_PLAYGROUND_OID } from './helpers';
+import { EPR_SPID_OID, EPD_PLAYGROUND_OID } from './helpers';
 import { reactive } from 'vue';
-import { VACD_COMPOSITION_ENTRY, VACD_IMMUNIZATION_ENTRY, FHIR_DOCUMENT_BUNLDE, VACD_RECORD_DOCUMENT } from '../plugins/VACD RECORD DOCUMENT'
-import { number } from '@intlify/core-base';
+import { VACD_IMMUNIZATION_ENTRY, FHIR_DOCUMENT_BUNLDE } from '../plugins/VACD RECORD DOCUMENT'
 
 // import moment library. More information under https://momentjs.com
 const now = moment();
@@ -39,6 +32,9 @@ export default class EpdService {
   organization: Organization
   patientSpid: string
   immunizations: Array<Immunization>
+  currentVACDRecord: Bundle
+  immunizationResource: BundleEntry
+  compositionResource: BundleEntry
 
   vaccCodeName = new Map<string, number>([
     ['FSME-Immun CC', 450],
@@ -90,26 +86,23 @@ export default class EpdService {
 
   /**
  * Gets the vaccination resources as bundle from the fhir endpoint.
- * @returns bundle with observation resources as JSON.
  */
-
   async getVaccinations(): Promise<void> {
-    const SEARCH_PARAMS = {
-      status: 'current',
-      'patient.identifier': EPD_PLAYGROUND_OID + '|7de95899-1e73-4ee2-8632-13987ee67ed6'
-    };
 
+    // gets the current bundle with all health documents the patient has
     const vaccinationRecordDocumentBundle = await this.getDocumentReference().then(res => {
       return res;
     });
 
+    // gets the amount of entries the patient has
     const docsAmount = vaccinationRecordDocumentBundle.entry.length
-
     console.log('Amount of current Documents: ', docsAmount)
 
+    //gets all entries
     const vacdDocuments = vaccinationRecordDocumentBundle
       .entry
 
+    //singles out the vaccination document entries
     const vacdVaccinationRecordDocuments = vacdDocuments.filter(document =>
       (document.resource as DocumentReference)
         .type
@@ -117,6 +110,8 @@ export default class EpdService {
         .display === 'Impfausweis'
     )
 
+    //sort them according to date to get the newest one, in future implementations, 
+    //only one current vaccination document should exist which hasnt been implemented due to time constraints
     vacdVaccinationRecordDocuments.sort(function (a, b) {
       return new Date((b.resource as DocumentReference)
         .content[0]
@@ -127,53 +122,62 @@ export default class EpdService {
           .attachment
           .creation).getTime();
     });
+    console.log('vacdVaccinationRecordDocuments', JSON.stringify(vacdVaccinationRecordDocuments))
 
+    //gets the url of the most current document
     const urlOfMostCurrentDocument = (vacdVaccinationRecordDocuments[0].resource as DocumentReference)
       .content[0]
       .attachment
       .url
 
-    console.log('urlOfMostCurrentDocument: ', urlOfMostCurrentDocument)
-
+    //fetches the most current vaccination document
     const response = await fetch(urlOfMostCurrentDocument);
     const data = await response.json();
+    this.currentVACDRecord = data as Bundle
 
-    this.practitioner = data.entry.find((entry: BundleEntry) => {
-      return entry
-        .resource
-        .resourceType === 'Practitioner'
+    //sets the practicioner from the most current vacd entry
+    this.practitioner = data?.entry.find((entry?: BundleEntry) => {
+      if (entry)
+        return entry
+          .resource
+          .resourceType === 'Practitioner'
     }).resource as Practitioner
-
     console.log('Practitioner ', this.practitioner)
 
-    this.currentPatient = data.entry.find((entry: BundleEntry) => {
-      return entry
-        .resource
-        .resourceType === 'Patient'
+    //sets the patient from the most current vacd entry
+    this.currentPatient = data?.entry.find((entry?: BundleEntry) => {
+      if (entry)
+        return entry
+          .resource
+          .resourceType === 'Patient'
     }).resource as Patient
-
     console.log('Patient ', this.currentPatient)
 
-    this.organization = data.entry.find((entry: BundleEntry) => {
-      return entry
-        .resource
-        .resourceType === 'Organization'
+    //sets the organization from the most current vacd entry
+    this.organization = data?.entry.find((entry?: BundleEntry) => {
+      if (entry)
+        return entry
+          .resource
+          .resourceType === 'Organization'
     }).resource as Organization
-
     console.log('Organization ', this.organization)
 
-    this.immunizations = data.entry.filter((entry: BundleEntry) => {
-      return entry
-        .resource
-        .resourceType === 'Immunization'
+    //sets the immunizations from the most current vacd entry
+    this.immunizations = data?.entry.filter((entry?: BundleEntry) => {
+      if (entry)
+        return entry
+          .resource
+          .resourceType === 'Immunization'
     }).map(x => x.resource as Immunization)
-
     console.log('Immunizations ', this.immunizations)
 
     this.createVaccinationTable()
-    //zuerst array mit allen imunizations und dann durch das array durchiterieren, practitioner etc dazuführen und dann in eigenes Objekt
   }
 
+  /**
+   * gets the VACD Record document 
+   * @returns a Promise with the vacd record document
+   */
   async getDocumentReference(): Promise<Bundle> {
     const SEARCH_PARAMS = {
       status: 'current',
@@ -192,10 +196,9 @@ export default class EpdService {
     });
   }
 
-  handleVaccinationResourcesAsBundle(): void {
-    const vaccinationRecordDocumentBundle = this.getVaccinations();
-  }
-
+  /**
+   * creates rows of immunization data
+   */
   createVaccinationTable(): void {
     interface Row {
       name: string,
@@ -232,24 +235,6 @@ export default class EpdService {
   }
 
   /**
-   * Gets all observations from the fhir endpoint.
-   * @returns bundle with observations
-   */
-  public loadObservations() {
-    return new Promise((resolve, reject) => {
-      this.jsOnFhir.search('Observation').then((result) => {
-        result
-          ? resolve(
-            (result as Bundle).entry?.map(
-              (entry) => entry.resource as Observation
-            ) || []
-          )
-          : reject('Error');
-      }).catch((error) => reject(error));
-    });
-  }
-
-  /**
    * searches the fhir endpoint for one or more resources.
    * @param resourceType resource type to look up
    * @param params search parameters according to fhir resource guide (not mandatory)
@@ -265,318 +250,6 @@ export default class EpdService {
     });
   }
 
-  /**
-   * Creates a observation (of type bodytemperature) resource on the fhir server
-   * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @param value the measured body temperature value.
-   * @returns a promise:
-   *              - if successfull -> response with the created resource as JSON
-   *              - if not successfull -> error message
-   */
-  public createObservation(
-    _status: ObservationStatus,
-    bodySite: string,
-    value: number
-  ): Promise<Observation> {
-    return new Promise((resolve, reject) => {
-      const observation = this.newBtObservation(_status, bodySite, value);
-      this.jsOnFhir.create(observation).then((result) => {
-        result ? resolve(result as Observation) : reject('internal error');
-      }).catch((error) => reject(error));
-    });
-  }
-
-  /**
-   * Updates a observation (of type bodytemperature) resource on the fhir server.
-   * @param _id identification for the observation to be updated.
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @param value the measured body temperature value.
-   * @returns a promise:
-   *              - if successfull -> response with the updated resource as JSON
-   *              - if not successfull -> error message
-   */
-  updateObservation(
-    _id: string,
-    bodySite: string,
-    value: number
-  ): Promise<Observation> {
-    return new Promise((resolve, reject) => {
-      this.jsOnFhir.search('Observation/' + _id).then((result) => {
-        if (result) {
-          const fhirObservation = result as Observation;
-          fhirObservation.valueQuantity.value = value;
-          fhirObservation.bodySite = this.getBodySite(bodySite);
-          fhirObservation.method = this.getMethod(bodySite);
-          fhirObservation.issued = now.format();
-          this.jsOnFhir
-            .update(fhirObservation)
-            .then((res) => {
-              resolve(res as Observation);
-            })
-            .catch((error: Error) => {
-              console.warn('Could not update observation ' + _id, error);
-              reject(error);
-            });
-        } else {
-          reject(
-            new Error(
-              'Invalid observation id: Observation ' + _id + ' was not found.'
-            )
-          );
-        }
-      }).catch((error) => reject(error));
-    });
-  }
-
-  /**
-   * Creates observation (of type Bodytemperature) where you can specify the status, bodySite and value.
-   * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @param value the measured body temperature value.
-   * @returns
-   */
-  newBtObservation(
-    _status: ObservationStatus,
-    bodySite: string,
-    value: number
-  ): Observation {
-    return {
-      resourceType: 'Observation',
-      status: _status,
-      category: [
-        {
-          coding: [
-            {
-              system:
-                'http://terminology.hl7.org/CodeSystem/observation-category',
-              code: 'vital-signs',
-              display: 'Vital Signs',
-            },
-          ],
-        },
-      ],
-      code: {
-        coding: [
-          {
-            system: 'http://loinc.org',
-            code: '8310-5',
-            display: 'Body temperature',
-          },
-        ],
-        text: 'Temperature',
-      },
-      subject: {
-        reference: 'Patient/' + this.jsOnFhir.getPatient(),
-      },
-      issued: now.format(),
-      performer: [
-        {
-          reference: 'Practitioner/mdh0us3',
-        },
-      ],
-      valueQuantity: {
-        value: value,
-        unit: 'degrees C',
-        system: 'http://unitsofmeasure.org',
-        code: 'Cel',
-      },
-      bodySite: this.getBodySite(bodySite),
-      method: this.getMethod(bodySite),
-    };
-  }
-
-  /**
-   * Helper function that creates a bodySite object to be used in an observation.
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @returns bodySite with coding as JSON.
-   */
-  getBodySite(bodySite: string) {
-    switch (bodySite) {
-      case 'Axillary':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Axillary',
-            },
-          ],
-        };
-      case 'Oral':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9367-9',
-              display: 'Oral',
-            },
-          ],
-        };
-      case 'Ear':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA21929-7',
-              display: 'Ear',
-            },
-          ],
-        };
-      case 'Tympanic membrane':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9368-7',
-              display: 'Tympanic membrane',
-            },
-          ],
-        };
-      case 'Temporal artery (forehead)':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Temporal artery (forehead)',
-            },
-          ],
-        };
-      case 'Rectal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Rectal',
-            },
-          ],
-        };
-      case 'Urinary bladder':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9371-1',
-              display: 'Urinary bladder',
-            },
-          ],
-        };
-      case 'Nasal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9263-0',
-              display: 'Nasal',
-            },
-          ],
-        };
-      case 'Nasopharyngeal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA18005-1',
-              display: 'Nasopharyngeal',
-            },
-          ],
-        };
-      case 'Finger':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA11862-2',
-              display: 'Finger',
-            },
-          ],
-        };
-      case 'Toe':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '	LA21930-5',
-              display: 'Toe',
-            },
-          ],
-        };
-      default:
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Axillary',
-            },
-          ],
-        };
-    }
-  }
-
-  /**
-   * Helper function that creates a Method of measurement to be used in an observation.
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @returns method of temperature taking with coding as JSON.
-   */
-  getMethod(bodySite: string) {
-    switch (bodySite) {
-      case 'Oral':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '89003005',
-              display: 'Oral temperature taking (procedure)',
-            },
-          ],
-        };
-      case 'Ear':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '448093005',
-              display:
-                'Measurement of temperature using tympanic thermometer (procedure)',
-            },
-          ],
-        };
-      case 'Tympanic membrane':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '448093005',
-              display:
-                'Measurement of temperature using tympanic thermometer (procedure)',
-            },
-          ],
-        };
-      case 'Rectal':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '18649001',
-              display: 'Rectal temperature taking (procedure)',
-            },
-          ],
-        };
-      default:
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '56342008',
-              display: 'Temperature taking (procedure)',
-            },
-          ],
-        };
-    }
-  }
 
   /**
    * creates a immunization FHIR resource https://build.fhir.org/immunization.html 
@@ -591,10 +264,11 @@ export default class EpdService {
     illnesses: Array<string>,
     doseNo: string,
     lotNo: string,
-    date: Date): void {
+    date: Date,
+    id: string) {
     const entry = VACD_IMMUNIZATION_ENTRY
     const entryResource = entry.resource
-    const id: string = 'Immunization-' + this.makeid(4)
+
     entry.fullUrl = 'http://test.fhir.ch/r4/Immunization/' + id
     entryResource.id = id
 
@@ -603,7 +277,7 @@ export default class EpdService {
 
     entryResource.occurrenceDateTime = date.toString()
 
-    entryResource.recorded = new Date().toDateString()
+    entryResource.recorded = moment(now).format('YYYY-MM-DD').toString()
 
     entryResource.lotNumber = lotNo
 
@@ -612,15 +286,110 @@ export default class EpdService {
     entryResource.protocolApplied[0].targetDisease = targetDiseases
 
     entry.resource = entryResource
-    console.log('entry: ', JSON.stringify(entry))
-    this.setVaccinationComposition(entry)
+
+    this.immunizationResource = entry
   }
 
-  setVaccinationComposition(vaccinationEntry) {
-    const entry = VACD_COMPOSITION_ENTRY
+  /**
+   * creates a Composition FHIR resource https://build.fhir.org/composition.html 
+   * @param immunizationName the name of the vaccination
+   * @param illnesses a list of the illnesses that the immunization tackles
+   * @param doseNo the number of the dose
+   * @param lotNo the Lot number of the dose
+   * @param date the date in which the vaccination was performed
+   */
+  setVaccinationComposition(
+    immunizationName: string,
+    illnesses: Array<string>,
+    doseNo: string,
+    lotNo: string,
+    date: Date) {
 
+    const immunizationId: string = this.makeid(4) + '-Immunization'
+    const compositionEntry = this.currentVACDRecord.entry.find((entry: BundleEntry) => {
+      return entry
+        .resource
+        .resourceType === 'Composition'
+    }).resource as Composition
 
+    this.setVaccinationEntry(
+      immunizationName,
+      illnesses,
+      doseNo,
+      lotNo,
+      date,
+      immunizationId)
 
+    compositionEntry.section[0].entry.push(
+      { 'reference': 'Immunization/' + immunizationId }
+    )
+
+    compositionEntry.id = this.makeid(2) + '-VaccinationRecordComposition'
+    const compositionResource = { fullUrl: 'http://test.fhir.ch/r4/Composition/' + compositionEntry.id, resource: {} }
+    compositionResource.resource = compositionEntry
+    //console.log('entry: ', JSON.stringify(compositionEntry.section[0].entry))
+
+    this.compositionResource = compositionResource
+  }
+
+  /**
+   * creates a VaccinationRecord FHIR resource http://fhir.ch/ig/ch-vacd/vaccination-record-document.html 
+   * @param immunizationName the name of the vaccination
+   * @param illnesses a list of the illnesses that the immunization tackles
+   * @param doseNo the number of the dose
+   * @param lotNo the Lot number of the dose
+   * @param date the date in which the vaccination was performed
+   */
+  setVACDRecordBundle(immunizationName: string,
+    illnesses: Array<string>,
+    doseNo: string,
+    lotNo: string,
+    date: Date) {
+
+    this.setVaccinationComposition(
+      immunizationName,
+      illnesses,
+      doseNo,
+      lotNo,
+      date)
+
+    const index: number = this.currentVACDRecord.entry.findIndex((entry: BundleEntry) => entry.resource.resourceType === 'Composition')
+    delete this.currentVACDRecord.entry[index]
+    //copyright Christian C. Salvadó
+    const filtered: BundleEntry[] = this.currentVACDRecord.entry.filter(function (el) {
+      return el != null;
+    });
+    this.currentVACDRecord.entry = filtered
+
+    this.currentVACDRecord.entry.unshift(this.compositionResource)
+    this.currentVACDRecord.entry.push(this.immunizationResource)
+    console.log('index', index, '\nentry', this.currentVACDRecord.entry, '\n')
+
+    const bundleId: string = this.makeid(2) + '-VaccinationRecord'
+    this.currentVACDRecord.id = bundleId
+    this.currentVACDRecord.timestamp = moment().format()
+  }
+
+  setProvideBundle() {
+    const provideBundle = FHIR_DOCUMENT_BUNLDE
+
+    console.log('currentVACDRecord: ', JSON.stringify(this.currentVACDRecord))
+    const recordString: string = JSON.stringify(this.currentVACDRecord)
+    const base64Data: string = btoa(recordString)
+    console.log(base64Data)
+    provideBundle.entry[0].resource.data = base64Data.toString()
+
+    provideBundle.entry[1].resource.date = moment(now).format('YYYY-MM-DD').toString()
+    provideBundle.entry[2].resource.date = moment(now).format('YYYY-MM-DD').toString()
+    provideBundle.entry[2].resource.masterIdentifier.value = 'urn:oid:89913ac4-f8a3-4eee-9e41-123' + this.makeid(3)
+
+ /*    this.jsOnFhir.create(provideBundle)
+      .then((res) => {
+        console.log('Create result', res)
+      })
+      .catch(err => {
+        console.log(err);
+      }); */
   }
 
   /**
@@ -670,7 +439,6 @@ export default class EpdService {
     return vaccineCode
   }
 
-
   /**
   copyright of the user csharptest.net
   
@@ -683,6 +451,26 @@ export default class EpdService {
   makeid(length: number): string {
     let result = '';
     const characters = '0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() *
+        charactersLength));
+    }
+    return result;
+  }
+
+  /**
+copyright of the user csharptest.net
+ 
+generates a hash out of the characters in @param characters 
+The length is determined by the number provided to the method
+ 
+@param length the length of the hash 
+@returns hash value of a certain length as string
+ */
+  makUuid(length: number): string {
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstufwxyz0123456789';
     const charactersLength = characters.length;
     for (let i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() *

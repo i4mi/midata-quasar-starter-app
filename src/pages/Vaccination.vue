@@ -184,36 +184,19 @@
 import actSites from '../data/actSites.json';
 import { Patient } from '@i4mi/fhir_r4';
 import { ref } from 'vue';
-import { JSOnFhir } from '@i4mi/js-on-fhir';
-import { v4 as uuid } from 'uuid';
-import { loggedInPatient, immunizations } from '../plugins/epdService.ts';
-import {patient} from '../plugins/storage';
-import {
-  getIdBySystemOID,
-  convertToBase64,
-  EPR_SPID_OID,
-  HOEHEWEG_OID,
-} from '../plugins/helpers.ts';
 
-
+import { loggedInPatient } from '../plugins/epdService.ts';
 
 export default {
   setup() {
-    let eprSpid = '';
-    function uploadToEpd() {
-      console.log('Upload to EPD pressed');
-    }
-    function uploadToMidata() {
-      console.log('Upload to Midata pressed');
-    }
-
+    let patName = loggedInPatient.loggedIn?.name[0].family
 
     return {
       name: ref(''),
       dosisName: ref(''),
       lotNumber: ref(''),
       patientName: ref(
-        loggedInPatient.loggedIn?.name[0].family ?? 'Bitte Patient erfassen'
+        patName ?? 'Bitte Patient erfassen'
       ),
       healthProfessional: ref(''),
       minuteOptionsTime1: [0, 15, 30, 45],
@@ -259,7 +242,8 @@ export default {
         '\nBehandelnder Arzt',
         this?.healthProfessional
       );
-      this.$epd.setVaccinationEntry(this.immunizationName,illnessArray,this.dosisName,this.lotNumber,this.date)
+      this.$epd.setVACDRecordBundle(this.immunizationName,illnessArray,this.dosisName,this.lotNumber,this.date)
+      this.$epd.setProvideBundle()
     },
     uploadToMidata() {
       console.log('Upload to Midata pressed');
