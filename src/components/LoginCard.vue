@@ -51,13 +51,6 @@
 import { defineComponent, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { JSOnFhir } from '@i4mi/js-on-fhir';
-import {
-  getIdBySystemOID,
-  EPR_SPID_OID,
-  HOEHEWEG_OID,
-} from '../plugins/helpers';
-import { loggedInPatient } from '../plugins/epdService.ts';
-import { storage } from 'src/boot/plugins';
 
 export default defineComponent({
   data: function () {
@@ -94,7 +87,7 @@ export default defineComponent({
           cancel: true,
           persistent: true,
         })
-        .onOk((data) => {
+        .onOk(() => {
            this.$epd.getPatientResource('761337619779800896')
            this.$epd.getVaccinations()
           this.labelEPD = 'Connected'
