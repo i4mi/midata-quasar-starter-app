@@ -117,8 +117,9 @@ export default class Storage {
           this.patientResource = results[0];
           this.observations = results[1] as Array<Observation>;
           this.immunizations = results[2] as Array<Immunization>;
-          this.persist();
-          resolve();
+          this.persist()
+          resolve()
+          this.midata.createVaccinationTable(this.immunizations)
         })
         .catch((error) => {
           console.warn('Error', error);

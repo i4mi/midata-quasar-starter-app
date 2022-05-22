@@ -383,13 +383,13 @@ export default class EpdService {
     provideBundle.entry[2].resource.date = moment(now).format('YYYY-MM-DD').toString()
     provideBundle.entry[2].resource.masterIdentifier.value = 'urn:oid:89913ac4-f8a3-4eee-9e41-123' + this.makeid(3)
 
- /*    this.jsOnFhir.create(provideBundle)
-      .then((res) => {
-        console.log('Create result', res)
-      })
-      .catch(err => {
-        console.log(err);
-      }); */
+    /*    this.jsOnFhir.create(provideBundle)
+         .then((res) => {
+           console.log('Create result', res)
+         })
+         .catch(err => {
+           console.log(err);
+         }); */
   }
 
   /**
