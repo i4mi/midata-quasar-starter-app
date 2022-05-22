@@ -7,7 +7,7 @@
           <h3>Übersicht</h3>
         </div>
       </div>
-      <q-btn round @click="test" label="Test" />
+      <q-btn round @click="test" label="Refresh" />
       <div class="row">
         <div class="col-2"></div>
         <div class="col-8 self-center">
@@ -72,10 +72,9 @@ import { ref } from 'vue';
 import { defineComponent } from 'vue';
 import {
   loggedInPatient,
-  immunizations,
-  EpdService,
   vaccinations
 } from '../plugins/epdService.ts';
+
 const columns = [
   {
     name: 'name',
@@ -189,20 +188,19 @@ const rows = vaccinations;
 export default defineComponent({
   data() {
     return {
-      patientName: ref(loggedInPatient.loggedIn?.name[0].family +
-        ' ' +
-        loggedInPatient.loggedIn?.name[0].given[0])
+      
     }
   },
   methods: {
     test() {
-      this.$epd.getPatientResource('761337619779800896');
-      this.$epd.handleVaccinationResourcesAsBundle();
+      this.$epd.getVaccinations();
     },
   },
   setup() {
     const selected = ref([]);
     return {
+      patientName: ref(
+        loggedInPatient.loggedIn?.name[0].family ?? 'Bitte Patient erfassen'),
       stoffname: 'hello',
       date: ref('2022/01/01'),
       group: ref([]),
