@@ -167,12 +167,12 @@
                 </q-avatar>
               </q-item-section>
               <q-item-section>
-                <q-item-label
+<!--                 <q-item-label
                   lines="1"
                   v-if="item.code.coding[0].display == 'Body temperature'"
                 >
                   Körpertemperatur
-                </q-item-label>
+                </q-item-label> -->
                 <q-item-label caption>
                   Wert: {{ item.valueQuantity.value }}
                   {{ item.valueQuantity.unit }} ({{
@@ -235,86 +235,6 @@
 
 <!-- ---------------Immunization Painel------------------------------------------ -->
 
-     <q-card bordered>
-      <q-card-section>
-        <q-item-label header
-          >Alle Immunizations von
-          {{ getFullPatientName() }}</q-item-label
-        >
-        <q-virtual-scroll
-          :items="getImmunizations()"
-          bordered
-          padding
-          class="rounded-borders"
-          style="max-height: 300px"
-        >
-          <template v-slot="{ item, index }">
-            <q-item clickable dense v-ripple :key="index">
-              <q-item-section avatar>
-                <q-avatar
-                  icon="thermostat"
-                  text-color="white"
-                  class="midata-fade"
-                >
-                </q-avatar>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label
-                  lines="1"
-                  v-if="item.code.coding[0].display == 'Body temperature'"
-                >
-                  Körpertemperatur
-                </q-item-label>
-                <q-item-label caption>
-                  Vaccine: {{ item.vaccineCode.coding.code.value }}
-                  {{ item.valueQuantity.unit }} ({{
-                    item.bodySite.coding[0].display
-                  }})
-                </q-item-label>
-                <q-item-label caption>
-                  Datum:
-                  {{ formatDate(item.issued) }}
-                </q-item-label>
-              </q-item-section>
-              <q-btn
-                color="primary"
-                outlined
-                flat
-                @mouseover="setCurrentObservation(item.id)"
-                @click.stop="showEditDialog = true"
-                icon="edit"
-                class="gt-xs"
-              >
-                Observation bearbeiten
-              </q-btn>
-              <q-btn
-                color="primary"
-                outlined
-                round
-                flat
-                @mouseover="setCurrentObservation(item.id)"
-                @click.stop="showEditDialog = true"
-                icon="edit"
-                class="lt-sm"
-              >
-              </q-btn>
-            </q-item>
-            <q-separator inset spaced />
-          </template>
-        </q-virtual-scroll>
-      </q-card-section>
-      <q-card-actions>
-        <q-btn
-          color="primary"
-          outlined
-          flat
-          icon="add"
-          @click.stop="showAddDialog = true"
-          label="Observation hinzufügen"
-        />
-      </q-card-actions>
-    </q-card>
-
 <!-- ------------------------------------------ -->
 
   </q-page>
@@ -323,7 +243,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import LoginCard from '../../components/LoginCard.vue';
-import { Patient } from '@i4mi/fhir_r4';
+import { Patient, Resource } from '@i4mi/fhir_r4';
 import bodySites from '../../data/bodySites.json';
 import EditObservationDialog from '../../components/EditObservationDialog.vue';
 import AddObservationDialog from '../../components/AddObservationDialog.vue';
@@ -386,9 +306,9 @@ export default defineComponent({
     getCurrentObservation() {
       return this.$storage.getCurrentObservation();
     },
-    getObservationId() {
+    /*     getObservationId() {
       return this.$storage.getCurrentObservation().id;
-    },
+    }, */
     formatDate(date: any) {
       return this.$moment(date.toString()).format('lll');
     },
