@@ -1,40 +1,39 @@
 <template>
   <login-card></login-card>
-  <q-page >
-    <div class="q-mb-xl">
+  <q-page>
+<!--     <div class="q-mb-xl">
       <div class="text-h3 text-weight-thin">Midata Demo</div>
       <q-separator spaced class="midata-fade"></q-separator>
-    </div>
+    </div> -->
 
-<q-btn
-        color="black"
-        label="Test Create Immunization"
-        icon="search"
-        rounded
-        outline
-        @click="this.$storage.createImmunization()"
-        class="gt-xs"
-      />
-<q-btn
-        color="black"
-        label="Test Immunizations Array"
-        icon="search"
-        rounded
-        outline
-        @click="testImmunizationsArray()"
-        class="gt-xs"
-      />
-
-<q-btn
-        color="black"
-        label="Test Observation Array"
-        icon="search"
-        rounded
-        outline
-        @click="testObservationArray()"
-        class="gt-xs"
-      />
-
+    <q-btn
+      color="black"
+      label="Test Create Immunization"
+      icon="search"
+      rounded
+      outline
+      @click="this.$storage.createImmunization()"
+      class="gt-xs"
+    />
+    <q-btn
+      color="black"
+      label="Test Immunizations Array"
+      icon="search"
+      rounded
+      outline
+      @click="testImmunizationsArray()"
+      class="gt-xs"
+    />
+<!-- 
+    <q-btn
+      color="black"
+      label="Test Observation Array"
+      icon="search"
+      rounded
+      outline
+      @click="testObservationArray()"
+      class="gt-xs"
+    /> -->
 
     <div class="row justify-end">
       <q-btn
@@ -145,10 +144,10 @@
 
     <q-card bordered>
       <q-card-section>
-        <q-item-label header
+        <!--         <q-item-label header
           >Alle Körpertemperatur Observationen von
           {{ getFullPatientName() }}</q-item-label
-        >
+        > -->
         <q-virtual-scroll
           :items="getObservations()"
           bordered
@@ -167,7 +166,7 @@
                 </q-avatar>
               </q-item-section>
               <q-item-section>
-<!--                 <q-item-label
+                <!--                 <q-item-label
                   lines="1"
                   v-if="item.code.coding[0].display == 'Body temperature'"
                 >
@@ -233,17 +232,16 @@
     >
     </add-observation-dialog>
 
-<!-- ---------------Immunization Painel------------------------------------------ -->
+    <!-- ---------------Immunization Painel------------------------------------------ -->
 
-<!-- ------------------------------------------ -->
-
+    <!-- ------------------------------------------ -->
   </q-page>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import LoginCard from '../../components/LoginCard.vue';
-import { Patient, Resource } from '@i4mi/fhir_r4';
+import { Patient } from '@i4mi/fhir_r4';
 import bodySites from '../../data/bodySites.json';
 import EditObservationDialog from '../../components/EditObservationDialog.vue';
 import AddObservationDialog from '../../components/AddObservationDialog.vue';
@@ -283,10 +281,10 @@ export default defineComponent({
   }),
   computed: {},
   methods: {
-    getFullPatientName() {
+    /*     getFullPatientName() {
       let name = this.$storage.getPatient().name;
       return name[0].given.toString() + ' ' + name[0].family;
-    },
+    }, */
     isEmpty(obj: any) {
       return JSON.stringify(obj) === '{}';
     },
@@ -297,7 +295,7 @@ export default defineComponent({
     getObservations() {
       return this.$storage.getObservations();
     },
-     getImmunizations() {
+    getImmunizations() {
       return this.$storage.getImmunizations();
     },
     setCurrentObservation(id: any) {
@@ -317,20 +315,18 @@ export default defineComponent({
       location.reload();
     },
 
-    testImmunizationsArray(){
-
-      console.log('getImmunizationResourcesAsBundle: '+this.$midata.getImmunizationResourcesAsBundle());
+    testImmunizationsArray() {
+      console.log(
+        'getImmunizationResourcesAsBundle: ' +
+          this.$midata.getImmunizationResourcesAsBundle()
+      );
       console.log(this.$storage.getImmunizations());
-
     },
-    testObservationArray(){
+    testObservationArray() {
       //console.log(this.$midata.getPatientResource())
       //console.log('getObservationResourcesAsBundle: '+this.$midata.getObservationResourcesAsBundle());
       console.log(this.$storage.getObservations());
-
     },
-
-
   },
 });
 </script>

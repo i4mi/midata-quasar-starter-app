@@ -6,9 +6,10 @@ import {
   ImmunizationPerformer,
   Organization,
   Practitioner,
-  DocumentReference,
   BundleEntry,
-  Composition, ObservationStatus, Observation, ImmunizationStatus
+  ObservationStatus,
+  Observation,
+  ImmunizationStatus
 } from '@i4mi/fhir_r4';
 import moment from 'moment';
 
@@ -117,7 +118,6 @@ export default class MidataService {
   }
 
   createVaccinationTable(vaccinations: Array<Immunization>): void {
-    console.log(JSON.stringify(vaccinations))
 
     this.immunizations = vaccinations
     interface Row {
@@ -131,7 +131,6 @@ export default class MidataService {
     }
 
     this.immunizations.forEach(element => {
-      console.log(JSON.stringify(element))
 
       const protections: Array<string> = []
       element
@@ -143,7 +142,7 @@ export default class MidataService {
         )
 
       const row: Row = {
-        name: element.vaccineCode.coding[0].display,
+        name: element.vaccineCode.text,
         lotNo: element.lotNumber,
         protection: protections.join(', '),
         dosageno: element.identifier[0].value,
@@ -532,7 +531,7 @@ export default class MidataService {
     * @returns bundle with observations
     */
   public loadImmunizations() {
-    
+
     return new Promise((resolve, reject) => {
       this.jsOnFhir.search('Immunization').then((result) => {
         result

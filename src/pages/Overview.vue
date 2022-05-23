@@ -71,13 +71,8 @@
 import { storage } from 'src/boot/plugins';
 import { ref } from 'vue';
 import { defineComponent } from 'vue';
-import {
-  loggedInPatient,
-  vaccinations
-} from '../plugins/epdService.ts';
-import {
-  vaccinationsMidata
-} from '../plugins/midataService.ts';
+import { loggedInPatient, vaccinations } from '../plugins/epdService.ts';
+
 
 const columns = [
   {
@@ -107,22 +102,29 @@ const columns = [
   {
     name: 'vaccinationdate',
     label: 'Verabreichungsdatum',
-    field: 'vaccinationdate',sortable: true,
+    field: 'vaccinationdate',
+    sortable: true,
   },
   { name: 'practicioner', label: 'Behandelnder Arzt', field: 'practicioner' },
 ];
 
-const rowsMidata = storage.getImmunizations()
-const rowsEPD = vaccinations
+const rowsMidata = storage.getImmunizations();
+const rowsEPD = vaccinations;
 
-const rows = rowsMidata?.concat(rowsEPD)
-console.log('rowsMidata', rows)
+let rows = [];
+
+if (rowsEPD && rowsMidata) rows.concat(rowsEPD, rowsMidata);
+if (rowsEPD) rows = rowsEPD;
+//if (rowsMidata) rows = rowsMidata;
+
+console.log(
+  'rows EPD exist: ',rowsEPD,
+  '\nrows Midata exist: ',rowsMidata,
+  '\nRows count', rows.length);
 
 export default defineComponent({
   data() {
-    return {
-      
-    }
+    return {};
   },
   methods: {
     test() {
@@ -133,7 +135,8 @@ export default defineComponent({
     const selected = ref([]);
     return {
       patientName: ref(
-        loggedInPatient.loggedIn?.name[0].family ?? 'Bitte Patient erfassen'),
+        loggedInPatient.loggedIn?.name[0].family ?? 'Bitte Patient erfassen'
+      ),
       stoffname: 'hello',
       date: ref('2022/01/01'),
       group: ref([]),

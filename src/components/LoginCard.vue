@@ -15,7 +15,9 @@
           @click="connect()"
           class="midata-fade full-width"
           color="white"
-          >Mit MIDATA verbinden</q-btn
+          v-model="connectedMidata"
+          :disabled="connectedMidata == true"
+          >{{ labelMidata }}</q-btn
         >
       </q-card-actions>
     </q-card>
@@ -29,16 +31,12 @@
       <q-separator inset />
       <q-card-actions>
         <q-btn
-          @click="
-            () => {
-              prompt();
-            }
-          "
-          v-model="connectedEpd"
-          :disabled="connectedEpd == true"
+          @click="prompt()"
           flat
           class="epd-fade full-width"
           color="white"
+          v-model="connectedEpd"
+          :disabled="connectedEpd == true"
         >
           {{ labelEPD }}</q-btn
         >
@@ -51,7 +49,6 @@
 import { defineComponent, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { JSOnFhir } from '@i4mi/js-on-fhir';
-import { storage } from 'src/boot/plugins';
 
 
 export default defineComponent({
@@ -60,6 +57,7 @@ export default defineComponent({
     return {
       $q: useQuasar(),
       connectedEpd: false,
+      connectedMidata: false,
       fhir: new JSOnFhir(
         'https://test.ahdis.ch/mag-bfh',
         'irrelevant',
@@ -67,6 +65,7 @@ export default defineComponent({
         true
       ),
       labelEPD: ref('Mit dem EPD verbinden'),
+      labelMidata: ref('Mit MIDATA verbinden')
     };
   },
   name: 'LoginCard',
@@ -74,6 +73,7 @@ export default defineComponent({
   methods: {
     connect() {
       this.$midata.authenticate();
+      this.labelMidata = 'Connected'
     },
     prompt() {
       this.$epd.loggedIn = true;

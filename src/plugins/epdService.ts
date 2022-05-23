@@ -211,7 +211,7 @@ export default class EpdService {
     }
 
     this.immunizations.forEach(element => {
-
+      
       const protections: Array<string> = []
       element
         .protocolApplied[0]
@@ -230,6 +230,8 @@ export default class EpdService {
         practicioner: this.practitioner.name[0].family + ' ' + this.practitioner.name[0].given[0],
         platform: ['EPD']
       }
+
+      //console.log(JSON.stringify(row))
       vaccinations.push(row)
     });
   }

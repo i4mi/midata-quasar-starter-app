@@ -60,7 +60,6 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import bodySites from '../data/bodySites.json';
-import { ImmunizationStatus } from '@i4mi/fhir_r4';
 
 export default defineComponent({
   name: 'AddImmunizationDialog',
@@ -94,7 +93,6 @@ export default defineComponent({
   methods: {
     createImmunization() {
       this.$storage.createImmunization(
-        ImmunizationStatus.COMPLETED,
         //this.bodySite,
         //this.bodyTemperature
       );

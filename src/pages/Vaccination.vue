@@ -181,8 +181,6 @@
 </template>
 
 <script>
-import actSites from '../data/actSites.json';
-import { Patient } from '@i4mi/fhir_r4';
 import { ref } from 'vue';
 
 import { loggedInPatient } from '../plugins/epdService.ts';
