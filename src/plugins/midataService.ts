@@ -9,7 +9,8 @@ import {
   BundleEntry,
   ObservationStatus,
   Observation,
-  ImmunizationStatus
+  ImmunizationStatus,
+  date
 } from '@i4mi/fhir_r4';
 import moment from 'moment';
 
@@ -120,14 +121,27 @@ export default class MidataService {
   createVaccinationTable(vaccinations: Array<Immunization>): void {
 
     this.immunizations = vaccinations
-    interface Row {
+    // interface Row {
+    //   name: string,
+    //   lotNo: string,
+    //   protection: string,
+    //   dosageno: string,
+    //   vaccinationdate: string,
+    //   practicioner: string,
+    //   platform: Array<string>,
+    // }
+    interface midataRow {
       name: string,
+      date: string,
+      primarysource: boolean,
       lotNo: string,
-      protection: string,
-      dosageno: string,
-      vaccinationdate: string,
-      practicioner: string,
-      platform: Array<string>,
+      expirationDate: string,
+      site: string,
+      occurrenceString: string,
+      route: string,
+      doseQuantity: string,
+      performer:string,
+      note:string,
     }
 
     this.immunizations.forEach(element => {
@@ -141,16 +155,34 @@ export default class MidataService {
         }
         )
 
-      const row: Row = {
-        name: element.vaccineCode.text,
-        lotNo: element.lotNumber,
-        protection: protections.join(', '),
-        dosageno: element.identifier[0].value,
-        vaccinationdate: moment(element.occurrenceDateTime)?.format('MMMM Do YYYY, h:mm a'),
-        practicioner: '',
-        platform: ['Midata']
+      // const row: Row = {
+      //   name: element.vaccineCode.text,
+      //   lotNo: element.lotNumber,
+      //   protection: protections.join(', '),
+      //   dosageno: element.identifier[0].value,
+      //   vaccinationdate: moment(element.occurrenceDateTime)?.format('MMMM Do YYYY, h:mm a'),
+      //   practicioner: '',
+      //   platform: ['epd']
+      // }
+      // vaccinationsMidata.push(row)
+
+      const miRow: midataRow = {
+      name: element.patient.display,
+      date: JSON.stringify(element._expirationDate),
+      primarysource: element.primarySource,
+      lotNo: element.lotNumber,
+      expirationDate: element.expirationDate,
+      site: JSON.stringify(element.site.coding[0].display), // not sure if this works
+      occurrenceString: element.occurrenceString,
+      route: JSON.stringify(element.route.coding[0].display),
+      doseQuantity:JSON.stringify(element.doseQuantity.value),
+      performer:JSON.stringify(element.performer[0].id),
+      note: JSON.stringify(element.note[0].text)
+        //platform: ['Midata']
       }
-      vaccinationsMidata.push(row)
+      vaccinationsMidata.push(miRow)
+
+
     });
   }
 
@@ -528,7 +560,7 @@ export default class MidataService {
 
   /**
     * Gets all immunizations from the fhir endpoint.
-    * @returns bundle with observations
+    * @returns bundle with Immunizations
     */
   public loadImmunizations() {
 

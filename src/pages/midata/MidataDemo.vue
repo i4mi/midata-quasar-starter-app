@@ -24,7 +24,7 @@
       @click="testImmunizationsArray()"
       class="gt-xs"
     />
-<!-- 
+<!--
     <q-btn
       color="black"
       label="Test Observation Array"
@@ -241,11 +241,13 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import LoginCard from '../../components/LoginCard.vue';
-import { Patient } from '@i4mi/fhir_r4';
+import { Patient, Immunization } from '@i4mi/fhir_r4';
 import bodySites from '../../data/bodySites.json';
 import EditObservationDialog from '../../components/EditObservationDialog.vue';
 import AddObservationDialog from '../../components/AddObservationDialog.vue';
-
+import { midata, storage } from 'src/boot/plugins';
+import { store } from 'quasar/wrappers';
+import { vaccinationsMidata } from 'src/plugins/midataService';
 export default defineComponent({
   name: 'MidataDemo',
   components: {
@@ -316,16 +318,32 @@ export default defineComponent({
     },
 
     testImmunizationsArray() {
+      // console.log(
+      //   'getImmunizationResourcesAsBundle: ' +
+      //     this.$midata.getImmunizationResourcesAsBundle()
+      // );
+      // console.log(this.$storage.getImmunizations());
+      // let array1 : Array<Immunization> = this.$storage.getImmunizations();
+      // console.log(JSON.stringify(array1[6].site.coding[0].display));
+      // console.log(JSON.stringify(array1[0]));
+      // console.log(array1[0]);
+
       console.log(
-        'getImmunizationResourcesAsBundle: ' +
-          this.$midata.getImmunizationResourcesAsBundle()
-      );
-      console.log(this.$storage.getImmunizations());
-    },
+        // JSON.stringify(midata.immunizations[0]),
+
+      JSON.stringify(vaccinationsMidata)
+
+      )
+      // console.log(array1[6].patient._display);
+
+},
     testObservationArray() {
-      //console.log(this.$midata.getPatientResource())
-      //console.log('getObservationResourcesAsBundle: '+this.$midata.getObservationResourcesAsBundle());
-      console.log(this.$storage.getObservations());
+      // console.log(this.$midata.getPatientResource())
+      // console.log('getObservationResourcesAsBundle: '+this.$midata.getObservationResourcesAsBundle());
+      const array1 : Array<Immunization> = this.$storage.getImmunizations();
+      // console.log(JSON.stringify(array1[0].patient.display));
+
+
     },
   },
 });

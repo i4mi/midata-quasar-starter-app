@@ -110,7 +110,7 @@ export default class EpdService {
         .display === 'Impfausweis'
     )
 
-    //sort them according to date to get the newest one, in future implementations, 
+    //sort them according to date to get the newest one, in future implementations,
     //only one current vaccination document should exist which hasnt been implemented due to time constraints
     vacdVaccinationRecordDocuments.sort(function (a, b) {
       return new Date((b.resource as DocumentReference)
@@ -175,7 +175,7 @@ export default class EpdService {
   }
 
   /**
-   * gets the VACD Record document 
+   * gets the VACD Record document
    * @returns a Promise with the vacd record document
    */
   async getDocumentReference(): Promise<Bundle> {
@@ -211,12 +211,9 @@ export default class EpdService {
     }
 
     this.immunizations.forEach(element => {
-      
+
       const protections: Array<string> = []
-      element
-        .protocolApplied[0]
-        .targetDisease
-        .forEach(target => {
+      element.protocolApplied[0].targetDisease.forEach(target => {
           protections.push(target.coding[0].display)
         }
         )
@@ -230,8 +227,6 @@ export default class EpdService {
         practicioner: this.practitioner.name[0].family + ' ' + this.practitioner.name[0].given[0],
         platform: ['EPD']
       }
-
-      //console.log(JSON.stringify(row))
       vaccinations.push(row)
     });
   }
@@ -254,7 +249,7 @@ export default class EpdService {
 
 
   /**
-   * creates a immunization FHIR resource https://build.fhir.org/immunization.html 
+   * creates a immunization FHIR resource https://build.fhir.org/immunization.html
    * @param immunizationName the name of the vaccination
    * @param illnesses a list of the illnesses that the immunization tackles
    * @param doseNo the number of the dose
@@ -293,7 +288,7 @@ export default class EpdService {
   }
 
   /**
-   * creates a Composition FHIR resource https://build.fhir.org/composition.html 
+   * creates a Composition FHIR resource https://build.fhir.org/composition.html
    * @param immunizationName the name of the vaccination
    * @param illnesses a list of the illnesses that the immunization tackles
    * @param doseNo the number of the dose
@@ -335,7 +330,7 @@ export default class EpdService {
   }
 
   /**
-   * creates a VaccinationRecord FHIR resource http://fhir.ch/ig/ch-vacd/vaccination-record-document.html 
+   * creates a VaccinationRecord FHIR resource http://fhir.ch/ig/ch-vacd/vaccination-record-document.html
    * @param immunizationName the name of the vaccination
    * @param illnesses a list of the illnesses that the immunization tackles
    * @param doseNo the number of the dose
@@ -385,19 +380,19 @@ export default class EpdService {
     provideBundle.entry[2].resource.date = moment(now).format('YYYY-MM-DD').toString()
     provideBundle.entry[2].resource.masterIdentifier.value = 'urn:oid:89913ac4-f8a3-4eee-9e41-123' + this.makeid(3)
 
-    /*    this.jsOnFhir.create(provideBundle)
-         .then((res) => {
-           console.log('Create result', res)
-         })
-         .catch(err => {
-           console.log(err);
-         }); */
+ /*    this.jsOnFhir.create(provideBundle)
+      .then((res) => {
+        console.log('Create result', res)
+      })
+      .catch(err => {
+        console.log(err);
+      }); */
   }
 
   /**
    * Sets the code of the diseases according to the snomed code system
    * @param illnesses the names of the illnesses as string
-   * @returns a FHIR object array 
+   * @returns a FHIR object array
    */
   setTargetDiseases(illnesses: Array<string>): Array<{ coding: { system: string, code: string, display: string }[] }> {
     const diseaseCode = {
@@ -443,11 +438,11 @@ export default class EpdService {
 
   /**
   copyright of the user csharptest.net
-  
-  generates a hash out of the characters in @param characters 
+
+  generates a hash out of the characters in @param characters
   The length is determined by the number provided to the method
-  
-  @param length the length of the hash 
+
+  @param length the length of the hash
   @returns hash value of a certain length as string
    */
   makeid(length: number): string {
@@ -463,11 +458,11 @@ export default class EpdService {
 
   /**
 copyright of the user csharptest.net
- 
-generates a hash out of the characters in @param characters 
+
+generates a hash out of the characters in @param characters
 The length is determined by the number provided to the method
- 
-@param length the length of the hash 
+
+@param length the length of the hash
 @returns hash value of a certain length as string
  */
   makUuid(length: number): string {

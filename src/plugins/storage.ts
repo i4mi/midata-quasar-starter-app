@@ -1,8 +1,9 @@
 import MidataService from './midataService';
-import { Immunization, Observation, ObservationStatus, Patient, ImmunizationPerformer, Condition, AllergyIntolerance } from '@i4mi/fhir_r4';
+import { Immunization, Observation, ObservationStatus, Patient, ImmunizationPerformer, Condition, AllergyIntolerance, ImmunizationStatus } from '@i4mi/fhir_r4';
 import EpdService from './epdService';
 import { Notify } from 'quasar';
 import { reactive } from 'vue'
+
 
 const STORAGE_KEY = 'demo-app-storage';
 
@@ -99,7 +100,14 @@ export default class Storage {
     }
 
   }
+/**
+  * Gets all Immunizations from the store.
+  * @returns
+  */
+ public getImmunizations(): Array<Immunization> {
+  return this.immunizations;
 
+}
   /**
    *
    * @returns a promise:
@@ -117,9 +125,12 @@ export default class Storage {
           this.patientResource = results[0];
           this.observations = results[1] as Array<Observation>;
           this.immunizations = results[2] as Array<Immunization>;
+          this.midata.createVaccinationTable(this.getImmunizations())
+
+
           this.persist()
           resolve()
-          this.midata.createVaccinationTable(this.immunizations)
+
         })
         .catch((error) => {
           console.warn('Error', error);
@@ -172,13 +183,7 @@ export default class Storage {
     return this.observations;
   }
 
-  /**
-  * Gets all Immunizations from the store.
-  * @returns
-  */
-  public getImmunizations(): Array<Immunization> {
-    return this.immunizations;
-  }
+
 
   /**
    * Creates a new Observation

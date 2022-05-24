@@ -69,9 +69,11 @@
 
 <script>
 import { storage } from 'src/boot/plugins';
+import { vaccinationsMidata } from 'src/plugins/midataService';
 import { ref } from 'vue';
 import { defineComponent } from 'vue';
 import { loggedInPatient, vaccinations } from '../plugins/epdService.ts';
+
 
 
 const columns = [
@@ -108,19 +110,21 @@ const columns = [
   { name: 'practicioner', label: 'Behandelnder Arzt', field: 'practicioner' },
 ];
 
-const rowsMidata = storage.getImmunizations();
+// const rowsMidata = storage.getImmunizations();
+const rowsMidata = vaccinationsMidata;
 const rowsEPD = vaccinations;
 
 let rows = [];
 
-if (rowsEPD && rowsMidata) rows.concat(rowsEPD, rowsMidata);
-if (rowsEPD) rows = rowsEPD;
-//if (rowsMidata) rows = rowsMidata;
+//if (rowsEPD && rowsMidata) rows.concat(rowsEPD, rowsMidata);
+//if (rowsEPD) rows = rowsEPD;
+if (rowsMidata) rows = rowsMidata;
 
 console.log(
   'rows EPD exist: ',rowsEPD,
   '\nrows Midata exist: ',rowsMidata,
-  '\nRows count', rows.length);
+  '\nRows count', rows.length,
+  '\nvaccinations', vaccinations.length);
 
 export default defineComponent({
   data() {
