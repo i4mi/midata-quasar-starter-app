@@ -13,8 +13,12 @@ import {
   date
 } from '@i4mi/fhir_r4';
 import moment from 'moment';
+import { storage } from 'src/boot/plugins';
+import { number } from '@intlify/core-base';
 
 export const vaccinationsMidata = []
+
+
 
 // import moment library. More information under https://momentjs.com
 const now = moment();
@@ -132,7 +136,8 @@ export default class MidataService {
     // }
     interface midataRow {
       name: string,
-      date: string,
+      // date: string,
+      vaccinationdate: string,
       primarysource: boolean,
       lotNo: string,
       expirationDate: string,
@@ -140,50 +145,63 @@ export default class MidataService {
       occurrenceString: string,
       route: string,
       doseQuantity: string,
-      performer:string,
+      dosageno: string,
+      // performer:string,
+      practicioner:string | 'Not Registered',
       note:string,
+      platform: Array<string>,
+      protection: string,
     }
 
     this.immunizations.forEach(element => {
 
-      const protections: Array<string> = []
-      element
-        .protocolApplied[0]
-        .targetDisease
-        .forEach(target => {
-          protections.push(target.coding[0].display)
-        }
-        )
-
-      // const row: Row = {
-      //   name: element.vaccineCode.text,
-      //   lotNo: element.lotNumber,
-      //   protection: protections.join(', '),
-      //   dosageno: element.identifier[0].value,
-      //   vaccinationdate: moment(element.occurrenceDateTime)?.format('MMMM Do YYYY, h:mm a'),
-      //   practicioner: '',
-      //   platform: ['epd']
-      // }
-      // vaccinationsMidata.push(row)
 
       const miRow: midataRow = {
-      name: element.patient.display,
-      date: JSON.stringify(element._expirationDate),
-      primarysource: element.primarySource,
+      name: setVacUndefined(element),//element.vaccineCode.coding[0].code,
+      dosageno: '1', // Immunization Sources online still no dosage numer implemented.
+      platform: ['Midata'],
       lotNo: element.lotNumber,
+      protection: element.vaccineCode.text,
+      vaccinationdate: element.occurrenceString,
+      practicioner: setPerformerUndefined(element),
+
+      //not used in Overview.
+      doseQuantity: 'test dose quantity',   // JSON.stringify(element.doseQuantity.value),
       expirationDate: element.expirationDate,
-      site: JSON.stringify(element.site.coding[0].display), // not sure if this works
       occurrenceString: element.occurrenceString,
-      route: JSON.stringify(element.route.coding[0].display),
-      doseQuantity:JSON.stringify(element.doseQuantity.value),
-      performer:JSON.stringify(element.performer[0].id),
-      note: JSON.stringify(element.note[0].text)
-        //platform: ['Midata']
+      route:'test route',  //JSON.stringify(element.route.coding[0].display),
+      note:'test note', //JSON.stringify(element.note[0].text)
+      primarysource: element.primarySource,
+      site:'test site',// JSON.stringify(element.site.coding[0].display), // not sure if this works
+
       }
       vaccinationsMidata.push(miRow)
 
 
     });
+
+    //check if the Performer is defined. If not, set the value as a string.
+    function setPerformerUndefined(element:Immunization){
+      if(element.performer === undefined){
+           return ''}
+      else{
+            return element.performer[0].actor.display
+      }
+
+    }
+    //check if the element Vaccination name is defined. If not, set the value as  a string.
+    function setVacUndefined(element:Immunization){
+      if(element.performer === undefined){
+           return ''}
+      else{
+            return element.vaccineCode.coding[0].code
+      }
+
+    }
+
+
+
+
   }
 
 
@@ -610,6 +628,17 @@ export default class MidataService {
       * site: array ( hast to have part of the body and a code)
       */
 
+      /**
+       * Needded for display
+       * Vac Name
+       * Platform
+       * LotNumber
+       * Schutz
+       * Dosisnumber
+       * Update Date
+       * Practitioner
+       */
+
       vaccineCode: {
         coding: [
           {
@@ -729,6 +758,8 @@ export default class MidataService {
         };
     }
   }
+
+
 
 }
 

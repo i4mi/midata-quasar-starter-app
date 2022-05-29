@@ -116,8 +116,8 @@ const rowsEPD = vaccinations;
 
 let rows = [];
 
-//if (rowsEPD && rowsMidata) rows.concat(rowsEPD, rowsMidata);
-//if (rowsEPD) rows = rowsEPD;
+if (rowsEPD && rowsMidata) rows.concat(rowsEPD, rowsMidata);
+if (rowsEPD) rows = rowsEPD;
 if (rowsMidata) rows = rowsMidata;
 
 console.log(

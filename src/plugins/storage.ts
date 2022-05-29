@@ -1,4 +1,5 @@
 import MidataService from './midataService';
+import immunArray from './midataService';
 import { Immunization, Observation, ObservationStatus, Patient, ImmunizationPerformer, Condition, AllergyIntolerance, ImmunizationStatus } from '@i4mi/fhir_r4';
 import EpdService from './epdService';
 import { Notify } from 'quasar';
@@ -6,6 +7,7 @@ import { reactive } from 'vue'
 
 
 const STORAGE_KEY = 'demo-app-storage';
+
 
 
 export const vaccination = reactive({
@@ -126,6 +128,9 @@ export default class Storage {
           this.observations = results[1] as Array<Observation>;
           this.immunizations = results[2] as Array<Immunization>;
           this.midata.createVaccinationTable(this.getImmunizations())
+
+
+
 
 
           this.persist()

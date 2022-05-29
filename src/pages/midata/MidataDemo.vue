@@ -17,23 +17,32 @@
     />
     <q-btn
       color="black"
-      label="Test Immunizations Array"
+      label="Test vaccinationsmidata[]"
       icon="search"
       rounded
       outline
       @click="testImmunizationsArray()"
       class="gt-xs"
     />
-<!--
+
     <q-btn
       color="black"
-      label="Test Observation Array"
+      label="Test storage.getimmunizations()"
       icon="search"
       rounded
       outline
       @click="testObservationArray()"
       class="gt-xs"
-    /> -->
+    />
+    <q-btn
+      color="black"
+      label="Test action"
+      icon="search"
+      rounded
+      outline
+      @click="testAction()"
+      class="gt-xs"
+    />
 
     <div class="row justify-end">
       <q-btn
@@ -232,9 +241,7 @@
     >
     </add-observation-dialog>
 
-    <!-- ---------------Immunization Painel------------------------------------------ -->
 
-    <!-- ------------------------------------------ -->
   </q-page>
 </template>
 
@@ -248,6 +255,10 @@ import AddObservationDialog from '../../components/AddObservationDialog.vue';
 import { midata, storage } from 'src/boot/plugins';
 import { store } from 'quasar/wrappers';
 import { vaccinationsMidata } from 'src/plugins/midataService';
+
+
+const array1 = vaccinationsMidata;
+
 export default defineComponent({
   name: 'MidataDemo',
   components: {
@@ -318,30 +329,34 @@ export default defineComponent({
     },
 
     testImmunizationsArray() {
-      // console.log(
-      //   'getImmunizationResourcesAsBundle: ' +
-      //     this.$midata.getImmunizationResourcesAsBundle()
-      // );
-      // console.log(this.$storage.getImmunizations());
-      // let array1 : Array<Immunization> = this.$storage.getImmunizations();
-      // console.log(JSON.stringify(array1[6].site.coding[0].display));
-      // console.log(JSON.stringify(array1[0]));
-      // console.log(array1[0]);
+
+      // midata.createVaccinationTable(this.getImmunizations())
+
+
 
       console.log(
-        // JSON.stringify(midata.immunizations[0]),
+        // this.getImmunizations(),
+        // 'immunizationsMidata ', JSON.stringify(array1),
+        'immunizationsMidata ', vaccinationsMidata,
 
-      JSON.stringify(vaccinationsMidata)
-
-      )
-      // console.log(array1[6].patient._display);
+        )
 
 },
     testObservationArray() {
-      // console.log(this.$midata.getPatientResource())
-      // console.log('getObservationResourcesAsBundle: '+this.$midata.getObservationResourcesAsBundle());
-      const array1 : Array<Immunization> = this.$storage.getImmunizations();
-      // console.log(JSON.stringify(array1[0].patient.display));
+
+       console.log(this.getImmunizations())
+
+
+    },
+
+    testAction() {
+              //record "getImmunizations()[3]" works, the other ones does not have
+              console.log(this.getImmunizations()[0].vaccineCode.coding[0].code)
+
+
+
+          // this.getImmunizations().forEach(element => {console.log(element.performer)});
+
 
 
     },
