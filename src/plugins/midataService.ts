@@ -182,6 +182,7 @@ export default class MidataService {
 
     //check if the Performer is defined. If not, set the value as a string.
     function setPerformerUndefined(element:Immunization){
+
       if(element.performer === undefined){
            return ''}
       else{
@@ -191,7 +192,7 @@ export default class MidataService {
     }
     //check if the element Vaccination name is defined. If not, set the value as  a string.
     function setVacUndefined(element:Immunization){
-      if(element.performer === undefined){
+      if(element.vaccineCode.coding === undefined){
            return ''}
       else{
             return element.vaccineCode.coding[0].code
@@ -613,7 +614,108 @@ export default class MidataService {
   /**
 * Creates immunization with status (compleated as default), vacination code, patient, date, lot number, performer and dose quantity
 */
-  newImmunization(): Immunization {
+  // newImmunization(): Immunization {
+  //   return {
+
+  //     resourceType: 'Immunization',
+  //     status: ImmunizationStatus.COMPLETED,
+
+  //     /**
+  //     * vacinationCode: string
+  //     * dateAndTime: date
+  //     * primarySource: booleam
+  //     * lotnumber:string
+  //     * expirationDate:date
+  //     * site: array ( hast to have part of the body and a code)
+  //     */
+
+  //     /**
+  //      * Needded for display
+  //      * Vac Name
+  //      * Platform
+  //      * LotNumber
+  //      * Schutz
+  //      * Dosisnumber
+  //      * Update Date
+  //      * Practitioner
+  //      */
+
+  //     vaccineCode: {
+  //       coding: [
+  //         {
+  //           system: 'urn:oid:1.2.36.1.2001.1005.17',
+  //           code: 'FLUVAX',
+  //         }
+  //       ],
+  //       text: 'Fluvax (In fluenza)',
+  //     },
+
+  //     occurrenceDateTime: '2013-01-10',
+  //     primarySource: true,
+  //     lotNumber: 'AAJN11K',
+  //     expirationDate: '2015-02-15',
+
+  //     site: {
+  //       coding: [
+  //         {
+  //           system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
+  //           code: 'LA',
+  //           display: 'left arm'
+  //         }
+  //       ]
+  //     },
+
+  //     patient: {
+  //       display: '',
+  //       reference: 'Patient/' + this.jsOnFhir.getPatient(),
+  //     },
+
+  //     occurrenceString: '2022-02-16',
+
+  //     route: {
+  //       coding: [
+  //         {
+  //           system: 'http://terminology.hl7.org/CodeSystem/v3-RouteOfAdministration',
+  //           code: 'IM',
+  //           display: 'Injection, intramuscular'
+  //         }
+  //       ]
+  //     },
+
+
+  //     doseQuantity: {
+  //       value: 5,
+  //       system: 'http://unitsofmeasure.org',
+  //       code: 'mg'
+  //     },
+
+
+  //     performer: [
+  //       {
+  //         actor: {
+  //           identifier:
+  //           {
+  //             system: 'http://www.gs1.org/gln',
+  //             value: '7640166732204'
+  //           },
+  //           display: 'Dr. med. Hanspeter Wenger'
+  //         }
+  //       }
+  //     ],
+  //     note: [
+  //       {
+  //         text: 'if you are reading this, your code worked'
+  //       }
+  //     ]
+
+
+
+  //   };
+  // }
+
+
+  newImmunization(impstoffname?:string, platform?:string, lotnummer?:string, schutz?:string, verabreichung?:string, performer?:string): Immunization {
+
     return {
 
       resourceType: 'Immunization',
@@ -643,15 +745,15 @@ export default class MidataService {
         coding: [
           {
             system: 'urn:oid:1.2.36.1.2001.1005.17',
-            code: 'FLUVAX',
+            code: impstoffname ||'FLUVAX',
           }
         ],
-        text: 'Fluvax (In fluenza)',
+        text: schutz || 'Fluvax (In fluenza)',
       },
 
-      occurrenceDateTime: '2013-01-10',
+      occurrenceDateTime: verabreichung || '2013-01-10',
       primarySource: true,
-      lotNumber: 'AAJN11K',
+      lotNumber: lotnummer || 'AAJN11K',
       expirationDate: '2015-02-15',
 
       site: {
@@ -669,7 +771,7 @@ export default class MidataService {
         reference: 'Patient/' + this.jsOnFhir.getPatient(),
       },
 
-      occurrenceString: '2022-02-16',
+      occurrenceString: verabreichung||'2022-02-16',
 
       route: {
         coding: [
@@ -697,20 +799,23 @@ export default class MidataService {
               system: 'http://www.gs1.org/gln',
               value: '7640166732204'
             },
-            display: 'Dr. med. Hanspeter Wenger'
+            display: performer || 'Dr. med. Hanspeter Wenger'
           }
         }
       ],
       note: [
         {
-          text: 'if you are reading this, your code worked'
+          text: ''
         }
       ]
 
 
 
+
     };
   }
+
+
   /**
   * Helper function that creates a Method of measurement to be used in an observation.
   * @param bodySite the body site where the bodytemperature was measured.

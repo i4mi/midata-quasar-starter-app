@@ -236,13 +236,9 @@ export default class Storage {
   }
 
   /**
-     * Creates a new Observation
-     * @param _status
-     * @param bodySite
-     * @param value
-     * @returns
+     *
      */
-  public createImmunization(
+  public createImmunization(newImmunization?:Immunization
 
   ): Promise<Immunization> {
     return new Promise((resolve, reject) => {

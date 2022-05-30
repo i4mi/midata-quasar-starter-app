@@ -181,8 +181,9 @@
 </template>
 
 <script>
+import { storage } from 'src/boot/plugins';
 import { ref } from 'vue';
-
+import { Immunization } from '@i4mi/fhir_r4';
 import { loggedInPatient } from '../plugins/epdService.ts';
 
 export default {
@@ -244,7 +245,10 @@ export default {
       this.$epd.setProvideBundle()
     },
     uploadToMidata() {
-      console.log('Upload to Midata pressed');
+      const newImunnization = this.$midata.newImmunization(this.immunizationName,'Midata',this.lotNumber,this.protections,this.date,this.healthProfessional)
+      // storage.createImmunization(newImunnization)
+
+      console.log(newImunnization);
     },
 
     getPatient() {
