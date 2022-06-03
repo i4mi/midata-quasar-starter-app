@@ -169,7 +169,7 @@ export default class EpdService {
           .resource
           .resourceType === 'Immunization'
     }).map(x => x.resource as Immunization)
-    console.log('Immunizations ', this.immunizations)
+    console.log('Immunizations ', JSON.stringify(this.immunizations))
 
     this.createVaccinationTable()
   }

@@ -10,11 +10,12 @@ import {
   ObservationStatus,
   Observation,
   ImmunizationStatus,
-  date
+  date,
+  integer
 } from '@i4mi/fhir_r4';
 import moment from 'moment';
-import { storage } from 'src/boot/plugins';
-import { number } from '@intlify/core-base';
+
+
 
 export const vaccinationsMidata = []
 
@@ -22,6 +23,7 @@ export const vaccinationsMidata = []
 
 // import moment library. More information under https://momentjs.com
 const now = moment();
+
 
 export default class MidataService {
   jsOnFhir: JSOnFhir
@@ -136,7 +138,7 @@ export default class MidataService {
     // }
     interface midataRow {
       name: string,
-      // date: string,
+
       vaccinationdate: string,
       primarysource: boolean,
       lotNo: string,
@@ -146,7 +148,7 @@ export default class MidataService {
       route: string,
       doseQuantity: string,
       dosageno: string,
-      // performer:string,
+
       practicioner:string | 'Not Registered',
       note:string,
       platform: Array<string>,
@@ -157,13 +159,13 @@ export default class MidataService {
 
 
       const miRow: midataRow = {
-      name: setVacUndefined(element),//element.vaccineCode.coding[0].code,
-      dosageno: '1', // Immunization Sources online still no dosage numer implemented.
+      name: ifVacUndefined(element),//element.vaccineCode.coding[0].code,
+      dosageno: ifDoseNumUndefined(element),  // Immunization Sources online still no dosage numer implemented.
       platform: ['Midata'],
       lotNo: element.lotNumber,
-      protection: element.vaccineCode.text,
+      protection: ifProtectionUndefined(element),
       vaccinationdate: element.occurrenceString,
-      practicioner: setPerformerUndefined(element),
+      practicioner: ifPerformerUndefined(element),
 
       //not used in Overview.
       doseQuantity: 'test dose quantity',   // JSON.stringify(element.doseQuantity.value),
@@ -181,7 +183,7 @@ export default class MidataService {
     });
 
     //check if the Performer is defined. If not, set the value as a string.
-    function setPerformerUndefined(element:Immunization){
+    function ifPerformerUndefined(element:Immunization){
       if(element.performer === undefined){
            return ''}
       else{
@@ -190,7 +192,7 @@ export default class MidataService {
 
     }
     //check if the element Vaccination name is defined. If not, set the value as  a string.
-    function setVacUndefined(element:Immunization){
+    function ifVacUndefined(element:Immunization){
       if(element.performer === undefined){
            return ''}
       else{
@@ -198,6 +200,25 @@ export default class MidataService {
       }
 
     }
+    //check if the element Vaccination name is defined. If not, set the value as  a string.
+    function ifDoseNumUndefined(element:Immunization,){
+      if(element.protocolApplied === undefined){
+           return ''}
+      else{
+            return element.protocolApplied[0].doseNumberPositiveInt.toString()
+      }
+
+
+    }
+
+    function ifProtectionUndefined(element:Immunization,){
+      if(element.protocolApplied === undefined){
+           return ''}
+      else{
+            return element.protocolApplied[0].targetDisease[0].coding[0].display
+      }
+    }
+
 
 
 
@@ -596,62 +617,132 @@ export default class MidataService {
   }
 
   /**
-  * Creates a Immunization (of type bodytemperature) resource on the fhir server
+  * Creates a Immunization  resource on the fhir server
   *              - if successfull -> response with the created resource as JSON
   *              - if not successfull -> error message
   */
-  public createImmunization(
-  ): Promise<Immunization> {
-    return new Promise((resolve, reject) => {
-      const immunization = this.newImmunization();
-      this.jsOnFhir.create(immunization).then((result) => {
-        result ? resolve(result as Immunization) : reject('internal error');
-      }).catch((error) => reject(error));
-    });
-  }
+  //  public createImmunization(
+  //   ): Promise<Immunization> {
+  //     return new Promise((resolve, reject) => {
+  //       const immunization = this.newImmunization();
+  //       this.jsOnFhir.create(immunization).then((result) => {
+  //         result ? resolve(result as Immunization) : reject('internal error');
+  //       }).catch((error) => reject(error));
+  //     });
+  //   }
+    public createImmunization(immun?:Immunization
+      ): Promise<Immunization> {
+        let immunization:Immunization
+        return new Promise((resolve, reject) => {
+          if(immun)
+          immunization = immun;
+          else
+          immunization = this.newImmunization();
+          this.jsOnFhir.create(immunization).then((result) => {
+            result ? resolve(result as Immunization) : reject('internal error');
+          }).catch((error) => reject(error));
+        });
+      }
+
+
 
   /**
-* Creates immunization with status (compleated as default), vacination code, patient, date, lot number, performer and dose quantity
+* Creates immunization
 */
-  newImmunization(): Immunization {
+  newImmunization(impfstoffname?:string, protection?:string, dosisnumber?:integer , lotnumber?:string, date?:string, performer?:string ): Immunization {
     return {
+              // resourceType: 'Immunization',
+              // id: '8227-Immunization',
+              // occurrenceString:'',
+              //         meta: {
+              //           profile: [
+              //             'http://fhir.ch/ig/ch-vacd/StructureDefinition/ch-vacd-immunization'
+              //           ]
+              //         },
+              //         text: {
+              //           status: NarrativeStatus.GENERATED,
+              //           div: "<div xmlns='http://www.w3.org/1999/xhtml'><p><b>Generated Narrative</b></p><div style='display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%'><p style='margin-bottom: 0px'>Resource '7-4-Immunization' </p><p style='margin-bottom: 0px'>Profile: <a href='StructureDefinition-ch-vacd-immunization.html'>CH VACD Immunization Profile</a></p></div><p><b>identifier</b>: id: 34567</p><p><b>status</b>: completed</p><p><b>vaccineCode</b>: Boostrix <span style='background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki'> (<a href='CodeSystem-ch-vacd-swissmedic-cs.html'>Swiss Medic Authorized Vaccines Codesystem</a>#637)</span></p><p><b>patient</b>: <a href='#Patient_3-1-Patient'>See above (Patient/3-1-Patient)</a></p><p><b>occurrence</b>: 2015-11-01T00:00:00+01:00</p><p><b>recorded</b>: 2015-11-01T00:00:00+01:00</p><p><b>lotNumber</b>: 12-34244</p><p><b>route</b>: Intramuscular use <span style='background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki'> (standardterms.edqm.eu#20035000)</span></p><h3>Performers</h3><table class='grid'><tr><td>-</td><td><b>Actor</b></td></tr><tr><td>*</td><td><a href='#PractitionerRole_6-2-PractitionerRole'>See above (PractitionerRole/6-2-PractitionerRole)</a></td></tr></table><h3>ProtocolApplieds</h3><table class='grid'><tr><td>-</td><td><b>TargetDisease</b></td><td><b>DoseNumber[x]</b></td></tr><tr><td>*</td><td>Diphtheria caused by Corynebacterium diphtheriae (disorder) <span style='background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki'> (<a href='https://browser.ihtsdotools.org/'>SNOMED CT</a>#397430003)</span>, Tetanus (disorder) <span style='background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki'> (<a href='https://browser.ihtsdotools.org/'>SNOMED CT</a>#76902006)</span>, Pertussis (disorder) <span style='background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki'> (<a href='https://browser.ihtsdotools.org/'>SNOMED CT</a>#27836007)</span></td><td>1</td></tr></table></div>"
+              //         },
+              //         identifier: [
+              //           {
+              //             system: 'urn:oid:2.16.756.5.30.1.147.1.3.1',
+              //             value: '34567'
+              //           }
+              //         ],
+              //         status: ImmunizationStatus.COMPLETED,
+              //         vaccineCode: {
+              //           coding: [
+              //             {
+              //               system: 'http://fhir.ch/ig/ch-vacd/CodeSystem/ch-vacd-swissmedic-cs',
+              //               code: '450',
+              //               display: impfstoffname || 'FSME-Immun CC'
+              //             }
+              //           ]
+              //         },
+              //         patient: {
+              //           reference: 'Patient/3-1-Patient'
+              //         },
+              //         occurrenceDateTime: '2013-01-10',
+              //         recorded: '2022-05-26',
+              //         lotNumber: lotnumber || '2222',
+              //         route: {
+              //           coding: [
+              //             {
+              //               system: 'http://standardterms.edqm.eu',
+              //               code: '20035000',
+              //               display: 'Intramuscular use'
+              //             }
+              //           ]
+              //         },
+              //         performer: [
+              //             {
+              //               actor: {
+              //                 identifier:
+              //                 {
+              //                   system: 'http://www.gs1.org/gln',
+              //                   value: '7640166732204'
+              //                 },
+              //                 display: performer || 'Dr. med. Hanspeter Wenger'
+              //               }
+              //             }
+              //           ],
+              //         protocolApplied: [
+              //           {
+              //                         targetDisease: [
+              //                           {
+              //                             coding: [
+              //                               {
+              //                                 system: 'http://snomed.info/sct',
+              //                                 code: '38907003',
+              //                                 display: schutz || 'Windpocken'
+              //                               }
+              //                             ]
+              //                           }
+              //                         ],
+
+              //             doseNumberString:'',
+              //             doseNumberPositiveInt: dosisnumber || 1,
+              //           }
+
+              //         ],
+
 
       resourceType: 'Immunization',
       status: ImmunizationStatus.COMPLETED,
-
-      /**
-      * vacinationCode: string
-      * dateAndTime: date
-      * primarySource: booleam
-      * lotnumber:string
-      * expirationDate:date
-      * site: array ( hast to have part of the body and a code)
-      */
-
-      /**
-       * Needded for display
-       * Vac Name
-       * Platform
-       * LotNumber
-       * Schutz
-       * Dosisnumber
-       * Update Date
-       * Practitioner
-       */
 
       vaccineCode: {
         coding: [
           {
             system: 'urn:oid:1.2.36.1.2001.1005.17',
-            code: 'FLUVAX',
+            code: impfstoffname || 'FLUVAX',
           }
         ],
-        text: 'Fluvax (In fluenza)',
+        text: protection || 'Fluvax (In fluenza)',
       },
 
-      occurrenceDateTime: '2013-01-10',
+      occurrenceDateTime: date || '2013-01-10',
       primarySource: true,
-      lotNumber: 'AAJN11K',
+      lotNumber: lotnumber ||'AAJN11K',
       expirationDate: '2015-02-15',
 
       site: {
@@ -669,7 +760,7 @@ export default class MidataService {
         reference: 'Patient/' + this.jsOnFhir.getPatient(),
       },
 
-      occurrenceString: '2022-02-16',
+      occurrenceString: date || '2022-02-16',
 
       route: {
         coding: [
@@ -697,67 +788,51 @@ export default class MidataService {
               system: 'http://www.gs1.org/gln',
               value: '7640166732204'
             },
-            display: 'Dr. med. Hanspeter Wenger'
+            display: performer || 'Dr. med. Hanspeter Wenger'
           }
         }
       ],
-      note: [
+
+      protocolApplied: [
         {
-          text: 'if you are reading this, your code worked'
+          targetDisease: [
+            {
+              coding: [
+                {
+                  system: 'http://snomed.info/sct',
+                  code: '38907003',
+                  display: 'Windpocken'
+                }
+              ]
+            }
+          ],
+          doseNumberString:'',
+          doseNumberPositiveInt: dosisnumber || 1
         }
-      ]
+      ],
+
 
 
 
     };
+
   }
-  /**
-  * Helper function that creates a Method of measurement to be used in an observation.
-  * @param bodySite the body site where the bodytemperature was measured.
-  * @returns method of temperature taking with coding as JSON.
-  */
-  getImmunizationSite(bodySite: string) {
-    switch (bodySite) {
-      case 'left arm':
-        return {
-          coding: [
-            {
-              system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
-              code: 'LA',
-              display: 'left arm'
-            }
-          ]
-        };
-      case 'left gluteus':
-        return {
-
-          system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
-          code: 'LG',
-          display: 'left gluteus medius'
 
 
-        };
-      case 'right gluteus':
-        return {
-          system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
-          code: 'RG',
-          display: 'right gluteus medius'
-        };
-      case 'right arm':
-        return {
-          system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
-          code: 'RA',
-          display: 'right arm'
-        };
-      default:
-        return {
-          system: 'http://terminology.hl7.org/CodeSystem/v3-ActSite',
-          code: '_HumanSubstanceAdministrationSite',
-          display: 'Human Substance Administration Site'
+   getPatientName() {
+//     const pat = await this.getPatientResource();
 
-        };
-    }
-  }
+//    console.log(
+//          pat.name[0].given +' ' + pat.name[0].family
+//           )
+
+//     return pat.name[0].given +' ' + pat.name[0].family
+
+}
+
+
+
+
 
 
 

@@ -181,21 +181,23 @@
 </template>
 
 <script>
+import { midata } from 'src/boot/plugins';
 import { ref } from 'vue';
 
 import { loggedInPatient } from '../plugins/epdService.ts';
 
+
 export default {
   setup() {
-    let patName = loggedInPatient.loggedIn?.name[0].family
+
 
     return {
       name: ref(''),
       dosisName: ref(''),
       lotNumber: ref(''),
       patientName: ref(
-        patName ?? 'Bitte Patient erfassen'
-      ),
+
+        'Bitte Patient erfassen'),
       healthProfessional: ref(''),
       minuteOptionsTime1: [0, 15, 30, 45],
       date: ref(new Date().toLocaleString('de-CH')),
@@ -244,7 +246,9 @@ export default {
       this.$epd.setProvideBundle()
     },
     uploadToMidata() {
-      console.log('Upload to Midata pressed');
+      const newImmunization = midata.newImmunization(this.immunizationName, this.protections, this.dosisName, this.lotNumber, this.date, this.healthProfessional)
+
+      midata.createImmunization(newImmunization)
     },
 
     getPatient() {
@@ -254,6 +258,7 @@ export default {
 
   },
 };
+
 </script>
 
 <style scoped>

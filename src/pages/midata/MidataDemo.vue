@@ -252,7 +252,7 @@ import { Patient, Immunization } from '@i4mi/fhir_r4';
 import bodySites from '../../data/bodySites.json';
 import EditObservationDialog from '../../components/EditObservationDialog.vue';
 import AddObservationDialog from '../../components/AddObservationDialog.vue';
-import { midata, storage } from 'src/boot/plugins';
+import { midata, storage} from 'src/boot/plugins';
 import { store } from 'quasar/wrappers';
 import { vaccinationsMidata } from 'src/plugins/midataService';
 
@@ -294,10 +294,17 @@ export default defineComponent({
   }),
   computed: {},
   methods: {
-    /*     getFullPatientName() {
+
+
+
+
+
+
+       getFullPatientName() {
       let name = this.$storage.getPatient().name;
       return name[0].given.toString() + ' ' + name[0].family;
-    }, */
+    },
+
     isEmpty(obj: any) {
       return JSON.stringify(obj) === '{}';
     },
@@ -305,6 +312,7 @@ export default defineComponent({
       this.patientResource = this.$storage.getPatient();
       console.log(this.patientResource);
     },
+
     getObservations() {
       return this.$storage.getObservations();
     },
@@ -349,19 +357,27 @@ export default defineComponent({
 
     },
 
-    testAction() {
-              //record "getImmunizations()[3]" works, the other ones does not have
-              console.log(this.getImmunizations()[0].vaccineCode.coding[0].code)
 
 
+       testAction() {
+              //   let pat = await midata.getPatientResource();
 
-          // this.getImmunizations().forEach(element => {console.log(element.performer)});
+              //  console.log(
+              //        pat.name[0].given
 
+              //     )
+                  // return pat.name[0].given +' ' + pat.name[0].family
 
+                  console.log(storage.getImmunizations()[6].protocolApplied[0].doseNumberPositiveInt.toString())
 
-    },
+                  // protocolApplied[0].doseNumberPositiveInt.toString
+
+      },
+
   },
 });
+
+
 </script>
 
 <style lang="sass" scoped>

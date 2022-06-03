@@ -8,6 +8,10 @@
         </div>
       </div>
       <q-btn round @click="test" label="Refresh" />
+
+      <div></div>
+
+
       <div class="row">
         <div class="col-2"></div>
         <div class="col-8 self-center">
@@ -68,11 +72,12 @@
 </template>
 
 <script>
-import { storage } from 'src/boot/plugins';
-import { vaccinationsMidata } from 'src/plugins/midataService';
+import { midata, storage } from 'src/boot/plugins';
+import { vaccinationsMidata, currentPatient } from 'src/plugins/midataService';
 import { ref } from 'vue';
 import { defineComponent } from 'vue';
 import { loggedInPatient, vaccinations } from '../plugins/epdService.ts';
+import { Patient } from '@i4mi/fhir_r4';
 
 
 
@@ -110,9 +115,11 @@ const columns = [
   { name: 'practicioner', label: 'Behandelnder Arzt', field: 'practicioner' },
 ];
 
-// const rowsMidata = storage.getImmunizations();
+
 const rowsMidata = vaccinationsMidata;
 const rowsEPD = vaccinations;
+
+
 
 let rows = [];
 
@@ -127,20 +134,31 @@ console.log(
   '\nvaccinations', vaccinations.length);
 
 export default defineComponent({
-  data() {
-    return {};
-  },
+
+
   methods: {
     test() {
-      this.$epd.getVaccinations();
+      this.$epd.getVaccinations()
+      // this.patientResource = this.$storage.getPatient();
+      // console.log(this.patientResource.name[0].given.toString() + ' ' + this.patientResource.name[0].family);
+
+
     },
+
+
+    //  getFullPatientName() {
+    //   let name = this.$storage.getPatient().name;
+    //   return name[0].given.toString() + ' ' + name[0].family;
+    // },
+
   },
   setup() {
     const selected = ref([]);
     return {
-      patientName: ref(
-        loggedInPatient.loggedIn?.name[0].family ?? 'Bitte Patient erfassen'
-      ),
+      patientName: ref(loggedInPatient.loggedIn?.name[0].family ?? 'Please Log in'), //Works for EPD not midata.
+
+      // this.$storage.getPatient()[0].given.toString() + ' ' + this.$storage.getPatient().family),
+
       stoffname: 'hello',
       date: ref('2022/01/01'),
       group: ref([]),
@@ -158,5 +176,25 @@ export default defineComponent({
       },
     };
   },
+  data() {
+  return {};
+  },
 });
+
+ function getNameFinally() {
+
+   return new Promise((resolve,reject)=>{
+     if (this.getFullPatientName() !== undefined){
+      name: this.getFullPatientName()}
+      else {
+        resolve (
+          'Unresolved'
+        )
+
+      }
+   })
+
+
+ }
+
 </script>
