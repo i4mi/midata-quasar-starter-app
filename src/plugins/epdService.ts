@@ -89,6 +89,7 @@ export default class EpdService {
  */
   async getVaccinations(): Promise<void> {
 
+    this.immunizations= []    
     // gets the current bundle with all health documents the patient has
     const vaccinationRecordDocumentBundle = await this.getDocumentReference().then(res => {
       return res;
@@ -122,7 +123,6 @@ export default class EpdService {
           .attachment
           .creation).getTime();
     });
-    console.log('vacdVaccinationRecordDocuments', vacdVaccinationRecordDocuments)
 
     //gets the url of the most current document
     const urlOfMostCurrentDocument = (vacdVaccinationRecordDocuments[0].resource as DocumentReference)
@@ -227,6 +227,7 @@ export default class EpdService {
         practicioner: this.practitioner.name[0].family + ' ' + this.practitioner.name[0].given[0],
         platform: ['EPD']
       }
+
       vaccinations.push(row)
     });
   }
@@ -324,7 +325,6 @@ export default class EpdService {
     compositionEntry.id = this.makeid(2) + '-VaccinationRecordComposition'
     const compositionResource = { fullUrl: 'http://test.fhir.ch/r4/Composition/' + compositionEntry.id, resource: {} }
     compositionResource.resource = compositionEntry
-    //console.log('entry: ', JSON.stringify(compositionEntry.section[0].entry))
 
     this.compositionResource = compositionResource
   }
@@ -373,12 +373,10 @@ export default class EpdService {
   setProvideBundle() {
     const provideBundle = FHIR_DOCUMENT_BUNLDE
 
-    console.log('currentVACDRecord: ', JSON.stringify(this.currentVACDRecord))
     const recordString: string = JSON.stringify(this.currentVACDRecord)
     const base64Data: string = btoa(recordString)
-    console.log(base64Data)
-    provideBundle.entry[0].resource.data = base64Data.toString()
 
+    provideBundle.entry[0].resource.data = base64Data.toString()
     provideBundle.entry[1].resource.date = moment(now).format('YYYY-MM-DD').toString()
     provideBundle.entry[2].resource.date = moment(now).format('YYYY-MM-DD').toString()
     provideBundle.entry[2].resource.masterIdentifier.value = 'urn:oid:89913ac4-f8a3-4eee-9e41-123' + this.makeid(3)
