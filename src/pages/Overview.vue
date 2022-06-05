@@ -125,7 +125,7 @@ let rows = [];
 
 if (rowsEPD && rowsMidata) rows.concat(rowsEPD, rowsMidata);
 if (rowsEPD) rows = rowsEPD;
-if (rowsMidata) rows = rowsMidata;
+//if (rowsMidata) rows = rowsMidata;
 
 console.log(
   'rows EPD exist: ',rowsEPD,
