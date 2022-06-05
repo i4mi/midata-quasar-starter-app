@@ -117,10 +117,6 @@ if (rowsEPD && rowsMidata) rows.concat(rowsEPD, rowsMidata);
 if (rowsEPD) rows = rowsEPD;
 //if (rowsMidata) rows = rowsMidata;
 
-console.log(
-  'rows EPD exist: ',rowsEPD,
-  '\nrows Midata exist: ',rowsMidata,
-  '\nRows count', rows.length);
 
 export default defineComponent({
   data() {
