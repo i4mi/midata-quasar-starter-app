@@ -183,7 +183,7 @@
 <script>
 import { midata } from 'src/boot/plugins';
 import { ref } from 'vue';
-
+import { Immunization } from '@i4mi/fhir_r4';
 import { loggedInPatient } from '../plugins/epdService.ts';
 
 
