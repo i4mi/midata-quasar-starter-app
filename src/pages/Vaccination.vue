@@ -246,7 +246,11 @@ export default {
       this.$epd.setProvideBundle()
     },
     uploadToMidata() {
+
+
       const newImmunization = midata.newImmunization(this.immunizationName, this.protections, this.dosisName, this.lotNumber, this.date, this.healthProfessional)
+
+      console.log(newImmunization.protocolApplied[0].targetDisease[0].coding[0].display)
 
       midata.createImmunization(newImmunization)
     },
@@ -270,3 +274,7 @@ export default {
   padding-left: 50px;
 }
 </style>
+
+
+
+
