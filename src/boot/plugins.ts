@@ -9,7 +9,7 @@ import moment from 'moment';
 // Create MidataService and Storage
 const midata = new MidataService();
 const epd = new EpdService();
-const storage = new Storage(midata, epd);
+const storage = new Storage(midata);
 
 
 // Type declaration

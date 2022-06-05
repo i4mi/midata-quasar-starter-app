@@ -23,15 +23,6 @@
           />
       </q-toolbar>
     </q-header>
-
-    <!-- <q-drawer v-model="drawerExpanded" show-if-above bordered>
-      <q-list>
-        <q-item-label header> All entries </q-item-label>
-        
-        
-      </q-list>
-    </q-drawer> -->
-
     <q-page-container class="my-div">
       <router-view />
     </q-page-container>
@@ -58,7 +49,7 @@ const midataLinksList = [
   {
     title: 'Login',
     icon: 'person',
-    link: '/midata/demo',
+    link: '/login',
   },
 ];
 

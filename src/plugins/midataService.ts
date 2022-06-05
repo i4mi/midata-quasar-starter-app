@@ -7,23 +7,12 @@ import {
   Organization,
   Practitioner,
   BundleEntry,
-  ObservationStatus,
-  Observation,
   ImmunizationStatus,
   integer,
   NarrativeStatus
 } from '@i4mi/fhir_r4';
-import moment from 'moment';
-
-
 
 export const vaccinationsMidata = []
-
-
-
-// import moment library. More information under https://momentjs.com
-const now = moment();
-
 
 export default class MidataService {
   jsOnFhir: JSOnFhir
@@ -107,38 +96,15 @@ export default class MidataService {
   }
 
   /**
-   * Gets the observation resources as bundle from the fhir endpoint.
-   * @returns bundle with observation resources as JSON.
+   * creates rows for the table in the overview tab out of the immunizations in MIDATA
+   * @param vaccinations a list with all immunizations
    */
-  getObservationResourcesAsBundle(): Promise<Bundle> {
-    return new Promise((resolve, reject) => {
-      this.jsOnFhir
-        .search('Observation')
-        .then((result) => {
-          const observationBundle = result as Bundle;
-          observationBundle.entry?.length > 0
-            ? resolve(observationBundle)
-            : reject('No entries in observation bundle found!');
-        })
-        .catch((error) => reject(error));
-    });
-  }
-
   createVaccinationTable(vaccinations: Array<Immunization>): void {
 
     this.immunizations = vaccinations
-    // interface Row {
-    //   name: string,
-    //   lotNo: string,
-    //   protection: string,
-    //   dosageno: string,
-    //   vaccinationdate: string,
-    //   practicioner: string,
-    //   platform: Array<string>,
-    // }
+
     interface midataRow {
       name: string,
-
       vaccinationdate: string,
       primarysource: boolean,
       lotNo: string,
@@ -148,50 +114,42 @@ export default class MidataService {
       route: string,
       doseQuantity: string,
       dosageno: string,
-
-      practicioner:string,
-      note:string,
+      practicioner: string,
+      note: string,
       platform: Array<string>,
       protection: string,
     }
 
     this.immunizations.forEach(element => {
-
-
       const miRow: midataRow = {
-      name: ifVacUndefined(element),//element.vaccineCode.coding[0].code,
-      dosageno: ifDoseNumUndefined(element),  // Immunization Sources online still no dosage numer implemented.
-      platform: ['Midata'],
-      lotNo: element.lotNumber,
-      protection: element.protocolApplied[0].targetDisease[0].coding[0].display, // cant get the name cos it is in a Proxy object
-      // protection: JSON.parse(JSON.stringify(element.protocolApplied[0].targetDisease[0].coding[0].display))[0].label,
-      vaccinationdate: element.occurrenceString,
-      practicioner: ifPerformerUndefined(element),
-
-      //not used in Overview.
-      doseQuantity: 'test dose quantity',   // JSON.stringify(element.doseQuantity.value),
-      expirationDate: element.expirationDate,
-      occurrenceString: element.occurrenceString,
-      route:'test route',  //JSON.stringify(element.route.coding[0].display),
-      note:'test note', //JSON.stringify(element.note[0].text)
-      primarysource: element.primarySource,
-      site:'test site',// JSON.stringify(element.site.coding[0].display), // not sure if this works
-
+        name: ifVacUndefined(element),
+        dosageno: ifDoseNumUndefined(element),
+        platform: ['Midata'],
+        lotNo: element.lotNumber,
+        protection: '',
+        vaccinationdate: element.occurrenceString,
+        practicioner: ifPerformerUndefined(element),
+        doseQuantity: 'test dose quantity',
+        expirationDate: element.expirationDate,
+        occurrenceString: element.occurrenceString,
+        route: 'test route',
+        note: 'test note',
+        primarysource: element.primarySource,
+        site: 'test site',
       }
       vaccinationsMidata.push(miRow)
-
-
     });
 
     /**
      * check if the Performer is defined. If not, set the value as a string.
      * @returns string with Performer's  name
      */
-    function ifPerformerUndefined(element:Immunization){
-      if(element.performer === undefined){
-           return 'Undefined'}
-      else{
-            return element.performer[0].actor.display
+    function ifPerformerUndefined(element: Immunization) {
+      if (element.performer === undefined) {
+        return 'Undefined'
+      }
+      else {
+        return element.performer[0].actor.display
       }
 
     }
@@ -200,11 +158,12 @@ export default class MidataService {
      * @returns name of the vaccin
      */
     //check if the element Vaccination name is defined. If not, set the value as  a string.
-    function ifVacUndefined(element:Immunization){
-      if(element.performer === undefined){
-           return 'Undefined'}
-      else{
-            return element.vaccineCode.coding[0].code
+    function ifVacUndefined(element: Immunization) {
+      if (element.performer === undefined) {
+        return 'Undefined'
+      }
+      else {
+        return element.vaccineCode.coding[0].code
       }
 
     }
@@ -213,37 +172,16 @@ export default class MidataService {
      * check if the Dosis number is defined. If not, set the value as a string.
      * @returns Dosis number
      */
-    function ifDoseNumUndefined(element:Immunization,){
-      if(element.protocolApplied === undefined){
-           return 'Undefined'}
-      else{
-            return element.protocolApplied[0].doseNumberPositiveInt.toString()
+    function ifDoseNumUndefined(element: Immunization,) {
+      if (element.protocolApplied === undefined) {
+        return 'Undefined'
       }
-
-
+      else {
+        return element.protocolApplied[0].doseNumberPositiveInt.toString()
+      }
     }
-
-
   }
 
-
-  /**
-   * Gets all observations from the fhir endpoint.
-   * @returns bundle with observations
-   */
-  public loadObservations() {
-    return new Promise((resolve, reject) => {
-      this.jsOnFhir.search('Observation').then((result) => {
-        result
-          ? resolve(
-            (result as Bundle).entry?.map(
-              (entry) => entry.resource as Observation
-            ) || []
-          )
-          : reject('Error');
-      }).catch((error) => reject(error));
-    });
-  }
 
   /**
    * searches the fhir endpoint for one or more resources.
@@ -262,326 +200,8 @@ export default class MidataService {
   }
 
   /**
-   * Creates a observation (of type bodytemperature) resource on the fhir server
-   * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @param value the measured body temperature value.
-   * @returns a promise:
-   *              - if successfull -> response with the created resource as JSON
-   *              - if not successfull -> error message
-   */
-  public createObservation(
-    _status: ObservationStatus,
-    bodySite: string,
-    value: number
-  ): Promise<Observation> {
-    return new Promise((resolve, reject) => {
-      const observation = this.newBtObservation(_status, bodySite, value);
-      this.jsOnFhir.create(observation).then((result) => {
-        result ? resolve(result as Observation) : reject('internal error');
-      }).catch((error) => reject(error));
-    });
-  }
-
-  /**
-   * Updates a observation (of type bodytemperature) resource on the fhir server.
-   * @param _id identification for the observation to be updated.
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @param value the measured body temperature value.
-   * @returns a promise:
-   *              - if successfull -> response with the updated resource as JSON
-   *              - if not successfull -> error message
-   */
-  updateObservation(
-    _id: string,
-    bodySite: string,
-    value: number
-  ): Promise<Observation> {
-    return new Promise((resolve, reject) => {
-      this.jsOnFhir.search('Observation/' + _id).then((result) => {
-        if (result) {
-          const fhirObservation = result as Observation;
-          fhirObservation.valueQuantity.value = value;
-          fhirObservation.bodySite = this.getBodySite(bodySite);
-          fhirObservation.method = this.getMethod(bodySite);
-          fhirObservation.issued = now.format();
-          this.jsOnFhir
-            .update(fhirObservation)
-            .then((res) => {
-              resolve(res as Observation);
-            })
-            .catch((error: Error) => {
-              console.warn('Could not update observation ' + _id, error);
-              reject(error);
-            });
-        } else {
-          reject(
-            new Error(
-              'Invalid observation id: Observation ' + _id + ' was not found.'
-            )
-          );
-        }
-      }).catch((error) => reject(error));
-    });
-  }
-
-  /**
-  * Creates observation (of type Bodytemperature) where you can specify the status, bodySite and value.
-  * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
-  * @param bodySite the body site where the bodytemperature was measured.
-  * @param value the measured body temperature value.
-  * @returns
-  */
-  newBtObservation(
-    _status: ObservationStatus,
-    bodySite: string,
-    value: number
-  ): Observation {
-    return {
-      resourceType: 'Observation',
-      status: _status,
-      category: [
-        {
-          coding: [
-            {
-              system:
-                'http://terminology.hl7.org/CodeSystem/observation-category',
-              code: 'vital-signs',
-              display: 'Vital Signs',
-            },
-          ],
-        },
-      ],
-      code: {
-        coding: [
-          {
-            system: 'http://loinc.org',
-            code: '8310-5',
-            display: 'Body temperature',
-          },
-        ],
-        text: 'Temperature',
-      },
-      subject: {
-        reference: 'Patient/' + this.jsOnFhir.getPatient(),
-      },
-      issued: now.format(),
-      performer: [
-        {
-          reference: 'Practitioner/mdh0us3',
-        },
-      ],
-      valueQuantity: {
-        value: value,
-        unit: 'degrees C',
-        system: 'http://unitsofmeasure.org',
-        code: 'Cel',
-      },
-      bodySite: this.getBodySite(bodySite),
-      method: this.getMethod(bodySite),
-    };
-  }
-
-  /**
-  * Helper function that creates a bodySite object to be used in an observation.
-  * @param bodySite the body site where the bodytemperature was measured.
-  * @returns bodySite with coding as JSON.
-  */
-  getBodySite(bodySite: string) {
-    switch (bodySite) {
-      case 'Axillary':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Axillary',
-            },
-          ],
-        };
-      case 'Oral':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9367-9',
-              display: 'Oral',
-            },
-          ],
-        };
-      case 'Ear':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA21929-7',
-              display: 'Ear',
-            },
-          ],
-        };
-      case 'Tympanic membrane':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9368-7',
-              display: 'Tympanic membrane',
-            },
-          ],
-        };
-      case 'Temporal artery (forehead)':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Temporal artery (forehead)',
-            },
-          ],
-        };
-      case 'Rectal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Rectal',
-            },
-          ],
-        };
-      case 'Urinary bladder':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9371-1',
-              display: 'Urinary bladder',
-            },
-          ],
-        };
-      case 'Nasal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9263-0',
-              display: 'Nasal',
-            },
-          ],
-        };
-      case 'Nasopharyngeal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA18005-1',
-              display: 'Nasopharyngeal',
-            },
-          ],
-        };
-      case 'Finger':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA11862-2',
-              display: 'Finger',
-            },
-          ],
-        };
-      case 'Toe':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '	LA21930-5',
-              display: 'Toe',
-            },
-          ],
-        };
-      default:
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Axillary',
-            },
-          ],
-        };
-    }
-  }
-
-  /**
-  * Helper function that creates a Method of measurement to be used in an observation.
-  * @param bodySite the body site where the bodytemperature was measured.
-  * @returns method of temperature taking with coding as JSON.
-  */
-  getMethod(bodySite: string) {
-    switch (bodySite) {
-      case 'Oral':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '89003005',
-              display: 'Oral temperature taking (procedure)',
-            },
-          ],
-        };
-      case 'Ear':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '448093005',
-              display:
-                'Measurement of temperature using tympanic thermometer (procedure)',
-            },
-          ],
-        };
-      case 'Tympanic membrane':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '448093005',
-              display:
-                'Measurement of temperature using tympanic thermometer (procedure)',
-            },
-          ],
-        };
-      case 'Rectal':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '18649001',
-              display: 'Rectal temperature taking (procedure)',
-            },
-          ],
-        };
-      default:
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '56342008',
-              display: 'Temperature taking (procedure)',
-            },
-          ],
-        };
-    }
-  }
-
-
-
-
-  /**
-    * ---------------------------------------------------------------
     * Gets the Immunization resources as bundle from the fhir endpoint.
     * @returns bundle with Immunization resources as JSON.
-    * ----------------------------------------------------------------
     */
   getImmunizationResourcesAsBundle(): Promise<Bundle> {
     return new Promise((resolve, reject) => {
@@ -623,26 +243,26 @@ export default class MidataService {
   *              - if not successfull -> error message
   */
 
-    public createImmunization(immun?:Immunization
-      ): Promise<Immunization> {
-        let immunization:Immunization
-        return new Promise((resolve, reject) => {
-          if(immun)
-          immunization = immun;
-          else
-          immunization = this.newImmunization();
-          this.jsOnFhir.create(immunization).then((result) => {
-            result ? resolve(result as Immunization) : reject('internal error');
-          }).catch((error) => reject(error));
-        });
-      }
+  public createImmunization(immun?: Immunization
+  ): Promise<Immunization> {
+    let immunization: Immunization
+    return new Promise((resolve, reject) => {
+      if (immun)
+        immunization = immun;
+      else
+        immunization = this.newImmunization();
+      this.jsOnFhir.create(immunization).then((result) => {
+        result ? resolve(result as Immunization) : reject('internal error');
+      }).catch((error) => reject(error));
+    });
+  }
 
 
 
-   /**
-  * Creates a new Immunization  esources with the parameters from Vaccination aquisition UI
-  */
-  newImmunization(impfstoffname?:string, protection?:string, dosisnumber?:integer , lotnumber?:string, date?:string, performer?:string ): Immunization {
+  /**
+   * Creates a new Immunization  esources with the parameters from Vaccination aquisition UI
+   */
+  newImmunization(impfstoffname?: string, protection?: string, dosisnumber?: integer, lotnumber?: string, date?: string, performer?: string): Immunization {
     return {
 
       resourceType: 'Immunization',
@@ -664,7 +284,7 @@ export default class MidataService {
       ],
       status: ImmunizationStatus.COMPLETED,
 
-     performer: [
+      performer: [
         {
           actor: {
             identifier:
@@ -677,21 +297,19 @@ export default class MidataService {
         }
       ],
 
+      vaccineCode: {
+        coding: [
+          {
+            system: 'urn:oid:1.2.36.1.2001.1005.17',
+            code: impfstoffname || 'FLUVAX',
+          }
+        ],
 
-       vaccineCode: {
-          coding: [
-            {
-              system: 'urn:oid:1.2.36.1.2001.1005.17',
-              code: impfstoffname || 'FLUVAX',
-            }
-          ],
+      },
 
-        },
+      occurrenceDateTime: '2022-10-05',
 
-        occurrenceDateTime: '2022-10-05',
-      // occurrenceDateTime: date || '26.5.2022, 16:29:15', //remove comment when date is correctly generated in Vaccination.vue
-
-      lotNumber: lotnumber ||'AAJN11K',
+      lotNumber: lotnumber || 'AAJN11K',
       expirationDate: '2015-02-15',
       site: {
         coding: [
@@ -735,25 +353,12 @@ export default class MidataService {
               ]
             }
           ],
-          doseNumberString:'',
-          doseNumberPositiveInt: dosisnumber || 0
+          doseNumberString: '',
+          doseNumberPositiveInt: dosisnumber.toString() || '0'
         }
       ],
-
     }
-
   }
-
-
-//  getPatientName() {
-//     const pat = await this.getPatientResource();
-
-//    console.log(
-//          pat.name[0].given +' ' + pat.name[0].family
-//           )
-
-//     return pat.name[0].given +' ' + pat.name[0].family
-
 }
 
 

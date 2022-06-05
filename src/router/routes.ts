@@ -17,56 +17,13 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/Vaccination.vue') }],
   },
   {
-    path: '/developmentBasics',
+    path: '/login',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/development/DevelopmentBasics.vue') },
+      { path: '', component: () => import('pages/Login.vue') },
     ],
   },
-  {
-    path: '/quasar',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/Quasar.vue') }],
-  },
-  {
-    path: '/github',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/Github.vue') }],
-  },
-  {
-    path: '/midata/introduction',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('pages/midata/MidataIntroduction.vue'),
-      },
-    ],
-  },
-  {
-    path: '/midata/myFirstApp',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('pages/midata/MidataMyFirstApp.vue'),
-      },
-    ],
-  },
-  {
-    path: '/midata/demo',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/midata/MidataDemo.vue') },
-    ],
-  },
-  {
-    path: '/internationalization',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/development/Internationalization.vue') },
-    ],
-  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

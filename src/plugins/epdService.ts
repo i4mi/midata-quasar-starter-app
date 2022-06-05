@@ -122,7 +122,7 @@ export default class EpdService {
           .attachment
           .creation).getTime();
     });
-    console.log('vacdVaccinationRecordDocuments', JSON.stringify(vacdVaccinationRecordDocuments))
+    console.log('vacdVaccinationRecordDocuments', vacdVaccinationRecordDocuments)
 
     //gets the url of the most current document
     const urlOfMostCurrentDocument = (vacdVaccinationRecordDocuments[0].resource as DocumentReference)
@@ -169,7 +169,7 @@ export default class EpdService {
           .resource
           .resourceType === 'Immunization'
     }).map(x => x.resource as Immunization)
-    console.log('Immunizations ', JSON.stringify(this.immunizations))
+    console.log('Immunizations ', this.immunizations)
 
     this.createVaccinationTable()
   }
@@ -367,6 +367,9 @@ export default class EpdService {
     this.currentVACDRecord.timestamp = moment().format()
   }
 
+  /**
+   * Creates the envelope which the EPD needs to receive FHIR data
+   */
   setProvideBundle() {
     const provideBundle = FHIR_DOCUMENT_BUNLDE
 

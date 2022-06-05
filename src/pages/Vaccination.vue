@@ -45,9 +45,7 @@
                 multiple
                 :options="options"
                 label="Schutz"
-
                 :rules="[(val) => !!val || 'Field is required']"
-
               />
             </div>
           </div>
@@ -183,21 +181,14 @@
 <script>
 import { midata } from 'src/boot/plugins';
 import { ref } from 'vue';
-import { Immunization } from '@i4mi/fhir_r4';
-import { loggedInPatient } from '../plugins/epdService.ts';
-
 
 export default {
   setup() {
-
-
     return {
       name: ref(''),
       dosisName: ref(''),
       lotNumber: ref(''),
-      patientName: ref(
-
-        'Bitte Patient erfassen'),
+      patientName: ref('Bitte Patient erfassen'),
       healthProfessional: ref(''),
       minuteOptionsTime1: [0, 15, 30, 45],
       date: ref(new Date().toLocaleString('de-CH')),
@@ -219,14 +210,14 @@ export default {
     };
   },
 
-
   methods: {
     uploadToEpd() {
-
-        const illnessArray = !this?.protections?[]:Object.keys(this?.protections)?.map((index) => {
-        let illness = this?.protections[index];
-        return illness.label;
-      })
+      const illnessArray = !this?.protections
+        ? []
+        : Object.keys(this?.protections)?.map((index) => {
+            let illness = this?.protections[index];
+            return illness.label;
+          });
       console.log(
         'Upload to EPD pressed',
         '\nImpfstoffname',
@@ -242,27 +233,37 @@ export default {
         '\nBehandelnder Arzt',
         this?.healthProfessional
       );
-      this.$epd.setVACDRecordBundle(this.immunizationName,illnessArray,this.dosisName,this.lotNumber,this.date)
-      this.$epd.setProvideBundle()
+      this.$epd.setVACDRecordBundle(
+        this.immunizationName,
+        illnessArray,
+        this.dosisName,
+        this.lotNumber,
+        this.date
+      );
+      this.$epd.setProvideBundle();
     },
     uploadToMidata() {
+      const newImmunization = midata.newImmunization(
+        this.immunizationName,
+        this.protections,
+        this.dosisName,
+        this.lotNumber,
+        this.date,
+        this.healthProfessional
+      );
+      console.log(
+        newImmunization.protocolApplied[0].targetDisease[0].coding[0].display
+      );
 
-
-      const newImmunization = midata.newImmunization(this.immunizationName, this.protections, this.dosisName, this.lotNumber, this.date, this.healthProfessional)
-
-      console.log(newImmunization.protocolApplied[0].targetDisease[0].coding[0].display)
-
-      midata.createImmunization(newImmunization)
+      midata.createImmunization(newImmunization);
     },
 
     getPatient() {
-          this.patientResource = this.$storage.getPatient();
-          console.log(this.patientResource);
-        },
-
+      this.patientResource = this.$storage.getPatient();
+      console.log(this.patientResource);
+    },
   },
 };
-
 </script>
 
 <style scoped>

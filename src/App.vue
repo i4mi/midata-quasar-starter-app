@@ -39,7 +39,7 @@ export default defineComponent({
                   this.setLanguage(lang);
                 }
               }
-              this.$router.push('/midata/demo');
+              this.$router.push('/login');
             })
             .catch();
         } else if (this.$midata.isLoggedIn()) {

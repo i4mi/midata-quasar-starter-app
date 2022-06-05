@@ -25,7 +25,7 @@
       <q-card-section>
         <div class="text-h4 text-weight-thin">EPD Login</div>
         <div class="text-body1">
-          Damit sie EPD verwenden können, müssen Sie sich zuerst einloggen.
+          Damit sie das EPD verwenden können, müssen Sie sich zuerst einloggen.
         </div>
       </q-card-section>
       <q-separator inset />
