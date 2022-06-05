@@ -1,83 +1,108 @@
 <template>
-  <div class="q-pa-md">
-    <q-carousel
-      swipeable
-      animated
-      v-model="slide"
-      :autoplay="autoplay"
-      ref="carousel"
-      infinite
-    >
-      <q-carousel-slide :name="1" class="column no-wrap flex-center">
-        <q-img
-          src="../assets/overview/undraw_pair_programming_re_or4x.svg"
-          height="150px"
-          fit="contain"
-        />
-        <div class="q-mt-md text-center text-h3 text-weight-thin">
-          Web- <br/> entwicklung
+  <div id="q-app" style="min-height: 100vh">
+    <div class="q-pa-md">
+      <div class="row">
+        <div class="col-2"></div>
+        <div class="col">
+          <h3>Übersicht</h3>
         </div>
-        <q-btn to="/developmentBasics" class="midata-fade text-white">Los gehts!</q-btn>
-      </q-carousel-slide>
-      <q-carousel-slide :name="2" class="column no-wrap flex-center">
-        <q-img
-          src="../assets/overview/undraw_doctors_hwty.svg"
-          height="150px"
-          fit="contain"
-        />
-        <div class="q-mt-md text-center text-h3 text-weight-thin">Midata</div>
-        <q-btn to="/midata/introduction" class="midata-fade text-white">Los gehts!</q-btn>
-      </q-carousel-slide>
-      <template v-slot:control>
-        <q-carousel-control
-          position="top-right"
-          :offset="[5, 5]"
-          class="text-black rounded-borders"
-        >
-          <q-toggle
-            flat
-            dense
-            color="primary"
-            v-model="autoplay"
-            label="Auto Play"
-          />
-        </q-carousel-control>
+      </div>
+      <!--q-btn round @click="refresh" label="Refresh" /-->
 
-        <q-carousel-control
-          position="bottom-right"
-          :offset="[5, 5]"
-          class="q-gutter-xs"
-        >
-          <q-btn
-            flat
-            color="primary"
-            text-color="black"
-            icon="arrow_left"
-            @click="$refs.carousel.previous()"
-          />
-          <q-btn
-            flat
-            color="primary"
-            text-color="black"
-            icon="arrow_right"
-            @click="$refs.carousel.next()"
-          />
-        </q-carousel-control>
-      </template>
-    </q-carousel>
+      <div></div>
+
+      <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8 self-center">
+          <div class="q-pa-md">
+            <div class="q-gutter-y-md column" style="max-width: 500px">
+              <q-input
+                v-model="patientName"
+                readonly
+                label="Patient / geimpfte Person"
+              ></q-input>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="q-pa-md">
+      <q-table
+        title="Historie"
+        :rows="this.rows"
+        :columns="columns"
+        row-key="name"
+      />
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script>
+import { vaccinationsMidata } from 'src/plugins/midataService';
+import { ref } from 'vue';
+import { defineComponent } from 'vue';
+import { loggedInPatient, vaccinations } from '../plugins/epdService.ts';
+
+const columns = [
+  {
+    name: 'name',
+    required: true,
+    label: 'Impfstoffname',
+    align: 'left',
+    field: (row) => row.name,
+    format: (val) => `${val}`,
+    sortable: true,
+  },
+  {
+    name: 'platform',
+    align: 'center',
+    label: 'Hochgeladen auf',
+    field: 'platform',
+  },
+  {
+    name: 'producer',
+    align: 'center',
+    label: 'Lot Nummer',
+    field: 'lotNo',
+    sortable: true,
+  },
+  { name: 'protection', label: 'Schutz', field: 'protection', sortable: true },
+  { name: 'dosageno', label: 'Dosisnummer', field: 'dosageno' },
+  {
+    name: 'vaccinationdate',
+    label: 'Verabreichungsdatum',
+    field: 'vaccinationdate',
+    sortable: true,
+  },
+  { name: 'practicioner', label: 'Behandelnder Arzt', field: 'practicioner' },
+];
 
 export default defineComponent({
-  name: 'Overview',
+  methods: {
+    refresh() {
+      this.$epd.getVaccinations();
+    },
+  },
   setup() {
     return {
-      slide: ref(1),
-      autoplay: ref(true),
+      patientName: ref(
+        loggedInPatient.loggedIn?.name[0].family ?? 'Please Log in'
+      ),
+      stoffname: 'hello',
+      date: ref('2022/01/01'),
+      group: ref([]),
+      model: ref(null),
+      columns,
+      visibleColumns: ref([]),
+    };
+  },
+  data() {
+    return {
+      rowsMidata: vaccinationsMidata,
+      rowsEPD: vaccinations,
+      rows: ref([].concat(vaccinations, vaccinationsMidata))
     };
   },
 });
+
 </script>

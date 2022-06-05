@@ -3,5 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "strictNullChecks": false,
+    "noLib": false,
+    "noImplicitAny": false,
+
   }
 }

@@ -5,7 +5,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'App',
+  name: 'Impfconnect',
   methods: {
     setLanguage(_lang: string): void {
       this.$i18n.locale = _lang;
@@ -39,7 +39,7 @@ export default defineComponent({
                   this.setLanguage(lang);
                 }
               }
-              this.$router.push('/midata/demo');
+              this.$router.push('/login');
             })
             .catch();
         } else if (this.$midata.isLoggedIn()) {
