@@ -43,7 +43,7 @@ export default class MidataService {
    * Initiates the oAuth process.
    * @param params
    */
-  public authenticate(params?: Record<string, unknown>): void {
+  public authenticate(params?: {[p: string]: string}): void {
     this.jsOnFhir.authenticate(params);
   }
 
@@ -64,12 +64,14 @@ export default class MidataService {
   public getPatientResource(): Promise<Patient> {
     return new Promise((resolve, reject) => {
       this.jsOnFhir
-        .search('Patient', { _id: this.jsOnFhir.getPatient() })
+        .getResource('Patient', this.jsOnFhir.getUserId())
         .then((result) => {
-          const patientBundle = result as Bundle;
-          (patientBundle.entry?.length !== undefined && patientBundle.entry?.length > 0 && patientBundle.entry[0].resource)
-            ? resolve(patientBundle.entry[0].resource as Patient)
-            : reject('No entry in patient bundle found!');
+          if (result.resourceType === 'Patient'){
+            resolve(result as Patient)
+          }
+          else {
+            reject('No Patient resource found');
+          }
         })
         .catch((error) => reject(error));
     });
@@ -84,9 +86,8 @@ export default class MidataService {
       this.jsOnFhir
         .search('Observation')
         .then((result) => {
-          const observationBundle = result as Bundle;
-          observationBundle.entry?.length > 0
-            ? resolve(observationBundle)
+          result.entry?.length > 0
+            ? resolve(result)
             : reject('No entries in observation bundle found!');
         })
         .catch((error) => reject(error));
@@ -102,7 +103,7 @@ export default class MidataService {
       this.jsOnFhir.search('Observation').then((result) => {
         result
           ? resolve(
-              (result as Bundle).entry?.map(
+              (result).entry?.map(
                 (entry) => entry.resource as Observation
               ) || []
             )
@@ -122,6 +123,22 @@ export default class MidataService {
   search(resourceType: any, params?: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.jsOnFhir.search(resourceType, params).then((result) => {
+        result ? resolve(result) : reject('Error');
+      }).catch((error)=> reject(error));
+    });
+  }
+
+  /**
+   * searches the fhir endpoint for one resource with the id.
+   * @param resourceType resource type to look up
+   * @param _id The id of the fhir resource
+   * @returns a promise:
+   *              - if successfull -> response with resource(s) as JSON
+   *              - if not successfull -> error message
+   */
+  searchWithId(resourceType: any, _id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.jsOnFhir.getResource(resourceType, _id).then((result) => {
         result ? resolve(result) : reject('Error');
       }).catch((error)=> reject(error));
     });
@@ -164,7 +181,7 @@ export default class MidataService {
     value: number
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
-      this.jsOnFhir.search('Observation/' + _id).then((result) => {
+      this.jsOnFhir.getResource('Observation', _id).then((result) => {
         if (result) {
           const fhirObservation = result as Observation;
           fhirObservation.valueQuantity.value = value;
@@ -229,7 +246,7 @@ export default class MidataService {
         text: 'Temperature',
       },
       subject: {
-        reference: 'Patient/' + this.jsOnFhir.getPatient(),
+        reference: 'Patient/' + this.jsOnFhir.getUserId(),
       },
       issued: now.format(),
       performer: [
