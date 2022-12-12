@@ -90,12 +90,13 @@ export default defineComponent({
     },
   },
   methods: {
-    updateObservation() {
-      this.$storage.updateObservation(
+    async updateObservation() {
+      await this.$storage.updateObservation(
         this.$storage.getCurrentObservation().id,
         this.bodySite,
         this.bodyTemperature
       );
+      this.show = false
     },
   },
 });

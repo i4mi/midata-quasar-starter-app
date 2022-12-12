@@ -1,5 +1,5 @@
 import { JSOnFhir } from '@i4mi/js-on-fhir';
-import { Patient, Bundle, ObservationStatus, Observation } from '@i4mi/fhir_r4';
+import { Bundle, Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import moment from 'moment';
 
 // import moment library. More information under https://momentjs.com
@@ -101,14 +101,19 @@ export default class MidataService {
   public loadObservations() {
     return new Promise((resolve, reject) => {
       this.jsOnFhir.search('Observation').then((result) => {
-        result
-          ? resolve(
-              (result).entry?.map(
-                (entry) => entry.resource as Observation
-              ) || []
-            )
-          : reject('Error');
-      }).catch((error)=> reject(error));
+        if (result) {
+          const observations = (result).entry?.map(
+            entry => entry.resource as Observation
+          ) || [];
+
+          // Filter out observations that are smaller than 10
+          const filteredObservations = observations.filter(obs =>
+            obs.status !== ObservationStatus.ENTERED_IN_ERROR);
+          resolve(filteredObservations);
+        } else {
+          reject('Error');
+        }
+      }).catch((error) => reject(error));
     });
   }
 
@@ -171,6 +176,7 @@ export default class MidataService {
    * @param _id identification for the observation to be updated.
    * @param bodySite the body site where the bodytemperature was measured.
    * @param value the measured body temperature value.
+   * @param observationStatus optional status for Observation. Default is ObservationStatus.PRELIMINARY
    * @returns a promise:
    *              - if successfull -> response with the updated resource as JSON
    *              - if not successfull -> error message
@@ -178,7 +184,8 @@ export default class MidataService {
   updateObservation(
     _id: string,
     bodySite: string,
-    value: number
+    value: number,
+    observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
       this.jsOnFhir.getResource('Observation', _id).then((result) => {
@@ -188,6 +195,7 @@ export default class MidataService {
           fhirObservation.bodySite = this.getBodySite(bodySite);
           fhirObservation.method = this.getMethod(bodySite);
           fhirObservation.issued = now.format();
+          fhirObservation.status = observationStatus
           this.jsOnFhir
             .update(fhirObservation)
             .then((res) => {

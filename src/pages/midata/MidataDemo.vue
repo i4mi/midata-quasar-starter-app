@@ -32,6 +32,11 @@
       >
       </q-btn>
       <q-space />
+      <q-toggle
+        v-model="expanded"
+        label="Resourcen-JSON anzeigen"
+        left-label
+      />
       <q-btn
         color="black"
         label="Logout"
@@ -73,29 +78,6 @@
               {{ 'E-Mail: ' + patientResource.telecom[0].value }}
             </div>
           </q-card-section>
-
-          <q-card-actions>
-            <q-space></q-space>
-            <q-btn
-              color="grey"
-              round
-              flat
-              dense
-              :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-              @click="expanded = !expanded"
-              class="gt-xs"
-              >Vollständige Ressource anzeigen</q-btn
-            >
-            <q-btn
-              color="grey"
-              round
-              flat
-              dense
-              :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-              @click="expanded = !expanded"
-              class="lt-sm"
-            ></q-btn>
-          </q-card-actions>
           <q-slide-transition>
             <div v-show="expanded">
               <q-separator />
@@ -112,7 +94,6 @@
     </q-card>
 
     <div style="height: 100px" />
-
     <q-card bordered>
       <q-card-section>
         <q-item-label header
@@ -163,7 +144,18 @@
                 icon="edit"
                 class="gt-xs"
               >
-                Observation bearbeiten
+                Bearbeiten
+              </q-btn>
+              <q-btn
+                color="red"
+                outlined
+                flat
+                @mouseover="setCurrentObservation(item.id)"
+                @click.stop="showDeleteDialog = true"
+                icon="delete"
+                class="gt-xs"
+              >
+                Löschen
               </q-btn>
               <q-btn
                 color="primary"
@@ -176,6 +168,25 @@
                 class="lt-sm"
               >
               </q-btn>
+              <q-btn
+                color="red"
+                outlined
+                round
+                flat
+                @mouseover="setCurrentObservation(item.id)"
+                @click.stop="showDeleteDialog = true"
+                icon="delete"
+                class="lt-sm"
+              >
+              </q-btn>
+            </q-item>
+            <q-item v-if='expanded' :key='index + "_codeblock"'>
+              <q-item-section>
+                <highlightjs
+                  lang="json"
+                  :code="JSON.stringify(item, null, 2)"
+                ></highlightjs>
+              </q-item-section>
             </q-item>
             <q-separator inset spaced />
           </template>
@@ -200,8 +211,11 @@
     <add-observation-dialog
       :visible="showAddDialog"
       @close="showAddDialog = false"
-    >
-    </add-observation-dialog>
+    ></add-observation-dialog>
+    <delete-observation-dialog
+      :visible="showDeleteDialog"
+      @close="showDeleteDialog = false"
+    ></delete-observation-dialog>
   </q-page>
 </template>
 
@@ -212,10 +226,12 @@ import { Patient } from '@i4mi/fhir_r4';
 import bodySites from '../../data/bodySites.json';
 import EditObservationDialog from '../../components/EditObservationDialog.vue';
 import AddObservationDialog from '../../components/AddObservationDialog.vue';
+import DeleteObservationDialog from '../../components/DeleteObservationDialog.vue';
 
 export default defineComponent({
   name: 'MidataDemo',
   components: {
+    DeleteObservationDialog,
     'login-card': LoginCard,
     'edit-observation-dialog': EditObservationDialog,
     AddObservationDialog,
@@ -228,6 +244,7 @@ export default defineComponent({
       expanded: ref(false),
       showAddDialog: ref(false),
       showEditDialog: ref(false),
+      showDeleteDialog: ref(false),
       //q-select BodySite
       bodySite,
       options: bodySites.bodySites,
@@ -267,9 +284,6 @@ export default defineComponent({
     },
     getCurrentObservation() {
       return this.$storage.getCurrentObservation();
-    },
-    getObservationId() {
-      return this.$storage.getCurrentObservation().id;
     },
     formatDate(date: any) {
       return this.$moment(date.toString()).format('lll');

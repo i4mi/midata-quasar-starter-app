@@ -160,16 +160,18 @@ export default class Storage {
    * @param _id
    * @param bodySite
    * @param value
+   * @param observationStatus
    * @returns
    */
   public updateObservation(
     _id: string,
     bodySite: string,
-    value: number
+    value: number,
+    observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
       this.midata
-        .updateObservation(_id, bodySite, value)
+        .updateObservation(_id, bodySite, value, observationStatus)
         .then((result) => {
           if (result) {
             this.midata
@@ -178,7 +180,7 @@ export default class Storage {
                 this.observations = res as Array<Observation>;
                 this.persist();
                 Notify.create({
-                  message: 'Observation erfolgreich gespeichert',
+                  message: 'Observation erfolgreich bearbeitet',
                   color: 'green',
                   position: 'top',
                   icon: 'announcement',
@@ -188,7 +190,7 @@ export default class Storage {
               .catch((error) => reject(error));
           } else {
             Notify.create({
-              message: 'Die Observation konnte nicht erstellt werden',
+              message: 'Die Observation konnte nicht bearbeitet werden',
               color: 'red',
               position: 'top',
               icon: 'announcement',
