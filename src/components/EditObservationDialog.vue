@@ -94,8 +94,7 @@ export default defineComponent({
       await this.$storage.updateObservation(
         this.$storage.getCurrentObservation().id,
         this.bodySite,
-        this.bodyTemperature
-      );
+        this.bodyTemperature)
       this.show = false
     },
   },

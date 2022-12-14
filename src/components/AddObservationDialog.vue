@@ -92,12 +92,13 @@ export default defineComponent({
     },
   },
   methods: {
-    createObservation() {
-      this.$storage.createObservation(
+    async createObservation() {
+      await this.$storage.createObservation(
         ObservationStatus.PRELIMINARY,
         this.bodySite,
         this.bodyTemperature
       );
+      this.show = false
     },
   },
 });

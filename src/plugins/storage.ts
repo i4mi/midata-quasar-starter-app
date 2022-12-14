@@ -55,7 +55,7 @@ export default class Storage {
       ])
         .then((results) => {
           this.patientResource = results[0];
-          this.observations = results[1] as Array<Observation>;
+          this.observations = results[1]
           this.persist();
           resolve();
         })
@@ -130,7 +130,7 @@ export default class Storage {
             this.midata
               .loadObservations()
               .then((res) => {
-                this.observations = res as Array<Observation>;
+                this.observations = res
                 this.persist();
                 Notify.create({
                   message: 'Observation erfolgreich gespeichert',
@@ -177,7 +177,7 @@ export default class Storage {
             this.midata
               .loadObservations()
               .then((res) => {
-                this.observations = res as Array<Observation>;
+                this.observations = res
                 this.persist();
                 Notify.create({
                   message: 'Observation erfolgreich bearbeitet',

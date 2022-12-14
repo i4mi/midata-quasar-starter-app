@@ -1,5 +1,10 @@
 import { JSOnFhir } from '@i4mi/js-on-fhir';
-import { Bundle, Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
+import {
+  Bundle,
+  Observation,
+  ObservationStatus,
+  Patient
+} from '@i4mi/fhir_r4';
 import moment from 'moment';
 
 // import moment library. More information under https://momentjs.com
@@ -95,26 +100,18 @@ export default class MidataService {
   }
 
   /**
-   * Gets all observations from the fhir endpoint.
+   * Gets all observations from the fhir endpoint that do not have the status
+   * "ENTERED_IN_ERROR"
    * @returns bundle with observations
    */
-  public loadObservations() {
-    return new Promise((resolve, reject) => {
-      this.jsOnFhir.search('Observation').then((result) => {
-        if (result) {
-          const observations = (result).entry?.map(
-            entry => entry.resource as Observation
-          ) || [];
-
-          // Filter out observations that are smaller than 10
-          const filteredObservations = observations.filter(obs =>
-            obs.status !== ObservationStatus.ENTERED_IN_ERROR);
-          resolve(filteredObservations);
-        } else {
-          reject('Error');
-        }
-      }).catch((error) => reject(error));
-    });
+  public async loadObservations() {
+    try {
+      const result = await this.jsOnFhir.search('Observation');
+      const observations = result.entry?.map(entry => entry.resource as Observation) || [];
+      return observations.filter(obs => obs.status !== ObservationStatus.ENTERED_IN_ERROR);
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**
