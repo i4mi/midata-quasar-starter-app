@@ -205,7 +205,7 @@ export default class Storage {
    * @param _id
    */
   public setCurrentObservation(_id: string): void {
-    void this.midata.search('Observation/' + _id).then((result) => {
+    void this.midata.searchWithId('Observation', _id).then((result) => {
       this.currentObservation = result as Observation;
       this.persist();
     });
