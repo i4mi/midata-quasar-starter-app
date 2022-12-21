@@ -52,7 +52,10 @@ const routes: RouteRecordRaw[] = [
     path: '/midata/demo',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/midata/MidataDemo.vue') },
+      {
+        path: '',
+        component: () => import('pages/midata/MidataDemo.vue'),
+      },
     ],
   },
   {

@@ -1,5 +1,5 @@
 {
-  "bodySites": [
+  "bodySitesBt": [
     "Axillary",
     "Oral",
     "Ear",
@@ -11,5 +11,14 @@
     "Nasopharyngeal",
     "Finger",
     "Toe"
+  ],
+  "bodySitesHr": [
+    "Brachial artery",
+    "Carotid artery",
+    "Dorsalis pedis artery",
+    "Femoral artery",
+    "Posterior tibial artery",
+    "Radial artery",
+    "Cardiac apex"
   ]
 }

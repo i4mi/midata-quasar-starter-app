@@ -3,7 +3,7 @@
     <q-card-section v-if="!isEmpty(patientResource)">
       <q-card flat bordered>
         <q-card-section>
-          <q-img src="../assets/midata/demo/masks.png" height="200px">
+          <q-img src="../../assets/midata/demo/masks.png" height="200px">
           </q-img>
 
           <div class="text-h6">Steckbrief</div>

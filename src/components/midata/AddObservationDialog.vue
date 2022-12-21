@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import bodySites from '../data/bodySites.json';
+import bodySites from '../../data/bodySites.json';
 import { ObservationStatus } from '@i4mi/fhir_r4';
 
 export default defineComponent({
@@ -70,7 +70,7 @@ export default defineComponent({
     const bodyTemperature = ref(36.8);
     return {
       bodySite,
-      options: bodySites.bodySites,
+      options: bodySites.bodySitesBt,
       bodyTemperature,
       onReset() {
         bodySite.value = '';

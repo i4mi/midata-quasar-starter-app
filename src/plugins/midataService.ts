@@ -271,8 +271,68 @@ export default class MidataService {
   }
 
   /**
-   * Helper function that creates a bodySite object to be used in an observation.
+   * Creates observation (of type Heart Rate) where you can specify the status, bodySite and value.
+   * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
    * @param bodySite the body site where the bodytemperature was measured.
+   * @param value the measured body temperature value.
+   * @returns
+   */
+  newHrObservation(
+    _status: ObservationStatus,
+    bodySite: string,
+    value: number
+  ): Observation {
+    return {
+      resourceType: 'Observation',
+      status: _status,
+      category: [
+        {
+          coding: [
+            {
+              system:
+                'http://terminology.hl7.org/CodeSystem/observation-category',
+              code: 'vital-signs',
+              display: 'Vital Signs',
+            },
+          ],
+        },
+      ],
+      code: {
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '8867-4',
+            display: 'Heart rate',
+          },
+        ],
+        text: 'Heart rate',
+      },
+      subject: {
+        reference: 'Patient/' + this.jsOnFhir.getUserId(),
+      },
+      issued: now.format(),
+      performer: [
+        {
+          reference: 'Practitioner/mdh0us3',
+        },
+      ],
+      //Todo stimmt das so?
+      valueQuantity: {
+        value: value,
+        unit: '{beats}/min',
+        system: 'http://unitsofmeasure.org',
+        code: '{beats}/min',
+      },
+      bodySite: this.getBodySite(bodySite),
+      method: this.getMethod(bodySite),
+    };
+  }
+
+  //Todo gibt es einen effektiveren weg als diese langen switch cases?
+  /**
+   * Helper function that creates a bodySite object to be used in an observation.
+   * @param bodySite the body site where the Observation (of type
+   * BodyTemperature or Heart Rate) was measured.
    * @returns bodySite with coding as JSON.
    */
   getBodySite(bodySite: string) {
@@ -387,6 +447,77 @@ export default class MidataService {
             },
           ],
         };
+
+      case 'Brachial artery':
+        return {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'LA24033-5',
+              display: 'Brachial artery',
+            },
+          ],
+        };
+      case 'Carotid artery':
+        return {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: 'LA24031-9',
+              display: 'Carotid artery',
+            },
+          ],
+        };
+      case 'Dorsalis pedis artery':
+        return {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '	LA24034-3',
+              display: 'Dorsalis pedis artery',
+            },
+          ],
+        };
+      case 'Femoral artery':
+        return {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '	LA24032-7',
+              display: 'Femoral artery',
+            },
+          ],
+        };
+      case 'Posterior tibial artery':
+        return {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '	LA24035-0',
+              display: 'Posterior tibial artery',
+            },
+          ],
+        };
+      case 'Radial artery':
+        return {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '	LA24030-1',
+              display: 'Radial artery',
+            },
+          ],
+        };
+      case 'Cardiac apex':
+        return {
+          coding: [
+            {
+              system: 'http://loinc.org',
+              code: '	LA21930-5',
+              display: 'Cardiac apex',
+            },
+          ],
+        };
       default:
         return {
           coding: [
@@ -400,9 +531,11 @@ export default class MidataService {
     }
   }
 
+  //Todo gibt es einen effektiveren weg als diese langen switch cases?
   /**
    * Helper function that creates a Method of measurement to be used in an observation.
-   * @param bodySite the body site where the bodytemperature was measured.
+   * @param bodySite the body site where the Observation (of type
+   * BodyTemperature or Heart Rate) was measured.
    * @returns method of temperature taking with coding as JSON.
    */
   getMethod(bodySite: string) {
@@ -446,6 +579,77 @@ export default class MidataService {
               system: 'http://snomed.info/sct',
               code: '18649001',
               display: 'Rectal temperature taking (procedure)',
+            },
+          ],
+        };
+
+      case 'Brachial artery':
+        return {
+          coding: [
+            {
+              system: 'http://snomed.info/sct',
+              code: '424411004',
+              display: 'Peripheral pulse taking (procedure)',
+            },
+          ],
+        };
+      case 'Carotid artery':
+        return {
+          coding: [
+            {
+              system: 'http://snomed.info/sct',
+              code: '65653002',
+              display: 'Pulse taking (procedure) ',
+            },
+          ],
+        };
+      case 'Dorsalis pedis artery':
+        return {
+          coding: [
+            {
+              system: 'http://snomed.info/sct',
+              code: '91161007',
+              display: 'Pedal pulse taking (procedure) ',
+            },
+          ],
+        };
+      case 'Femoral artery':
+        return {
+          coding: [
+            {
+              system: 'http://snomed.info/sct',
+              code: '424411004',
+              display: 'Peripheral pulse taking (procedure)',
+            },
+          ],
+        };
+      case 'Posterior tibial artery':
+        return {
+          coding: [
+            {
+              system: 'http://snomed.info/sct',
+              code: '424411004',
+              display: 'Peripheral pulse taking (procedure)',
+            },
+          ],
+        };
+      case 'Radial artery':
+        return {
+          coding: [
+            {
+              system: 'http://snomed.info/sct',
+              code: '72027000',
+              display: 'Radial pulse taking (procedure)',
+            },
+          ],
+        };
+      case 'Cardiac apex':
+        return {
+          coding: [
+            {
+              system: 'http://snomed.info/sct',
+              code: '4625008',
+              display: ' Apical pulse taking (procedure)',
             },
           ],
         };
