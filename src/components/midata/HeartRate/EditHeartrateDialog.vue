@@ -2,11 +2,11 @@
   <q-dialog v-model="show" persistent>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Neue Observation hinzufügen</div>
+        <div class="text-h6">Herzfrequenz hinzufügen/bearbeiten</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-form
-          @submit="createObservation()"
+          @submit="updateObservation()"
           @reset="onReset"
           class="q-gutter-md"
         >
@@ -14,7 +14,6 @@
             v-model="bodySite"
             :options="options"
             label="Körperregion der Messung"
-            style="width: 90%"
             :rules="[
               (val:String) =>
                 (val !== null && val !== '') ||
@@ -22,19 +21,19 @@
             ]"
           />
           <q-badge class="midata-fade">
-            Körpertemperatur: {{ bodyTemperature }} °C
+            Schläge pro Minute: {{ heartRate }}
           </q-badge>
 
           <q-slider
-            v-model="bodyTemperature"
-            :min="34"
-            :max="42"
-            :step="0.1"
+            v-model="heartRate"
+            :min="20"
+            :max="200"
+            :step="5"
             style="max-width: 90%"
           />
           <div>
             <q-btn
-              label="Observation speichern"
+              label="Herzfrequenz speichern"
               type="submit"
               color="primary"
               class="q-ml-sm"
@@ -59,22 +58,23 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import bodySites from '../../data/bodySites.json';
+import bodySites from '../../../data/bodySites.json';
 import { ObservationStatus } from '@i4mi/fhir_r4';
+import { ObservationType } from 'src/plugins/storage';
 
 export default defineComponent({
-  name: 'AddObservationDialog',
-  props: ['visible'],
+  name: 'EditHeartrateDialog',
+  props: ['visible', 'type'],
   setup() {
     const bodySite = ref('');
-    const bodyTemperature = ref(36.8);
+    const heartRate = ref(70);
     return {
       bodySite,
-      options: bodySites.bodySitesBt,
-      bodyTemperature,
+      options: bodySites.bodySitesHr,
+      heartRate,
       onReset() {
         bodySite.value = '';
-        bodyTemperature.value = 36.8;
+        heartRate.value = 70;
       },
     };
   },
@@ -92,14 +92,31 @@ export default defineComponent({
     },
   },
   methods: {
-    async createObservation() {
-      await this.$storage.createObservation(
-        ObservationStatus.PRELIMINARY,
-        this.bodySite,
-        this.bodyTemperature
-      );
+    async updateObservation() {
+      if (this.type == 'edit'){
+        await this.$storage.updateObservation(
+          this.$storage.getCurrentObservation().id,
+          this.bodySite,
+          this.heartRate)
+      }
+      else if (this.type == 'add'){
+        await this.$storage.createObservation(
+          ObservationStatus.PRELIMINARY,
+          this.bodySite,
+          this.heartRate,
+          ObservationType.HEART_RATE
+        );
+      }
+      else {
+        throw new Error('No correct type found')
+      }
       this.show = false
     },
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.fade
+    background-image: linear-gradient(to bottom right, #087add, #32c6b6)
+</style>

@@ -94,8 +94,8 @@ import LoginCard from '../../components/LoginCard.vue';
 import { Patient } from '@i4mi/fhir_r4';
 import { copyToClipboard, Notify } from 'quasar';
 import PatientResource from 'components/midata/PatientResource.vue';
-import MidataBodyTemperature from 'pages/midata/MidataBodyTemperature.vue';
-import MidataHeartRate from 'pages/midata/MidataHeartRate.vue';
+import MidataBodyTemperature from 'components/midata/BodyTemperature/MidataBodyTemperature.vue';
+import MidataHeartRate from 'components/midata/HeartRate/MidataHeartRate.vue';
 
 export default defineComponent({
   name: 'MidataDemo',

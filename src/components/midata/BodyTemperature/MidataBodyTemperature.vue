@@ -108,35 +108,26 @@
     </q-card-actions>
   </q-card>
 
-  <h6>Unfiltered list</h6>
-  <div v-for='item in refData' :key='item.id'>
-    <p>{{item.valueQuantity.value}}</p>
-  </div>
-
-  <h6>Filtered List</h6>
-  <div v-for='item in filteredList()' :key='item.id'>
-    <p>{{item.valueQuantity.value}}</p>
-  </div>
-
-  <edit-observation-dialog
+  <edit-body-temperature-dialog
     :visible="showEditDialog"
-    @close="showEditDialog = false"
-  ></edit-observation-dialog>
-  <add-observation-dialog
+    :type='"edit"'
+    @close="onEdit()"
+  ></edit-body-temperature-dialog>
+  <edit-body-temperature-dialog
+    :type='"add"'
     :visible="showAddDialog"
-    @close="showAddDialog = false"
-  ></add-observation-dialog>
+    @close="onEdit()"
+  ></edit-body-temperature-dialog>
   <delete-observation-dialog
     :visible="showDeleteDialog"
-    @close="showDeleteDialog = false"
+    @close="onEdit()"
   ></delete-observation-dialog>
 </template>
 
 <script lang='ts'>
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
-import AddObservationDialog from 'components/midata/AddObservationDialog.vue';
-import EditObservationDialog from 'components/midata/EditObservationDialog.vue';
-import { defineComponent, ref } from 'vue';
+import EditBodyTemperatureDialog from 'components/midata/BodyTemperature/EditBodyTemperatureDialog.vue';
+import { defineComponent } from 'vue';
 import bodySites from 'src/data/bodySites.json';
 import { Observation } from '@i4mi/fhir_r4';
 
@@ -144,37 +135,37 @@ export default defineComponent({
   name: 'MidataBodyTemperature',
   components: {
     DeleteObservationDialog,
-    AddObservationDialog,
-    EditObservationDialog
+    EditBodyTemperatureDialog
   },
   props: ['expanded', 'getFullPatientName', 'getCurrentObservation', 'formatDate', 'copyToClipBoard'],
-  //Todo wieso verhält sich setup hier so anders als data (Types werden richtig wahrgenommen)
   data() {
-
     return {
-      refData: this.$storage.observations,
-      showAddDialog: ref(false),
-      showEditDialog: ref(false),
-      showDeleteDialog: ref(false),
+      observations: this.$storage.getObservations(),
+      showAddDialog: false,
+      showEditDialog: false,
+      showDeleteDialog: false,
       options: bodySites.bodySitesBt,
     }
   },
-  //todo herausfinden wieso hier method funktioniert aber computed nicht
   computed: {},
   methods: {
     setCurrentObservation(id: any) {
       this.$storage.setCurrentObservation(id);
     },
     filteredList() {
-      console.log('data filtered from', this.refData)
-      return this.$storage.getObservations().value.filter((obs: Observation) => {
+      return this.observations.filter((obs: Observation) => {
         return obs.code.coding[0].code === '8310-5'
       })
     },
+    onEdit() {
+      this.showEditDialog = false;
+      this.showAddDialog = false;
+      this.showDeleteDialog = false;
+      this.observations = this.$storage.getObservations();
+    }
   },
 });
 </script>
 
 <style scoped>
-
 </style>

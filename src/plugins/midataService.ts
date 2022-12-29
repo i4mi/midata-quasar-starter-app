@@ -1,11 +1,7 @@
 import { JSOnFhir } from '@i4mi/js-on-fhir';
-import {
-  Bundle,
-  Observation,
-  ObservationStatus,
-  Patient
-} from '@i4mi/fhir_r4';
+import { Bundle, Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import moment from 'moment';
+import { ObservationType } from 'src/plugins/storage';
 
 // import moment library. More information under https://momentjs.com
 const now = moment();
@@ -105,13 +101,9 @@ export default class MidataService {
    * @returns bundle with observations
    */
   public async loadObservations() {
-    try {
       const result = await this.jsOnFhir.search('Observation');
       const observations = result.entry?.map(entry => entry.resource as Observation) || [];
       return observations.filter(obs => obs.status !== ObservationStatus.ENTERED_IN_ERROR);
-    } catch (error) {
-      throw error;
-    }
   }
 
   /**
@@ -151,6 +143,7 @@ export default class MidataService {
    * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
    * @param bodySite the body site where the bodytemperature was measured.
    * @param value the measured body temperature value.
+   * @param observationType Type of the Observation that should be created
    * @returns a promise:
    *              - if successfull -> response with the created resource as JSON
    *              - if not successfull -> error message
@@ -158,10 +151,22 @@ export default class MidataService {
   public createObservation(
     _status: ObservationStatus,
     bodySite: string,
-    value: number
+    value: number,
+    observationType: ObservationType
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
-      const observation = this.newBtObservation(_status, bodySite, value);
+
+      let observation;
+      if (observationType == ObservationType.BODY_TEMPERATURE){
+        observation = this.newBtObservation(_status, bodySite, value);
+      }
+      else if (observationType == ObservationType.HEART_RATE){
+        observation = this.newHrObservation(_status, bodySite, value);
+        console.log(observation)
+      }
+      else {
+        throw new Error('No matching ObservationType found')
+      }
       this.jsOnFhir.create(observation).then((result) => {
         result ? resolve(result as Observation) : reject('internal error');
       }).catch((error)=> reject(error));
@@ -316,7 +321,6 @@ export default class MidataService {
           reference: 'Practitioner/mdh0us3',
         },
       ],
-      //Todo stimmt das so?
       valueQuantity: {
         value: value,
         unit: '{beats}/min',
@@ -328,7 +332,6 @@ export default class MidataService {
     };
   }
 
-  //Todo gibt es einen effektiveren weg als diese langen switch cases?
   /**
    * Helper function that creates a bodySite object to be used in an observation.
    * @param bodySite the body site where the Observation (of type
@@ -336,6 +339,8 @@ export default class MidataService {
    * @returns bodySite with coding as JSON.
    */
   getBodySite(bodySite: string) {
+
+    //Body Temperature https://loinc.org/8327-9/
     switch (bodySite) {
       case 'Axillary':
         return {
@@ -448,6 +453,7 @@ export default class MidataService {
           ],
         };
 
+      //HeartRate https://loinc.org/LL3627-8/
       case 'Brachial artery':
         return {
           coding: [
@@ -519,19 +525,10 @@ export default class MidataService {
           ],
         };
       default:
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Axillary',
-            },
-          ],
-        };
+        throw Error(`No Body site found matching the String ${bodySite}`)
     }
   }
 
-  //Todo gibt es einen effektiveren weg als diese langen switch cases?
   /**
    * Helper function that creates a Method of measurement to be used in an observation.
    * @param bodySite the body site where the Observation (of type
@@ -540,6 +537,8 @@ export default class MidataService {
    */
   getMethod(bodySite: string) {
     switch (bodySite) {
+
+      //Bodytemperature https://browser.ihtsdotools.org/?perspective=full&conceptId1=56342008&edition=MAIN&release=&languages=en
       case 'Oral':
         return {
           coding: [
@@ -550,18 +549,8 @@ export default class MidataService {
             },
           ],
         };
-      case 'Ear':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '448093005',
-              display:
-                'Measurement of temperature using tympanic thermometer (procedure)',
-            },
-          ],
-        };
       case 'Tympanic membrane':
+      case 'Ear':
         return {
           coding: [
             {
@@ -583,7 +572,10 @@ export default class MidataService {
           ],
         };
 
+      //Heart Rate https://browser.ihtsdotools.org/?perspective=full&conceptId1=65653002&edition=MAIN&release=&languages=en
       case 'Brachial artery':
+      case 'Femoral artery':
+      case 'Posterior tibial artery':
         return {
           coding: [
             {
@@ -610,26 +602,6 @@ export default class MidataService {
               system: 'http://snomed.info/sct',
               code: '91161007',
               display: 'Pedal pulse taking (procedure) ',
-            },
-          ],
-        };
-      case 'Femoral artery':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '424411004',
-              display: 'Peripheral pulse taking (procedure)',
-            },
-          ],
-        };
-      case 'Posterior tibial artery':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '424411004',
-              display: 'Peripheral pulse taking (procedure)',
             },
           ],
         };

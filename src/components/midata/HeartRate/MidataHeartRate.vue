@@ -108,55 +108,59 @@
     </q-card-actions>
   </q-card>
 
-  <edit-observation-dialog
+  <edit-heartrate-dialog
+    :type='"edit"'
     :visible="showEditDialog"
-    @close="showEditDialog = false"
-  ></edit-observation-dialog>
-  <add-observation-dialog
+    @close="onEdit()"
+  ></edit-heartrate-dialog>
+  <edit-heartrate-dialog
+    :type='"add"'
     :visible="showAddDialog"
-    @close="showAddDialog = false"
-  ></add-observation-dialog>
+    @close="onEdit()"
+  ></edit-heartrate-dialog>
   <delete-observation-dialog
     :visible="showDeleteDialog"
-    @close="showDeleteDialog = false"
+    @close="onEdit()"
   ></delete-observation-dialog>
 </template>
 
 <script lang='ts'>
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
-import AddObservationDialog from 'components/midata/AddObservationDialog.vue';
-import EditObservationDialog from 'components/midata/EditObservationDialog.vue';
-import { defineComponent, ref } from 'vue';
+import EditHeartrateDialog from 'components/midata/HeartRate/EditHeartrateDialog.vue';
+import { defineComponent } from 'vue';
 import bodySites from 'src/data/bodySites.json';
-import { storage } from 'boot/plugins';
 import { Observation } from '@i4mi/fhir_r4';
 
 export default defineComponent({
   name: 'MidataHeartRate',
   components: {
     DeleteObservationDialog,
-    AddObservationDialog,
-    EditObservationDialog
+    EditHeartrateDialog
   },
   props: ['expanded', 'getFullPatientName', 'getCurrentObservation', 'formatDate', 'copyToClipBoard'],
-  setup() {
+  data() {
     return {
-      refData: storage.getObservations(),
-      showAddDialog: ref(false),
-      showEditDialog: ref(false),
-      showDeleteDialog: ref(false),
+      observations: this.$storage.getObservations(),
+      showAddDialog: false,
+      showEditDialog: false,
+      showDeleteDialog: false,
       options: bodySites.bodySitesHr
     }
   },
-  //todo herausfinden wieso hier method funktioniert aber computed nicht
   methods: {
     setCurrentObservation(id: any) {
       this.$storage.setCurrentObservation(id);
     },
     filteredList() {
-      return this.refData.filter((obs: Observation) => {
+      return this.observations.filter((obs: Observation) => {
         return obs.code.coding[0].code === '8867-4'
       })
+    },
+    onEdit() {
+      this.showEditDialog = false;
+      this.showAddDialog = false;
+      this.showDeleteDialog = false;
+      this.observations = this.$storage.getObservations();
     }
   },
   computed: {},

@@ -1,15 +1,20 @@
 import MidataService from './midataService';
 import { Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import { Notify } from 'quasar';
-import { ref } from 'vue';
 
 const STORAGE_KEY = 'demo-app-storage';
 
+export const enum ObservationType {
+  BODY_TEMPERATURE = 'Body temperature',
+  HEART_RATE = 'Heartrate',
+}
+
 export default class Storage {
+
   private currentLanguage = 'de';
   private patientResource = {} as Patient;
   private currentObservation = {} as Observation;
-  public observations = ref<Observation[]>([]);
+  private observations = [] as Observation[];
 
   midata: MidataService;
 
@@ -56,7 +61,7 @@ export default class Storage {
       ])
         .then((results) => {
           this.patientResource = results[0];
-          this.observations.value = results[1]
+          this.observations = results[1]
           this.persist();
           resolve();
         })
@@ -89,7 +94,7 @@ export default class Storage {
    */
   public deleteDataInStore(): void {
     this.currentLanguage = 'de';
-    this.observations.value = [];
+    this.observations = [];
     this.patientResource = {} as Patient;
     this.currentObservation = {} as Observation;
     this.persist();
@@ -112,22 +117,24 @@ export default class Storage {
    * @param _status
    * @param bodySite
    * @param value
+   * @param observationType
    * @returns
    */
   public createObservation(
     _status: ObservationStatus,
     bodySite: string,
-    value: number
+    value: number,
+    observationType: ObservationType
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
       this.midata
-        .createObservation(_status, bodySite, value)
+        .createObservation(_status, bodySite, value, observationType)
         .then((result) => {
           if (result) {
             this.midata
               .loadObservations()
               .then((res) => {
-                this.observations.value = res
+                this.observations = res
                 this.persist();
                 Notify.create({
                   message: 'Observation erfolgreich gespeichert',
@@ -174,7 +181,7 @@ export default class Storage {
             this.midata
               .loadObservations()
               .then((res) => {
-                this.observations.value = res
+                this.observations = res
                 this.persist();
                 Notify.create({
                   message: 'Observation erfolgreich bearbeitet',

@@ -71,5 +71,8 @@ export default defineComponent({
 });
 
 </script>
-<style scoped>
+<style lang="sass" scoped>
+.innerCardScroll
+  overflow: scroll
+  height: 300px
 </style>

@@ -2,7 +2,7 @@
   <q-dialog v-model="show" persistent>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Observation bearbeiten</div>
+        <div class="text-h6">Körpertemperatur hinzufügen/bearbeiten</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-form
@@ -58,11 +58,13 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import bodySites from '../../data/bodySites.json';
+import bodySites from '../../../data/bodySites.json';
+import { ObservationStatus } from '@i4mi/fhir_r4';
+import { ObservationType } from 'src/plugins/storage';
 
 export default defineComponent({
-  name: 'EditObservationDialog',
-  props: ['visible'],
+  name: 'EditBodyTemperatureDialog',
+  props: ['visible', 'type'],
   setup() {
     const bodySite = ref('');
     const bodyTemperature = ref(36.8);
@@ -91,10 +93,23 @@ export default defineComponent({
   },
   methods: {
     async updateObservation() {
-      await this.$storage.updateObservation(
-        this.$storage.getCurrentObservation().id,
-        this.bodySite,
-        this.bodyTemperature)
+      if (this.type == 'edit'){
+        await this.$storage.updateObservation(
+          this.$storage.getCurrentObservation().id,
+          this.bodySite,
+          this.bodyTemperature)
+      }
+      else if (this.type == 'add'){
+        await this.$storage.createObservation(
+          ObservationStatus.PRELIMINARY,
+          this.bodySite,
+          this.bodyTemperature,
+          ObservationType.BODY_TEMPERATURE
+        );
+      }
+      else {
+        throw new Error('No correct type found')
+      }
       this.show = false
     },
   },
