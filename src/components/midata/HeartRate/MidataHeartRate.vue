@@ -6,7 +6,7 @@
         {{ getFullPatientName() }}</q-item-label
       >
       <q-virtual-scroll
-        :items="filteredList()"
+        :items="filteredList"
         bordered
         padding
         class="rounded-borders"
@@ -43,7 +43,7 @@
               color="primary"
               outlined
               flat
-              @mouseover="setCurrentObservation(item.id)"
+              @mouseover="this.$storage.setCurrentObservation(item.id)"
               @click.stop="showEditDialog = true"
               icon="edit"
               class="gt-xs"
@@ -54,7 +54,7 @@
               color="red"
               outlined
               flat
-              @mouseover="setCurrentObservation(item.id)"
+              @mouseover="this.$storage.setCurrentObservation(item.id)"
               @click.stop="showDeleteDialog = true"
               icon="delete"
               class="gt-xs"
@@ -66,7 +66,7 @@
               outlined
               round
               flat
-              @mouseover="setCurrentObservation(item.id)"
+              @mouseover="this.$storage.setCurrentObservation(item.id)"
               @click.stop="showEditDialog = true"
               icon="edit"
               class="lt-sm"
@@ -77,7 +77,7 @@
               outlined
               round
               flat
-              @mouseover="setCurrentObservation(item.id)"
+              @mouseover="this.$storage.setCurrentObservation(item.id)"
               @click.stop="showDeleteDialog = true"
               icon="delete"
               class="lt-sm"
@@ -85,7 +85,7 @@
             </q-btn>
           </q-item>
           <q-item v-if='expanded' :key='index + "_codeblock"' >
-            <q-item-section clickable @click='copyToClipBoard(item, "Observation Resource")'>
+            <q-item-section clickable @click='this.$storage.copyToClipBoard(item, "Observation Resource")'>
               <highlightjs
                 lang="json"
                 :code="JSON.stringify(item, null, 2)"
@@ -107,6 +107,11 @@
       />
     </q-card-actions>
   </q-card>
+  <div style="height: 25px"></div>
+
+  <ObservationChart :data='filteredList'
+                    :observation-type='"Puls"'
+                    :unit='"beats/min"'></ObservationChart>
 
   <edit-heartrate-dialog
     :type='"edit"'
@@ -130,14 +135,18 @@ import EditHeartrateDialog from 'components/midata/HeartRate/EditHeartrateDialog
 import { defineComponent } from 'vue';
 import bodySites from 'src/data/bodySites.json';
 import { Observation } from '@i4mi/fhir_r4';
+import ObservationChart from 'components/midata/ObservationChart.vue';
 
 export default defineComponent({
   name: 'MidataHeartRate',
   components: {
+    ObservationChart,
     DeleteObservationDialog,
     EditHeartrateDialog
   },
-  props: ['expanded', 'getFullPatientName', 'getCurrentObservation', 'formatDate', 'copyToClipBoard'],
+  props: {
+    expanded: Boolean
+  },
   data() {
     return {
       observations: this.$storage.getObservations(),
@@ -147,14 +156,24 @@ export default defineComponent({
       options: bodySites.bodySitesHr
     }
   },
-  methods: {
-    setCurrentObservation(id: any) {
-      this.$storage.setCurrentObservation(id);
-    },
+  computed: {
     filteredList() {
-      return this.observations.filter((obs: Observation) => {
-        return obs.code.coding[0].code === '8867-4'
-      })
+      return this.observations
+        .filter((obs: Observation) => {
+          return obs.code.coding[0].code === '8867-4'
+        })
+        .sort((a: Observation, b: Observation) => {
+          return new Date(a.issued).getTime() - new Date(b.issued).getTime();
+        });
+    }
+  },
+  methods: {
+    formatDate(date: any) {
+      return this.$moment(date.toString()).format('lll');
+    },
+    getFullPatientName() {
+      let name = this.$storage.getPatient().name;
+      return name[0].given.toString() + ' ' + name[0].family;
     },
     onEdit() {
       this.showEditDialog = false;
@@ -162,11 +181,6 @@ export default defineComponent({
       this.showDeleteDialog = false;
       this.observations = this.$storage.getObservations();
     }
-  },
-  computed: {},
+  }
 });
 </script>
-
-<style scoped>
-
-</style>

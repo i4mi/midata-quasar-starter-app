@@ -55,6 +55,14 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('pages/midata/MidataDemo.vue'),
+        children: [
+          {
+            path: 'bodytemperature', component: () => import('components/midata/BodyTemperature/MidataBodyTemperature.vue')
+          },
+          {
+            path: 'heartrate', component: () => import('components/midata/HeartRate/MidataHeartRate.vue')
+          },
+        ],
       },
     ],
   },

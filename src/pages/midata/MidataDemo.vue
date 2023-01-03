@@ -67,24 +67,12 @@
       align="justify"
       class="text-primary"
     >
-      <q-tab :ripple="false" name="heartRate" icon="monitor_heart" label="Heart Rate" />
-      <q-tab :ripple="false" name="bodyTemperature" icon="thermostat" label="Body Temperature" />
+      <q-tab :ripple="false" name="heartRate" icon="monitor_heart" label="Heart Rate" @click='this.$router.push("/midata/demo/heartrate")'/>
+      <q-tab :ripple="false" name="bodyTemperature" icon="thermostat" label="Body Temperature" @click='this.$router.push("/midata/demo/bodytemperature")'/>
     </q-tabs>
     <div style="height: 25px" />
-    <MidataBodyTemperature v-if='tab === "bodyTemperature"'
-                           :expanded='expanded'
-                           :copy-to-clip-board='copyToClipBoard'
-                           :format-date='formatDate'
-                           :get-current-observation='getCurrentObservation'
-                           :get-full-patient-name='getFullPatientName'>
-    </MidataBodyTemperature>
-    <MidataHeartRate v-if='tab === "heartRate"'
-                           :expanded='expanded'
-                           :copy-to-clip-board='copyToClipBoard'
-                           :format-date='formatDate'
-                           :get-current-observation='getCurrentObservation'
-                           :get-full-patient-name='getFullPatientName'>
-    </MidataHeartRate>
+
+    <RouterView :expanded='expanded' />
   </q-page>
 </template>
 
@@ -92,24 +80,18 @@
 import { defineComponent, ref } from 'vue';
 import LoginCard from '../../components/LoginCard.vue';
 import { Patient } from '@i4mi/fhir_r4';
-import { copyToClipboard, Notify } from 'quasar';
 import PatientResource from 'components/midata/PatientResource.vue';
-import MidataBodyTemperature from 'components/midata/BodyTemperature/MidataBodyTemperature.vue';
-import MidataHeartRate from 'components/midata/HeartRate/MidataHeartRate.vue';
 
 export default defineComponent({
   name: 'MidataDemo',
   components: {
-    MidataHeartRate,
-    MidataBodyTemperature,
     PatientResource,
     'login-card': LoginCard,
   },
   setup() {
-
     return {
       expanded: ref(false),
-      tab: ref('bodyTemperature'),
+      tab: ref(),
     };
   },
   data: () => ({
@@ -129,12 +111,6 @@ export default defineComponent({
       this.patientResource = this.$storage.getPatient();
       console.log(this.patientResource);
     },
-    setCurrentObservation(id: any) {
-      this.$storage.setCurrentObservation(id);
-    },
-    getCurrentObservation() {
-      return this.$storage.getCurrentObservation();
-    },
     formatDate(date: any) {
       return this.$moment(date.toString()).format('lll');
     },
@@ -142,24 +118,14 @@ export default defineComponent({
       this.$midata.logout();
       location.reload();
     },
-    copyToClipBoard(item: any, identifier = 'Resource') {
-      copyToClipboard(JSON.stringify(item, null, 2))
-        .then(() => {
-          Notify.create({
-            message: `${identifier} kopiert`,
-            color: 'green',
-            position: 'top',
-            icon: 'announcement',
-          })
-          })
-        .catch(() => {
-          Notify.create({
-            message: `Kopieren von ${identifier} fehlgeschlagen`,
-            color: 'red',
-            position: 'top',
-            icon: 'announcement',
-          })
-        })
+    randomData(){
+      console.log(Math.round(Math.random()*12))
+      let bodyTemperaturesBase = [36, 36.5, 37, 37.5, 38, 39, 39.5, 40, 40, 39, 38, 37, 36.5, 36.5]
+      let bodyTemperaturesNoised = bodyTemperaturesBase.map(bt => {
+        return bt + Math.round(Math.random())
+      })
+      console.log(bodyTemperaturesBase)
+      console.log(bodyTemperaturesNoised)
     }
   },
 });

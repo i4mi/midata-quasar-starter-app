@@ -1,0 +1,79 @@
+<template>
+  <q-card>
+    <apexchart :series='series' :options='chartOptions' :height='400' :type='"area"' />
+  </q-card>
+</template>
+
+<script lang='ts'>
+import { defineComponent } from 'vue';
+import type { PropType } from 'vue'
+import { Observation } from '@i4mi/fhir_r4';
+export default defineComponent({
+  name: 'ObservationChart',
+  components: {},
+  props: {
+    data: Array as PropType<Observation[]>,
+    observationType: String,
+    unit: String
+
+  },
+  data() {
+    return {}
+  },
+  computed: {
+    series() {
+      return [{
+        name: this.observationType,
+        data: this.data.map(obs => {
+          return obs.valueQuantity.value
+        })
+      }]
+    },
+    chartOptions() {
+      return {
+        chart: {
+          id: `chart-${this.observationType}`,
+        },
+        title: {
+          text: `${this.observationType} Observationen`,
+          align: 'center',
+          offsetY: 15,
+        },
+        dataLabels: {
+          enabled: true
+        },
+        xaxis: {
+          labels: {
+            show: false
+          },
+          categories: this.data.map(obs => {
+            return this.$moment(obs.issued).format('llll')
+          })
+        },
+        yaxis: {
+          title: {
+            text: `${this.observationType} in ${this.unit}`,
+            align: 'center',
+            style: {
+              fontSize: '14px',
+            },
+          }
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: 'vertical',
+            shadeIntensity: 0.5,
+            colors: ['#087add', '#32c6b6'],
+            inverseColors: true,
+            opacityFrom: 1,
+            opacityTo: 1
+          }
+        }
+      }
+    }
+  },
+  methods: {},
+});
+</script>

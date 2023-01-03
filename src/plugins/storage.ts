@@ -1,6 +1,6 @@
 import MidataService from './midataService';
 import { Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
-import { Notify } from 'quasar';
+import { copyToClipboard, Notify } from 'quasar';
 
 const STORAGE_KEY = 'demo-app-storage';
 
@@ -223,5 +223,31 @@ export default class Storage {
    */
   public getCurrentObservation(): Observation {
     return this.currentObservation;
+  }
+
+  /**
+   *
+   * @param item Item that should be copied to the clipboard. Preferably
+   * a JSON Object or a String
+   * @param identifier Identifier that should be displayed as a Quasar Notify
+   */
+  public copyToClipBoard(item: any, identifier = 'Resource') {
+    copyToClipboard(JSON.stringify(item, null, 2))
+      .then(() => {
+        Notify.create({
+          message: `${identifier} kopiert`,
+          color: 'green',
+          position: 'top',
+          icon: 'announcement',
+        })
+      })
+      .catch(() => {
+        Notify.create({
+          message: `Kopieren von ${identifier} fehlgeschlagen`,
+          color: 'red',
+          position: 'top',
+          icon: 'announcement',
+        })
+      })
   }
 }
