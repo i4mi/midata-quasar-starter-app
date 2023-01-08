@@ -2,6 +2,8 @@ import { JSOnFhir } from '@i4mi/js-on-fhir';
 import { Bundle, Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import moment from 'moment';
 import { ObservationType } from 'src/plugins/storage';
+import bodySitesJson from '../data/bodySites.json';
+import { Notify } from 'quasar';
 
 // import moment library. More information under https://momentjs.com
 const now = moment();
@@ -162,7 +164,6 @@ export default class MidataService {
       }
       else if (observationType == ObservationType.HEART_RATE){
         observation = this.newHrObservation(_status, bodySite, value);
-        console.log(observation)
       }
       else {
         throw new Error('No matching ObservationType found')
@@ -635,6 +636,74 @@ export default class MidataService {
             },
           ],
         };
+    }
+  }
+
+  async generateRandomData() {
+    const bodyTemperaturesBase = [36, 36.5, 37, 37.5, 38, 39, 39.5, 40, 41, 41, 40, 39, 38, 37.5, 37, 36.5]
+    const bodyTemperaturesNoised = bodyTemperaturesBase.map(bt => {
+      return bt + Math.round(Math.random()*10)/10
+    })
+    console.log('bt base', bodyTemperaturesBase)
+    console.log('bt noised', bodyTemperaturesNoised)
+
+    const heartRateBase = [70, 70, 75, 80, 90, 95, 105, 110, 115, 120, 110, 100, 95, 85, 80, 70]
+    const heartRateNoised = heartRateBase.map(hr => {
+      return hr + Math.round(Math.random()*4)
+    })
+    console.log('hr base', heartRateBase)
+    console.log('hr noised', heartRateNoised)
+
+    const dat = now
+    const dates = []
+    for (let i = 0; i < heartRateBase.length; i++){
+      dat.subtract(Math.round(Math.random()*4), 'h')
+      dat.subtract(Math.round(Math.random()*10), 'm')
+      dat.subtract(Math.round(Math.random()*10), 's')
+      dates.push(dat.format())
+    }
+    console.log('dates', dates)
+
+    try {
+      for (const hrValue of heartRateNoised) {
+        await this.createObservation(ObservationStatus.PRELIMINARY,
+          this.getRandomBodySite(ObservationType.HEART_RATE),
+          hrValue, ObservationType.HEART_RATE);
+      }
+      for (const btValue of bodyTemperaturesNoised) {
+        await this.createObservation(ObservationStatus.PRELIMINARY,
+          this.getRandomBodySite(ObservationType.BODY_TEMPERATURE),
+          btValue, ObservationType.BODY_TEMPERATURE);
+      }
+      Notify.create({
+        message: '16 randomisierte Observationen wurden erstellt. Bitte die Seite neu laden',
+        color: 'green',
+        position: 'top',
+        icon: 'announcement'
+      });
+    } catch (error) {
+      Notify.create({
+        message: 'Ein Fehler ist aufgetreten beim erstellen der Observationen',
+        color: 'green',
+        position: 'top',
+        icon: 'announcement'
+      });
+    }
+  }
+
+  getRandomBodySite(observationType: ObservationType): string {
+    if (observationType == ObservationType.BODY_TEMPERATURE){
+      return bodySitesJson.bodySitesBt
+        [Math.floor(Math.random() * bodySitesJson.bodySitesBt.length)]
+    }
+
+    else if (observationType == ObservationType.HEART_RATE){
+      return bodySitesJson.bodySitesHr
+        [Math.floor(Math.random() * bodySitesJson.bodySitesHr.length)]
+    }
+
+    else {
+      throw new Error('No matching Observation Type found')
     }
   }
 }

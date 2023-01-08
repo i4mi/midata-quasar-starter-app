@@ -6,6 +6,14 @@
       <q-separator spaced class="midata-fade"></q-separator>
     </div>
 
+    <div v-if='!this.$storage.getObservations().length'>
+      Sie haben noch keine Daten. Wollen sie randomisierte Daten erstellen lassen?
+      <br>
+      <q-btn @click='updateRandomData()' color="red"> Generieren </q-btn>
+      <div style="height: 25px"></div>
+    </div>
+
+
     <div class="row justify-end">
       <q-btn
         @click="
@@ -118,14 +126,10 @@ export default defineComponent({
       this.$midata.logout();
       location.reload();
     },
-    randomData(){
-      console.log(Math.round(Math.random()*12))
-      let bodyTemperaturesBase = [36, 36.5, 37, 37.5, 38, 39, 39.5, 40, 40, 39, 38, 37, 36.5, 36.5]
-      let bodyTemperaturesNoised = bodyTemperaturesBase.map(bt => {
-        return bt + Math.round(Math.random())
+    updateRandomData(){
+      this.$midata.generateRandomData().then(() => {
+        console.log('done')
       })
-      console.log(bodyTemperaturesBase)
-      console.log(bodyTemperaturesNoised)
     }
   },
 });
