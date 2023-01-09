@@ -20,5 +20,16 @@
     "Posterior tibial artery",
     "Radial artery",
     "Cardiac apex"
+  ],
+  "bodySitesBp": [
+    "Biceps left",
+    "Biceps right",
+    "Wrist left",
+    "Wrist right",
+    "Thigh left",
+    "Thigh right",
+    "Ankle left",
+    "Ankle right",
+    "Finger"
   ]
 }

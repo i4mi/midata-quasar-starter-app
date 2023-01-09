@@ -127,6 +127,7 @@
   ></edit-body-temperature-dialog>
   <delete-observation-dialog
     :visible="showDeleteDialog"
+    :observation-type='ObservationType.BODY_TEMPERATURE'
     @close="onEdit()"
   ></delete-observation-dialog>
 </template>
@@ -138,6 +139,7 @@ import { defineComponent } from 'vue';
 import bodySites from 'src/data/bodySites.json';
 import { Observation } from '@i4mi/fhir_r4';
 import ObservationChart from 'components/midata/ObservationChart.vue';
+import { ObservationType } from 'src/plugins/storage';
 
 export default defineComponent({
   name: 'MidataBodyTemperature',
@@ -159,6 +161,9 @@ export default defineComponent({
     }
   },
   computed: {
+    ObservationType() {
+      return ObservationType.BODY_TEMPERATURE
+    },
     filteredList() {
       return this.observations
         .filter((obs: Observation) => {

@@ -97,7 +97,8 @@ export default defineComponent({
         await this.$storage.updateObservation(
           this.$storage.getCurrentObservation().id,
           this.bodySite,
-          this.heartRate)
+          this.heartRate,
+        ObservationType.HEART_RATE)
       }
       else if (this.type == 'add'){
         await this.$storage.createObservation(

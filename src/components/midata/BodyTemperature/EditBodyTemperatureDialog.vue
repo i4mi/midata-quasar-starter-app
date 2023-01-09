@@ -97,7 +97,8 @@ export default defineComponent({
         await this.$storage.updateObservation(
           this.$storage.getCurrentObservation().id,
           this.bodySite,
-          this.bodyTemperature)
+          this.bodyTemperature,
+        ObservationType.BODY_TEMPERATURE)
       }
       else if (this.type == 'add'){
         await this.$storage.createObservation(

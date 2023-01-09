@@ -7,6 +7,7 @@ const STORAGE_KEY = 'demo-app-storage';
 export const enum ObservationType {
   BODY_TEMPERATURE = 'Body temperature',
   HEART_RATE = 'Heartrate',
+  BLOOD_PRESSURE = 'Blood Pressure'
 }
 
 export default class Storage {
@@ -160,10 +161,11 @@ export default class Storage {
   }
 
   /**
-   *
+   * todo
    * @param _id
    * @param bodySite
    * @param value
+   * @param observationType
    * @param observationStatus
    * @returns
    */
@@ -171,11 +173,12 @@ export default class Storage {
     _id: string,
     bodySite: string,
     value: number,
+    observationType: ObservationType,
     observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
       this.midata
-        .updateObservation(_id, bodySite, value, observationStatus)
+        .updateObservation(_id, bodySite, value, observationType, observationStatus)
         .then((result) => {
           if (result) {
             this.midata

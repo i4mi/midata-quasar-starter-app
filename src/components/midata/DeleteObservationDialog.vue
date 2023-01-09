@@ -18,10 +18,15 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { ObservationStatus } from '@i4mi/fhir_r4';
+import { ObservationType } from 'src/plugins/storage';
+import { PropType } from 'vue';
 
 export default defineComponent({
   name: 'DeleteObservationDialog',
-  props: ['visible'],
+  props: {
+    visible: Boolean,
+    observationType: String as PropType<ObservationType>
+  },
   data: () => ({}),
   computed: {
     show: {
@@ -41,6 +46,7 @@ export default defineComponent({
         this.$storage.getCurrentObservation().id,
         this.$storage.getCurrentObservation().bodySite.coding[0].display,
         this.$storage.getCurrentObservation().valueInteger,
+        this.observationType,
         ObservationStatus.ENTERED_IN_ERROR
       );
       this.show = false

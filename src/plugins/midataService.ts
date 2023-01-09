@@ -3,6 +3,7 @@ import { Bundle, Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import moment from 'moment';
 import { ObservationType } from 'src/plugins/storage';
 import bodySitesJson from '../data/bodySites.json';
+import fhirDataJson from '../data/fhirData.json';
 import { Notify } from 'quasar';
 
 // import moment library. More information under https://momentjs.com
@@ -141,11 +142,12 @@ export default class MidataService {
   }
 
   /**
-   * Creates a observation (of type bodytemperature) resource on the fhir server
+   * Creates an observation (of type bodytemperature) resource on the fhir server
    * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
    * @param bodySite the body site where the bodytemperature was measured.
    * @param value the measured body temperature value.
    * @param observationType Type of the Observation that should be created
+   * @param dateString
    * @returns a promise:
    *              - if successfull -> response with the created resource as JSON
    *              - if not successfull -> error message
@@ -154,16 +156,17 @@ export default class MidataService {
     _status: ObservationStatus,
     bodySite: string,
     value: number,
-    observationType: ObservationType
+    observationType: ObservationType,
+    dateString: string = now.format()
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
 
       let observation;
       if (observationType == ObservationType.BODY_TEMPERATURE){
-        observation = this.newBtObservation(_status, bodySite, value);
+        observation = this.newBtObservation(_status, bodySite, value, dateString);
       }
       else if (observationType == ObservationType.HEART_RATE){
-        observation = this.newHrObservation(_status, bodySite, value);
+        observation = this.newHrObservation(_status, bodySite, value, dateString);
       }
       else {
         throw new Error('No matching ObservationType found')
@@ -175,11 +178,13 @@ export default class MidataService {
   }
 
   /**
-   * Updates a observation (of type bodytemperature) resource on the fhir server.
+   * Updates an observation (of type bodytemperature) resource on the fhir server.
    * @param _id identification for the observation to be updated.
    * @param bodySite the body site where the bodytemperature was measured.
    * @param value the measured body temperature value.
-   * @param observationStatus optional status for Observation. Default is ObservationStatus.PRELIMINARY
+   * @param observationType todo
+   * @param observationStatus optional status for Observation. The default is
+   * ObservationStatus.PRELIMINARY
    * @returns a promise:
    *              - if successfull -> response with the updated resource as JSON
    *              - if not successfull -> error message
@@ -188,6 +193,7 @@ export default class MidataService {
     _id: string,
     bodySite: string,
     value: number,
+    observationType: ObservationType,
     observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
@@ -195,8 +201,8 @@ export default class MidataService {
         if (result) {
           const fhirObservation = result as Observation;
           fhirObservation.valueQuantity.value = value;
-          fhirObservation.bodySite = this.getBodySite(bodySite);
-          fhirObservation.method = this.getMethod(bodySite);
+          fhirObservation.bodySite = this.getBodySiteFromJson(bodySite, observationType);
+          fhirObservation.method = this.getMethodFromJson(bodySite, observationType);
           fhirObservation.issued = now.format();
           fhirObservation.status = observationStatus
           this.jsOnFhir
@@ -220,16 +226,20 @@ export default class MidataService {
   }
 
   /**
-   * Creates observation (of type Bodytemperature) where you can specify the status, bodySite and value.
-   * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
-   * @param bodySite the body site where the bodytemperature was measured.
+   * Creates an observation (of type body temperature) where you can specify the
+   * status, bodySite and value.
+   * @param _status the status of the observation
+   * according to: http://hl7.org/fhir/observation-status
+   * @param bodySite the body site where the body temperature was measured.
    * @param value the measured body temperature value.
+   * @param dateString String representing a date
    * @returns
    */
   newBtObservation(
     _status: ObservationStatus,
     bodySite: string,
-    value: number
+    value: number,
+    dateString: string
   ): Observation {
     return {
       resourceType: 'Observation',
@@ -259,7 +269,7 @@ export default class MidataService {
       subject: {
         reference: 'Patient/' + this.jsOnFhir.getUserId(),
       },
-      issued: now.format(),
+      issued: dateString,
       performer: [
         {
           reference: 'Practitioner/mdh0us3',
@@ -271,22 +281,26 @@ export default class MidataService {
         system: 'http://unitsofmeasure.org',
         code: 'Cel',
       },
-      bodySite: this.getBodySite(bodySite),
-      method: this.getMethod(bodySite),
+      bodySite: this.getBodySiteFromJson(bodySite, ObservationType.BODY_TEMPERATURE),
+      method: this.getMethodFromJson(bodySite, ObservationType.BODY_TEMPERATURE),
     };
   }
 
   /**
-   * Creates observation (of type Heart Rate) where you can specify the status, bodySite and value.
-   * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
+   * Creates an observation (of type Heart Rate) where you can specify the
+   * status, bodySite and value.
+   * @param _status the status of the observation
+   * according to: http://hl7.org/fhir/observation-status
    * @param bodySite the body site where the bodytemperature was measured.
    * @param value the measured body temperature value.
+   * @param dateString String representing a date
    * @returns
    */
   newHrObservation(
     _status: ObservationStatus,
     bodySite: string,
-    value: number
+    value: number,
+    dateString: string
   ): Observation {
     return {
       resourceType: 'Observation',
@@ -316,7 +330,7 @@ export default class MidataService {
       subject: {
         reference: 'Patient/' + this.jsOnFhir.getUserId(),
       },
-      issued: now.format(),
+      issued: dateString,
       performer: [
         {
           reference: 'Practitioner/mdh0us3',
@@ -328,331 +342,171 @@ export default class MidataService {
         system: 'http://unitsofmeasure.org',
         code: '{beats}/min',
       },
-      bodySite: this.getBodySite(bodySite),
-      method: this.getMethod(bodySite),
+      bodySite: this.getBodySiteFromJson(bodySite, ObservationType.HEART_RATE),
+      method: this.getMethodFromJson(bodySite, ObservationType.HEART_RATE),
     };
   }
 
   /**
-   * Helper function that creates a bodySite object to be used in an observation.
-   * @param bodySite the body site where the Observation (of type
-   * BodyTemperature or Heart Rate) was measured.
-   * @returns bodySite with coding as JSON.
+   * Creates an observation (of type blood pressure) where you can specify the
+   * status, bodySite and the values.
+   * @param _status the status of the observation
+   * according to: http://hl7.org/fhir/observation-status
+   * @param bodySite the body site where the body temperature was measured.
+   * @param valueSystolic Systolic blood pressure value in mmHg
+   * @param valueDiastolic Diastolic blood pressure value in mmHg
+   * @param dateString String representing a date
+   * @returns
    */
-  getBodySite(bodySite: string) {
+  newBpObservation(
+    _status: ObservationStatus,
+    bodySite: string,
+    valueSystolic: number,
+    valueDiastolic: number,
+    dateString: string
+  ): Observation {
+    return {
+      resourceType: 'Observation',
+      status: _status,
+      category: [
+        {
+          coding: [
+            {
+              system:
+                'http://terminology.hl7.org/CodeSystem/observation-category',
+              code: 'vital-signs',
+              display: 'Vital Signs',
+            },
+          ],
+        },
+      ],
+      code: {
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '85354-9',
+            display: 'Blood pressure panel with all children optional',
+          },
+        ],
+        text: 'Blood pressure systolic & diastolic',
+      },
+      subject: {
+        reference: 'Patient/' + this.jsOnFhir.getUserId(),
+      },
+      issued: dateString,
+      performer: [
+        {
+          reference: 'Practitioner/mdh0us3',
+        },
+      ],
+      component: [
+        {
+          code: {
+            coding: [
+              {
+                system: 'http://snomed.info/sct',
+                code: '271649006',
+                display: 'Systolic blood pressure'
+              }
+            ]
+          },
+          valueQuantity: {
+            value: valueSystolic,
+            unit: 'mmHg',
+            system: 'http://unitsofmeasure.org',
+            code: 'mm[Hg]'
+          }
+        },
+        {
+          code: {
+            coding: [
+              {
+                system: 'http://loinc.org',
+                code: '8462-4',
+                display: 'Diastolic blood pressure'
+              }
+            ]
+          },
+          valueQuantity: {
+            value: valueDiastolic,
+            unit: 'mmHg',
+            system: 'http://unitsofmeasure.org',
+            code: 'mm[Hg]'
+          }
+        }
+      ],
+      bodySite: this.getBodySiteFromJson(bodySite, ObservationType.BLOOD_PRESSURE),
+      method: this.getMethodFromJson(bodySite, ObservationType.BLOOD_PRESSURE),
+    };
+  }
 
-    //Body Temperature https://loinc.org/8327-9/
-    switch (bodySite) {
-      case 'Axillary':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Axillary',
-            },
-          ],
-        };
-      case 'Oral':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9367-9',
-              display: 'Oral',
-            },
-          ],
-        };
-      case 'Ear':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA21929-7',
-              display: 'Ear',
-            },
-          ],
-        };
-      case 'Tympanic membrane':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9368-7',
-              display: 'Tympanic membrane',
-            },
-          ],
-        };
-      case 'Temporal artery (forehead)':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Temporal artery (forehead)',
-            },
-          ],
-        };
-      case 'Rectal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Rectal',
-            },
-          ],
-        };
-      case 'Urinary bladder':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9371-1',
-              display: 'Urinary bladder',
-            },
-          ],
-        };
-      case 'Nasal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9263-0',
-              display: 'Nasal',
-            },
-          ],
-        };
-      case 'Nasopharyngeal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA18005-1',
-              display: 'Nasopharyngeal',
-            },
-          ],
-        };
-      case 'Finger':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA11862-2',
-              display: 'Finger',
-            },
-          ],
-        };
-      case 'Toe':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '	LA21930-5',
-              display: 'Toe',
-            },
-          ],
-        };
+  getBodySiteFromJson(bodySite: string, observationType: ObservationType) {
 
-      //HeartRate https://loinc.org/LL3627-8/
-      case 'Brachial artery':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA24033-5',
-              display: 'Brachial artery',
-            },
-          ],
-        };
-      case 'Carotid artery':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA24031-9',
-              display: 'Carotid artery',
-            },
-          ],
-        };
-      case 'Dorsalis pedis artery':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '	LA24034-3',
-              display: 'Dorsalis pedis artery',
-            },
-          ],
-        };
-      case 'Femoral artery':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '	LA24032-7',
-              display: 'Femoral artery',
-            },
-          ],
-        };
-      case 'Posterior tibial artery':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '	LA24035-0',
-              display: 'Posterior tibial artery',
-            },
-          ],
-        };
-      case 'Radial artery':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '	LA24030-1',
-              display: 'Radial artery',
-            },
-          ],
-        };
-      case 'Cardiac apex':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '	LA21930-5',
-              display: 'Cardiac apex',
-            },
-          ],
-        };
+    let dataArray;
+    switch (observationType) {
+      case ObservationType.BLOOD_PRESSURE:
+        dataArray = fhirDataJson.BLOOD_PRESSURE;
+        break;
+      case ObservationType.BODY_TEMPERATURE:
+        dataArray = fhirDataJson.BODY_TEMPERATURE;
+        break;
+      case ObservationType.HEART_RATE:
+        dataArray = fhirDataJson.HEART_RATE;
+        break;
       default:
-        throw Error(`No Body site found matching the String ${bodySite}`)
+        throw new Error('No matching body site found')
     }
+
+    for (const data of dataArray) {
+      if (data.id === bodySite){
+        return data.bodySite
+      }
+    }
+    throw new Error('No matching body Site found')
+  }
+
+  getMethodFromJson(bodySite: string, observationType: ObservationType) {
+
+    let dataArray;
+    switch (observationType) {
+      case ObservationType.BLOOD_PRESSURE:
+        dataArray = fhirDataJson.BLOOD_PRESSURE;
+        break;
+      case ObservationType.BODY_TEMPERATURE:
+        dataArray = fhirDataJson.BODY_TEMPERATURE;
+        break;
+      case ObservationType.HEART_RATE:
+        dataArray = fhirDataJson.HEART_RATE;
+        break;
+      default:
+        throw new Error('No matching body site found')
+    }
+
+    for (const data of dataArray) {
+      if (data.id === bodySite){
+        return data.method
+      }
+    }
+    throw new Error('No matching body Site found')
   }
 
   /**
-   * Helper function that creates a Method of measurement to be used in an observation.
-   * @param bodySite the body site where the Observation (of type
-   * BodyTemperature or Heart Rate) was measured.
-   * @returns method of temperature taking with coding as JSON.
+   * Generates 16 fhir Observations of Type "body temperature" and "heart rate"
+   * and adds them to the Midata Account. The Data is modelled with a progression
+   * in mind. The values first rise and then fall of again. There is some noise
+   * applied with the Math.random() function to each of the values every time
+   * they get generated.
    */
-  getMethod(bodySite: string) {
-    switch (bodySite) {
-
-      //Bodytemperature https://browser.ihtsdotools.org/?perspective=full&conceptId1=56342008&edition=MAIN&release=&languages=en
-      case 'Oral':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '89003005',
-              display: 'Oral temperature taking (procedure)',
-            },
-          ],
-        };
-      case 'Tympanic membrane':
-      case 'Ear':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '448093005',
-              display:
-                'Measurement of temperature using tympanic thermometer (procedure)',
-            },
-          ],
-        };
-      case 'Rectal':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '18649001',
-              display: 'Rectal temperature taking (procedure)',
-            },
-          ],
-        };
-
-      //Heart Rate https://browser.ihtsdotools.org/?perspective=full&conceptId1=65653002&edition=MAIN&release=&languages=en
-      case 'Brachial artery':
-      case 'Femoral artery':
-      case 'Posterior tibial artery':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '424411004',
-              display: 'Peripheral pulse taking (procedure)',
-            },
-          ],
-        };
-      case 'Carotid artery':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '65653002',
-              display: 'Pulse taking (procedure) ',
-            },
-          ],
-        };
-      case 'Dorsalis pedis artery':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '91161007',
-              display: 'Pedal pulse taking (procedure) ',
-            },
-          ],
-        };
-      case 'Radial artery':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '72027000',
-              display: 'Radial pulse taking (procedure)',
-            },
-          ],
-        };
-      case 'Cardiac apex':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '4625008',
-              display: ' Apical pulse taking (procedure)',
-            },
-          ],
-        };
-      default:
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '56342008',
-              display: 'Temperature taking (procedure)',
-            },
-          ],
-        };
-    }
-  }
-
   async generateRandomData() {
     const bodyTemperaturesBase = [36, 36.5, 37, 37.5, 38, 39, 39.5, 40, 41, 41, 40, 39, 38, 37.5, 37, 36.5]
     const bodyTemperaturesNoised = bodyTemperaturesBase.map(bt => {
       return bt + Math.round(Math.random()*10)/10
     })
-    console.log('bt base', bodyTemperaturesBase)
-    console.log('bt noised', bodyTemperaturesNoised)
 
     const heartRateBase = [70, 70, 75, 80, 90, 95, 105, 110, 115, 120, 110, 100, 95, 85, 80, 70]
     const heartRateNoised = heartRateBase.map(hr => {
       return hr + Math.round(Math.random()*4)
     })
-    console.log('hr base', heartRateBase)
-    console.log('hr noised', heartRateNoised)
 
     const dat = now
     const dates = []
@@ -662,18 +516,20 @@ export default class MidataService {
       dat.subtract(Math.round(Math.random()*10), 's')
       dates.push(dat.format())
     }
-    console.log('dates', dates)
 
     try {
-      for (const hrValue of heartRateNoised) {
+      for (let i = 0; i < heartRateBase.length; i++) {
         await this.createObservation(ObservationStatus.PRELIMINARY,
           this.getRandomBodySite(ObservationType.HEART_RATE),
-          hrValue, ObservationType.HEART_RATE);
-      }
-      for (const btValue of bodyTemperaturesNoised) {
+          heartRateNoised[i],
+          ObservationType.HEART_RATE,
+          dates[i]);
+
         await this.createObservation(ObservationStatus.PRELIMINARY,
           this.getRandomBodySite(ObservationType.BODY_TEMPERATURE),
-          btValue, ObservationType.BODY_TEMPERATURE);
+          bodyTemperaturesNoised[i],
+          ObservationType.BODY_TEMPERATURE,
+          dates[i]);
       }
       Notify.create({
         message: '16 randomisierte Observationen wurden erstellt. Bitte die Seite neu laden',
@@ -691,6 +547,11 @@ export default class MidataService {
     }
   }
 
+  /**
+   * Helper for the generateRandomData() function. It picks a random body site
+   * from the options provided in the json data file.
+   * @param observationType Type of the Observation for picking the random body site
+   */
   getRandomBodySite(observationType: ObservationType): string {
     if (observationType == ObservationType.BODY_TEMPERATURE){
       return bodySitesJson.bodySitesBt
