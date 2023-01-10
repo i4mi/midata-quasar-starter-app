@@ -58,19 +58,24 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import bodySites from '../../../data/bodySites.json';
 import { ObservationStatus } from '@i4mi/fhir_r4';
-import { ObservationType } from 'src/plugins/storage';
+import fhirData from 'src/data/fhirData.json';
+import { ObservationType } from 'src/plugins/midataService';
 
 export default defineComponent({
   name: 'EditHeartrateDialog',
-  props: ['visible', 'type'],
+  props: {
+    visible: Boolean,
+    actionType: String
+  },
   setup() {
     const bodySite = ref('');
     const heartRate = ref(70);
     return {
       bodySite,
-      options: bodySites.bodySitesHr,
+      options: fhirData.HEART_RATE.map(e => {
+        return e.id
+      }),
       heartRate,
       onReset() {
         bodySite.value = '';
@@ -93,14 +98,14 @@ export default defineComponent({
   },
   methods: {
     async updateObservation() {
-      if (this.type == 'edit'){
+      if (this.actionType == 'edit'){
         await this.$storage.updateObservation(
           this.$storage.getCurrentObservation().id,
           this.bodySite,
           this.heartRate,
         ObservationType.HEART_RATE)
       }
-      else if (this.type == 'add'){
+      else if (this.actionType == 'add'){
         await this.$storage.createObservation(
           ObservationStatus.PRELIMINARY,
           this.bodySite,

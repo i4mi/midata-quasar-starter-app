@@ -109,25 +109,25 @@
   </q-card>
   <div style="height: 25px"></div>
 
-  <ObservationChart :data='filteredList'
+  <SingeTypeObservationChart :data='filteredList'
                     :observation-type='"Körpertemperatur"'
                     :unit='"C°"'>
 
-  </ObservationChart>
+  </SingeTypeObservationChart>
 
   <edit-body-temperature-dialog
     :visible="showEditDialog"
-    :type='"edit"'
+    :actionType='"edit"'
     @close="onEdit()"
   ></edit-body-temperature-dialog>
   <edit-body-temperature-dialog
-    :type='"add"'
+    :actionType='"add"'
     :visible="showAddDialog"
     @close="onEdit()"
   ></edit-body-temperature-dialog>
   <delete-observation-dialog
     :visible="showDeleteDialog"
-    :observation-type='ObservationType.BODY_TEMPERATURE'
+    :observation-type='observationType'
     @close="onEdit()"
   ></delete-observation-dialog>
 </template>
@@ -136,15 +136,14 @@
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
 import EditBodyTemperatureDialog from 'components/midata/BodyTemperature/EditBodyTemperatureDialog.vue';
 import { defineComponent } from 'vue';
-import bodySites from 'src/data/bodySites.json';
 import { Observation } from '@i4mi/fhir_r4';
-import ObservationChart from 'components/midata/ObservationChart.vue';
-import { ObservationType } from 'src/plugins/storage';
+import SingeTypeObservationChart from 'components/midata/SingeTypeObservationChart.vue';
+import { ObservationType } from 'src/plugins/midataService';
 
 export default defineComponent({
   name: 'MidataBodyTemperature',
   components: {
-    ObservationChart,
+    SingeTypeObservationChart,
     DeleteObservationDialog,
     EditBodyTemperatureDialog
   },
@@ -157,7 +156,7 @@ export default defineComponent({
       showAddDialog: false,
       showEditDialog: false,
       showDeleteDialog: false,
-      options: bodySites.bodySitesBt,
+      observationType: ObservationType.BODY_TEMPERATURE
     }
   },
   computed: {

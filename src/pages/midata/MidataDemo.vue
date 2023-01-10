@@ -9,7 +9,7 @@
     <div v-if='!this.$storage.getObservations().length'>
       Sie haben noch keine Daten. Wollen sie randomisierte Daten erstellen lassen?
       <br>
-      <q-btn @click='updateRandomData()' color="red"> Generieren </q-btn>
+      <q-btn @click='updateRandomData()' color="red"> Dummy Daten generieren </q-btn>
       <div style="height: 25px"></div>
     </div>
 
@@ -130,7 +130,7 @@ export default defineComponent({
       this.$midata.generateRandomData().then(() => {
         console.log('done')
       })
-    }
+    },
   },
 });
 </script>

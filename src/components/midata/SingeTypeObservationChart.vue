@@ -8,8 +8,15 @@
 import { defineComponent } from 'vue';
 import type { PropType } from 'vue'
 import { Observation } from '@i4mi/fhir_r4';
+
+/**
+ * Chart designed to use fhir Observations. Its intended usage is one type of
+ * Observation that only have single values. A working example is a Body temperature
+ * graph. A not working example is a blood pressure graph as it consists of
+ * a composite value or a combined graph of multiple Observation Types
+ */
 export default defineComponent({
-  name: 'ObservationChart',
+  name: 'SingeTypeObservationChart',
   components: {},
   props: {
     data: Array as PropType<Observation[]>,

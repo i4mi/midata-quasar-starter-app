@@ -16,10 +16,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { ObservationStatus } from '@i4mi/fhir_r4';
-import { ObservationType } from 'src/plugins/storage';
-import { PropType } from 'vue';
+import { ObservationType } from 'src/plugins/midataService';
 
 export default defineComponent({
   name: 'DeleteObservationDialog',

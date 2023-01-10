@@ -109,23 +109,23 @@
   </q-card>
   <div style="height: 25px"></div>
 
-  <ObservationChart :data='filteredList'
+  <SingeTypeObservationChart :data='filteredList'
                     :observation-type='"Puls"'
-                    :unit='"beats/min"'></ObservationChart>
+                    :unit='"beats/min"'></SingeTypeObservationChart>
 
   <edit-heartrate-dialog
-    :type='"edit"'
+    :actionType='"edit"'
     :visible="showEditDialog"
     @close="onEdit()"
   ></edit-heartrate-dialog>
   <edit-heartrate-dialog
-    :type='"add"'
+    :actionType='"add"'
     :visible="showAddDialog"
     @close="onEdit()"
   ></edit-heartrate-dialog>
   <delete-observation-dialog
     :visible="showDeleteDialog"
-    :observation-type='ObservationType.HEART_RATE'
+    :observation-type='observationType'
     @close="onEdit()"
   ></delete-observation-dialog>
 </template>
@@ -134,15 +134,14 @@
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
 import EditHeartrateDialog from 'components/midata/HeartRate/EditHeartrateDialog.vue';
 import { defineComponent } from 'vue';
-import bodySites from 'src/data/bodySites.json';
 import { Observation } from '@i4mi/fhir_r4';
-import ObservationChart from 'components/midata/ObservationChart.vue';
-import { ObservationType } from 'src/plugins/storage';
+import SingeTypeObservationChart from 'components/midata/SingeTypeObservationChart.vue';
+import { ObservationType } from 'src/plugins/midataService';
 
 export default defineComponent({
   name: 'MidataHeartRate',
   components: {
-    ObservationChart,
+    SingeTypeObservationChart,
     DeleteObservationDialog,
     EditHeartrateDialog
   },
@@ -155,7 +154,7 @@ export default defineComponent({
       showAddDialog: false,
       showEditDialog: false,
       showDeleteDialog: false,
-      options: bodySites.bodySitesHr
+      observationType: ObservationType.HEART_RATE
     }
   },
   computed: {

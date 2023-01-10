@@ -1,14 +1,8 @@
-import MidataService from './midataService';
+import MidataService, { ObservationType } from './midataService';
 import { Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import { copyToClipboard, Notify } from 'quasar';
 
 const STORAGE_KEY = 'demo-app-storage';
-
-export const enum ObservationType {
-  BODY_TEMPERATURE = 'Body temperature',
-  HEART_RATE = 'Heartrate',
-  BLOOD_PRESSURE = 'Blood Pressure'
-}
 
 export default class Storage {
 
@@ -109,16 +103,19 @@ export default class Storage {
     return this.patientResource;
   }
 
+  /**
+   * Returns all observations from Midata
+   */
   public getObservations() {
     return this.observations
   }
 
   /**
    * Creates a new Observation
-   * @param _status
-   * @param bodySite
-   * @param value
-   * @param observationType
+   * @param _status Status of the Observation. Default is PRELIMINARY for newly created Observations
+   * @param bodySite String representing a bodySite. Needs to be present in the fhirData.json file
+   * @param value Observation Value
+   * @param observationType Type of the Observation (ObservationType enum)
    * @returns
    */
   public createObservation(
@@ -161,12 +158,15 @@ export default class Storage {
   }
 
   /**
-   * todo
-   * @param _id
-   * @param bodySite
-   * @param value
-   * @param observationType
-   * @param observationStatus
+   * Updates an Observation with a new value and bodySite. Changes the issued
+   * date to the current date and time
+   * @param _id Midata id of the Observation
+   * @param bodySite String representing the bodySite of the Observation.
+   * Needs to be present in the fhirData.json file
+   * @param value Observation Value
+   * @param observationType Type of the Observation (ObservationType enum)
+   * @param observationStatus Status of the Observation. Default is PRELIMINARY.
+   * A deleted Observation gets the type ENTERED_IN_ERROR
    * @returns
    */
   public updateObservation(
@@ -210,7 +210,7 @@ export default class Storage {
   }
 
   /**
-   *
+   * Sets the selected Observation. Used to Observations them in the UI
    * @param _id
    */
   public setCurrentObservation(_id: string): void {
@@ -221,7 +221,7 @@ export default class Storage {
   }
 
   /**
-   *
+   * Retrieves the selected Observation
    * @returns
    */
   public getCurrentObservation(): Observation {
@@ -229,16 +229,16 @@ export default class Storage {
   }
 
   /**
-   *
+   * Copies an Item to the clipboard in JSON-Format
    * @param item Item that should be copied to the clipboard. Preferably
    * a JSON Object or a String
-   * @param identifier Identifier that should be displayed as a Quasar Notify
+   * @param label Label to display in the quasar notify component
    */
-  public copyToClipBoard(item: any, identifier = 'Resource') {
+  public copyToClipBoard(item: any, label = 'Resource') {
     copyToClipboard(JSON.stringify(item, null, 2))
       .then(() => {
         Notify.create({
-          message: `${identifier} kopiert`,
+          message: `${label} kopiert`,
           color: 'green',
           position: 'top',
           icon: 'announcement',
@@ -246,7 +246,7 @@ export default class Storage {
       })
       .catch(() => {
         Notify.create({
-          message: `Kopieren von ${identifier} fehlgeschlagen`,
+          message: `Kopieren von ${label} fehlgeschlagen`,
           color: 'red',
           position: 'top',
           icon: 'announcement',
