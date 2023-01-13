@@ -109,9 +109,10 @@
   </q-card>
   <div style="height: 25px"></div>
 
-  <SingeTypeObservationChart :data='filteredList'
+  <SingleValueObservationChart :data='filteredList'
                     :observation-type='"Puls"'
-                    :unit='"beats/min"'></SingeTypeObservationChart>
+                    :unit='"beats/min"'>
+  </SingleValueObservationChart>
 
   <edit-heartrate-dialog
     :actionType='"edit"'
@@ -135,13 +136,13 @@ import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.v
 import EditHeartrateDialog from 'components/midata/HeartRate/EditHeartrateDialog.vue';
 import { defineComponent } from 'vue';
 import { Observation } from '@i4mi/fhir_r4';
-import SingeTypeObservationChart from 'components/midata/SingeTypeObservationChart.vue';
+import SingleValueObservationChart from 'components/midata/SingleValueObservationChart.vue';
 import { ObservationType } from 'src/plugins/midataService';
 
 export default defineComponent({
   name: 'MidataHeartRate',
   components: {
-    SingeTypeObservationChart,
+    SingleValueObservationChart,
     DeleteObservationDialog,
     EditHeartrateDialog
   },

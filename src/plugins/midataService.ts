@@ -12,8 +12,8 @@ const now = moment();
  */
 export const enum ObservationType {
   BODY_TEMPERATURE = 'Body temperature',
-  HEART_RATE = 'Heartrate',
-  BLOOD_PRESSURE = 'Blood Pressure'
+  HEART_RATE = 'Heart rate',
+  BLOOD_PRESSURE = 'Blood pressure'
 }
 
 export default class MidataService {
@@ -473,6 +473,7 @@ export default class MidataService {
     }
 
     for (const data of dataArray) {
+      console.log(bodySite)
       if (data.id === bodySite){
         return data.bodySite
       }
@@ -517,8 +518,9 @@ export default class MidataService {
    * in mind. The values first rise and then fall of again. There is some noise
    * applied with the Math.random() function to each of the values every time
    * they get generated.
+   * @param dateString String representing a Date in the format of (YYYY-MM-DD HH:mm)
    */
-  async generateRandomData() {
+  async generateRandomData(dateString: string) {
     const bodyTemperaturesBase = [36, 36.5, 37, 37.5, 38, 38, 38.5, 39.5, 41, 39, 38.5, 40, 41, 39.5, 38, 36.5]
     const bodyTemperaturesNoised = bodyTemperaturesBase.map(bt => {
       return bt + Math.round(Math.random()*10)/10
@@ -529,7 +531,7 @@ export default class MidataService {
       return hr + Math.round(Math.random()*4)
     })
 
-    const dat = now
+    const dat = moment(dateString, 'YYYY-MM-DD HH:mm')
     const dates = []
     for (let i = 0; i < heartRateBase.length; i++){
       dat.subtract(Math.round(Math.random()*4), 'h')
@@ -537,7 +539,6 @@ export default class MidataService {
       dat.subtract(Math.round(Math.random()*10), 's')
       dates.push(dat.format())
     }
-
     try {
       for (let i = 0; i < heartRateBase.length; i++) {
 
@@ -560,6 +561,7 @@ export default class MidataService {
         icon: 'announcement'
       });
     } catch (error) {
+      console.log(error)
       Notify.create({
         message: 'Ein Fehler ist aufgetreten beim erstellen der Observationen',
         color: 'green',

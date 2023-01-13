@@ -6,14 +6,6 @@
       <q-separator spaced class="midata-fade"></q-separator>
     </div>
 
-    <div v-if='!this.$storage.getObservations().length'>
-      Sie haben noch keine Daten. Wollen sie randomisierte Daten erstellen lassen?
-      <br>
-      <q-btn @click='updateRandomData()' color="red"> Dummy Daten generieren </q-btn>
-      <div style="height: 25px"></div>
-    </div>
-
-
     <div class="row justify-end">
       <q-btn
         @click="
@@ -69,14 +61,23 @@
 
     <div style="height: 25px" />
     <q-tabs
-      v-model="tab"
       narrow-indicator
       dense
       align="justify"
       class="text-primary"
     >
-      <q-tab :ripple="false" name="heartRate" icon="monitor_heart" label="Heart Rate" @click='this.$router.push("/midata/demo/heartrate")'/>
-      <q-tab :ripple="false" name="bodyTemperature" icon="thermostat" label="Body Temperature" @click='this.$router.push("/midata/demo/bodytemperature")'/>
+      <q-route-tab
+        icon="monitor_heart"
+        to="/midata/demo/heartrate"
+        label='Heart Rate'
+        exact
+      />
+      <q-route-tab
+        icon="thermostat"
+        to="/midata/demo/bodytemperature"
+        label='Body Temperature'
+        exact
+      />
     </q-tabs>
     <div style="height: 25px" />
 
@@ -99,7 +100,7 @@ export default defineComponent({
   setup() {
     return {
       expanded: ref(false),
-      tab: ref(),
+      obsType: ref(),
     };
   },
   data: () => ({
@@ -125,12 +126,7 @@ export default defineComponent({
     logout() {
       this.$midata.logout();
       location.reload();
-    },
-    updateRandomData(){
-      this.$midata.generateRandomData().then(() => {
-        console.log('done')
-      })
-    },
+    }
   },
 });
 </script>

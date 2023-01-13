@@ -67,6 +67,16 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/midata/generate',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/midata/GenerateData.vue'),
+      },
+    ],
+  },
+  {
     path: '/internationalization',
     component: () => import('layouts/MainLayout.vue'),
     children: [

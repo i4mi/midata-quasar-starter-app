@@ -109,11 +109,10 @@
   </q-card>
   <div style="height: 25px"></div>
 
-  <SingeTypeObservationChart :data='filteredList'
+  <SingleValueObservationChart :data='filteredList'
                     :observation-type='"Körpertemperatur"'
                     :unit='"C°"'>
-
-  </SingeTypeObservationChart>
+  </SingleValueObservationChart>
 
   <edit-body-temperature-dialog
     :visible="showEditDialog"
@@ -137,13 +136,13 @@ import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.v
 import EditBodyTemperatureDialog from 'components/midata/BodyTemperature/EditBodyTemperatureDialog.vue';
 import { defineComponent } from 'vue';
 import { Observation } from '@i4mi/fhir_r4';
-import SingeTypeObservationChart from 'components/midata/SingeTypeObservationChart.vue';
+import SingleValueObservationChart from 'components/midata/SingleValueObservationChart.vue';
 import { ObservationType } from 'src/plugins/midataService';
 
 export default defineComponent({
   name: 'MidataBodyTemperature',
   components: {
-    SingeTypeObservationChart,
+    SingleValueObservationChart,
     DeleteObservationDialog,
     EditBodyTemperatureDialog
   },

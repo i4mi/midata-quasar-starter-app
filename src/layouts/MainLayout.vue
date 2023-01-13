@@ -84,6 +84,11 @@ const midataLinksList = [
     icon: 'auto_fix_high',
     link: '/midata/demo',
   },
+  {
+    title: 'Daten generieren',
+    icon: 'description',
+    link: '/midata/generate',
+  },
 ];
 
 const deveelopmentLinksList = [
