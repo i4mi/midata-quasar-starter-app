@@ -153,7 +153,7 @@ export default class MidataService {
    * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
    * @param bodySite String representing the bodySite of the Observation.
    * Needs to be present in the fhirData.json file
-   * @param value the measured body temperature value.
+   * @param values Observation Value or Values with multivalued Observations
    * @param observationType Type of the Observation (ObservationType enum)
    * @param dateString String representing a by momentJS readable date
    * @returns a promise:
@@ -163,7 +163,7 @@ export default class MidataService {
   public createObservation(
     _status: ObservationStatus,
     bodySite: string,
-    value: number,
+    values: number[],
     observationType: ObservationType,
     dateString: string = now.format()
   ): Promise<Observation> {
@@ -171,10 +171,13 @@ export default class MidataService {
 
       let observation;
       if (observationType == ObservationType.BODY_TEMPERATURE){
-        observation = this.newBtObservation(_status, bodySite, value, dateString);
+        observation = this.newBtObservation(_status, bodySite, values[0], dateString);
       }
       else if (observationType == ObservationType.HEART_RATE){
-        observation = this.newHrObservation(_status, bodySite, value, dateString);
+        observation = this.newHrObservation(_status, bodySite, values[0], dateString);
+      }
+      else if (observationType == ObservationType.BLOOD_PRESSURE){
+        observation = this.newBpObservation(_status, bodySite, values[0], values[1], dateString);
       }
       else {
         throw new Error('No matching ObservationType found for creating an Observation')
@@ -189,7 +192,7 @@ export default class MidataService {
    * Updates an observation (of type bodytemperature) resource on the fhir server.
    * @param _id identification for the observation to be updated.
    * @param bodySite the body site where the bodytemperature was measured.
-   * @param value the measured body temperature value.
+   * @param values Observation Value or Values with multivalued Observations
    * @param observationType Type of the fhir Observation
    * @param observationStatus optional status for Observation. The default is
    * ObservationStatus.PRELIMINARY
@@ -200,7 +203,7 @@ export default class MidataService {
   updateObservation(
     _id: string,
     bodySite: string,
-    value: number,
+    values: number[],
     observationType: ObservationType,
     observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
@@ -208,11 +211,19 @@ export default class MidataService {
       this.jsOnFhir.getResource('Observation', _id).then((result) => {
         if (result) {
           const fhirObservation = result as Observation;
-          fhirObservation.valueQuantity.value = value;
           fhirObservation.bodySite = this.getBodySiteFromJson(bodySite, observationType);
           fhirObservation.method = this.getMethodFromJson(bodySite, observationType);
           fhirObservation.issued = now.format();
           fhirObservation.status = observationStatus
+
+          if (observationType == ObservationType.BLOOD_PRESSURE){
+            fhirObservation.component[0].valueQuantity.value = values[0];
+            fhirObservation.component[1].valueQuantity.value = values[1];
+          }
+          else {
+            fhirObservation.valueQuantity.value = values[0];
+          }
+
           this.jsOnFhir
             .update(fhirObservation)
             .then((res) => {
@@ -473,7 +484,6 @@ export default class MidataService {
     }
 
     for (const data of dataArray) {
-      console.log(bodySite)
       if (data.id === bodySite){
         return data.bodySite
       }
@@ -544,13 +554,13 @@ export default class MidataService {
 
         await this.createObservation(ObservationStatus.PRELIMINARY,
           this.getRandomBodySite(ObservationType.HEART_RATE),
-          heartRateNoised[i],
+          [heartRateNoised[i]],
           ObservationType.HEART_RATE,
           dates[i]);
 
         await this.createObservation(ObservationStatus.PRELIMINARY,
           this.getRandomBodySite(ObservationType.BODY_TEMPERATURE),
-          bodyTemperaturesNoised[i],
+          [bodyTemperaturesNoised[i]],
           ObservationType.BODY_TEMPERATURE,
           dates[i]);
       }

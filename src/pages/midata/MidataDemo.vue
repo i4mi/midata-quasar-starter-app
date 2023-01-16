@@ -78,6 +78,12 @@
         label='Body Temperature'
         exact
       />
+      <q-route-tab
+        icon="bloodtype"
+        to="/midata/demo/bloodpressure"
+        label='Blood Pressure'
+        exact
+      />
     </q-tabs>
     <div style="height: 25px" />
 

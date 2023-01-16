@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import fhirData from '../../../data/fhirData.json'
 import { ObservationStatus } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
@@ -68,22 +68,15 @@ export default defineComponent({
     visible: Boolean,
     actionType: String
   },
-  setup() {
-    const bodySite = ref('');
-    const bodyTemperature = ref(36.8);
+  data() {
     return {
-      bodySite,
+      bodyTemperature: 36.8,
+      bodySite: '',
       options: fhirData.BODY_TEMPERATURE.map(e => {
         return e.id
       }),
-      bodyTemperature,
-      onReset() {
-        bodySite.value = '';
-        bodyTemperature.value = 36.8;
-      },
     };
   },
-  data: () => ({}),
   computed: {
     show: {
       get() {
@@ -97,19 +90,23 @@ export default defineComponent({
     },
   },
   methods: {
+    onReset() {
+      this.bodySite = '';
+      this.bodyTemperature = 36.8;
+    },
     async updateObservation() {
       if (this.actionType == 'edit'){
         await this.$storage.updateObservation(
           this.$storage.getCurrentObservation().id,
           this.bodySite,
-          this.bodyTemperature,
+          [this.bodyTemperature],
         ObservationType.BODY_TEMPERATURE)
       }
       else if (this.actionType == 'add'){
         await this.$storage.createObservation(
           ObservationStatus.PRELIMINARY,
           this.bodySite,
-          this.bodyTemperature,
+          [this.bodyTemperature],
           ObservationType.BODY_TEMPERATURE
         );
       }

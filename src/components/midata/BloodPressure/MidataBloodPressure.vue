@@ -2,7 +2,7 @@
   <q-card>
     <q-card-section>
       <q-item-label header
-      >Alle Puls Observationen von
+      >Alle Blutdruck Observationen von
         {{ getFullPatientName() }}</q-item-label
       >
       <q-virtual-scroll
@@ -16,7 +16,7 @@
           <q-item clickable dense v-ripple :key="index">
             <q-item-section avatar>
               <q-avatar
-                icon="monitor_heart"
+                icon="bloodtype"
                 text-color="white"
                 class="midata-fade"
               >
@@ -26,11 +26,11 @@
               <q-item-label
                 lines="1"
               >
-                Körpertemperatur
+                Blutdruck
               </q-item-label>
               <q-item-label caption>
-                Wert: {{ item.valueQuantity.value }}
-                {{ item.valueQuantity.unit }} ({{
+                Wert: {{ item.component[0].valueQuantity.value }} / {{ item.component[1].valueQuantity.value }}
+                {{ item.component[0].valueQuantity.unit }} ({{
                   item.bodySite.coding[0].display
                 }})
               </q-item-label>
@@ -103,43 +103,28 @@
         flat
         icon="add"
         @click.stop="showAddDialog = true"
-        label="Körpertemperatur Observation hinzufügen"
+        label="Blutdruck Observation hinzufügen"
       />
     </q-card-actions>
   </q-card>
   <div style="height: 25px"></div>
 
-  <SingleValueObservationChart :data='filteredList'
-                    :observation-type='"Puls"'
-                    :unit='"beats/min"'>
-  </SingleValueObservationChart>
+  <DoubleValueObservationChart
+    :data='filteredList'
+    :observation-type='"Blutdruck"'
+    :unit='"mmHg"'>
+  </DoubleValueObservationChart>
 
-  <edit-single-value-dialog
+  <edit-blood-pressure-dialog
     :visible="showEditDialog"
     :actionType='"edit"'
-    :observation-type='observationType'
-    :label='"Herzfrequenz"'
-    :unit='"bpm"'
-    :options='options'
-    :min='20'
-    :max='200'
-    :step='5'
-    :default-value='75'
     @close="onEdit()"
-  ></edit-single-value-dialog>
-  <edit-single-value-dialog
-    :visible="showAddDialog"
+  ></edit-blood-pressure-dialog>
+  <edit-blood-pressure-dialog
     :actionType='"add"'
-    :observation-type='observationType'
-    :label='"Herzfrequenz"'
-    :unit='"bpm"'
-    :options='options'
-    :min='20'
-    :max='200'
-    :step='5'
-    :default-value='75'
+    :visible="showAddDialog"
     @close="onEdit()"
-  ></edit-single-value-dialog>
+  ></edit-blood-pressure-dialog>
   <delete-observation-dialog
     :visible="showDeleteDialog"
     :observation-type='observationType'
@@ -151,41 +136,37 @@
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
 import { defineComponent } from 'vue';
 import { Observation } from '@i4mi/fhir_r4';
-import SingleValueObservationChart from 'components/midata/Charts/SingleValueObservationChart.vue';
 import { ObservationType } from 'src/plugins/midataService';
-import EditSingleValueDialog from 'components/midata/EditSingleValueDialog.vue';
-import fhirData from 'src/data/fhirData.json';
+import EditBloodPressureDialog from 'components/midata/BloodPressure/EditBloodPressureDialog.vue';
+import DoubleValueObservationChart from 'components/midata/Charts/DoubleValueObservationChart.vue';
 
 export default defineComponent({
-  name: 'MidataHeartRate',
+  name: 'MidataBloodPressure',
   components: {
-    EditSingleValueDialog,
-    SingleValueObservationChart,
-    DeleteObservationDialog
+    DoubleValueObservationChart,
+    DeleteObservationDialog,
+    EditBloodPressureDialog
   },
   props: {
     expanded: Boolean
   },
   data() {
     return {
-      options: fhirData.HEART_RATE.map(e => {
-        return e.id
-      }),
       observations: this.$storage.getObservations(),
       showAddDialog: false,
       showEditDialog: false,
       showDeleteDialog: false,
-      observationType: ObservationType.HEART_RATE
+      observationType: ObservationType.BLOOD_PRESSURE
     }
   },
   computed: {
     ObservationType() {
-      return ObservationType.HEART_RATE
+      return ObservationType.BODY_TEMPERATURE
     },
     filteredList() {
       return this.observations
         .filter((obs: Observation) => {
-          return obs.code.coding[0].code === '8867-4'
+          return obs.code.coding[0].code === '85354-9'
         })
         .sort((a: Observation, b: Observation) => {
           return new Date(a.issued).getTime() - new Date(b.issued).getTime();
@@ -206,6 +187,6 @@ export default defineComponent({
       this.showDeleteDialog = false;
       this.observations = this.$storage.getObservations();
     }
-  }
+  },
 });
 </script>

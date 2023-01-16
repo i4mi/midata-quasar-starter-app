@@ -62,6 +62,9 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'heartrate', component: () => import('components/midata/HeartRate/MidataHeartRate.vue')
           },
+          {
+            path: 'bloodpressure', component: () => import('components/midata/BloodPressure/MidataBloodPressure.vue')
+          },
         ],
       },
     ],

@@ -2,7 +2,7 @@
   <q-dialog v-model="show" persistent>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Herzfrequenz hinzufügen/bearbeiten</div>
+        <div class="text-h6">Blutdruck hinzufügen/bearbeiten</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-form
@@ -20,20 +20,31 @@
                 'Bitte wählen sie eine Körperregion aus.',
             ]"
           />
-          <q-badge class="midata-fade">
-            Schläge pro Minute: {{ heartRate }}
-          </q-badge>
 
+          <q-badge class="midata-fade">
+            Systolischer Blutdruck: {{ systolicPressure }} mmHg
+          </q-badge>
           <q-slider
-            v-model="heartRate"
+            v-model="systolicPressure"
             :min="20"
-            :max="200"
+            :max="220"
+            :step="5"
+            style="max-width: 90%"
+          />
+
+          <q-badge class="midata-fade">
+            Diastolischer Blutdruck: {{ diastolicPressure }} mmHg
+          </q-badge>
+          <q-slider
+            v-model="diastolicPressure"
+            :min="20"
+            :max="220"
             :step="5"
             style="max-width: 90%"
           />
           <div>
             <q-btn
-              label="Herzfrequenz speichern"
+              label="Observation speichern"
               type="submit"
               color="primary"
               class="q-ml-sm"
@@ -58,23 +69,25 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import fhirData from '../../../data/fhirData.json'
 import { ObservationStatus } from '@i4mi/fhir_r4';
-import fhirData from 'src/data/fhirData.json';
 import { ObservationType } from 'src/plugins/midataService';
+import { Notify } from 'quasar';
 
 export default defineComponent({
-  name: 'EditHeartrateDialog',
+  name: 'EditBloodPressureDialog',
   props: {
     visible: Boolean,
     actionType: String
   },
   data() {
     return {
-      heartRate: 70,
+      systolicPressure: 120,
+      diastolicPressure: 90,
       bodySite: '',
-      options: fhirData.HEART_RATE.map(e => {
+      options: fhirData.BLOOD_PRESSURE.map(e => {
         return e.id
-      }),
+      })
     };
   },
   computed: {
@@ -92,22 +105,33 @@ export default defineComponent({
   methods: {
     onReset() {
       this.bodySite = '';
-      this.heartRate = 70;
+      this.systolicPressure = 120;
+      this.diastolicPressure = 90;
     },
     async updateObservation() {
-      if (this.actionType == 'edit'){
+
+      if (this.systolicPressure < this.diastolicPressure){
+        Notify.create({
+          message: 'Der Systolische Blutdruck sollte nicht tiefer als der Diastolische sein',
+          color: 'red',
+          position: 'top',
+          icon: 'announcement',
+        });
+        return;
+      }
+      else if (this.actionType == 'edit'){
         await this.$storage.updateObservation(
           this.$storage.getCurrentObservation().id,
           this.bodySite,
-          [this.heartRate],
-        ObservationType.HEART_RATE)
+          [this.systolicPressure, this.diastolicPressure],
+        ObservationType.BLOOD_PRESSURE)
       }
       else if (this.actionType == 'add'){
         await this.$storage.createObservation(
           ObservationStatus.PRELIMINARY,
           this.bodySite,
-          [this.heartRate],
-          ObservationType.HEART_RATE
+          [this.systolicPressure, this.diastolicPressure],
+          ObservationType.BLOOD_PRESSURE
         );
       }
       else {

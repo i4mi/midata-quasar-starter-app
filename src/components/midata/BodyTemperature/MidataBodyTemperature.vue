@@ -114,16 +114,32 @@
                     :unit='"C°"'>
   </SingleValueObservationChart>
 
-  <edit-body-temperature-dialog
+  <edit-single-value-dialog
     :visible="showEditDialog"
     :actionType='"edit"'
+    :observation-type='observationType'
+    :label='"Körpertemperatur"'
+    :unit='"°C"'
+    :options='options'
+    :min='34'
+    :max='42'
+    :step='0.1'
+    :default-value='36.5'
     @close="onEdit()"
-  ></edit-body-temperature-dialog>
-  <edit-body-temperature-dialog
-    :actionType='"add"'
+  ></edit-single-value-dialog>
+  <edit-single-value-dialog
     :visible="showAddDialog"
+    :actionType='"add"'
+    :observation-type='observationType'
+    :label='"Körpertemperatur"'
+    :unit='"°C"'
+    :options='options'
+    :min='34'
+    :max='42'
+    :step='0.1'
+    :default-value='36.5'
     @close="onEdit()"
-  ></edit-body-temperature-dialog>
+  ></edit-single-value-dialog>
   <delete-observation-dialog
     :visible="showDeleteDialog"
     :observation-type='observationType'
@@ -133,24 +149,28 @@
 
 <script lang='ts'>
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
-import EditBodyTemperatureDialog from 'components/midata/BodyTemperature/EditBodyTemperatureDialog.vue';
 import { defineComponent } from 'vue';
 import { Observation } from '@i4mi/fhir_r4';
-import SingleValueObservationChart from 'components/midata/SingleValueObservationChart.vue';
+import SingleValueObservationChart from 'components/midata/Charts/SingleValueObservationChart.vue';
 import { ObservationType } from 'src/plugins/midataService';
+import fhirData from 'src/data/fhirData.json';
+import EditSingleValueDialog from 'components/midata/EditSingleValueDialog.vue';
 
 export default defineComponent({
   name: 'MidataBodyTemperature',
   components: {
+    EditSingleValueDialog,
     SingleValueObservationChart,
-    DeleteObservationDialog,
-    EditBodyTemperatureDialog
+    DeleteObservationDialog
   },
   props: {
     expanded: Boolean
   },
   data() {
     return {
+      options: fhirData.BODY_TEMPERATURE.map(e => {
+        return e.id
+      }),
       observations: this.$storage.getObservations(),
       showAddDialog: false,
       showEditDialog: false,

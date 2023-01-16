@@ -2,7 +2,7 @@
   <q-dialog v-model="show" persistent>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Herzfrequenz hinzufügen/bearbeiten</div>
+        <div class="text-h6">{{this.label}} hinzufügen/bearbeiten</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-form
@@ -21,19 +21,19 @@
             ]"
           />
           <q-badge class="midata-fade">
-            Schläge pro Minute: {{ heartRate }}
+            {{this.label}}: {{ value }} {{this.unit}}
           </q-badge>
 
           <q-slider
-            v-model="heartRate"
-            :min="20"
-            :max="200"
-            :step="5"
+            v-model="value"
+            :min="this.min"
+            :max="this.max"
+            :step="this.step"
             style="max-width: 90%"
           />
           <div>
             <q-btn
-              label="Herzfrequenz speichern"
+              label="Observation speichern"
               type="submit"
               color="primary"
               class="q-ml-sm"
@@ -57,24 +57,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { ObservationStatus } from '@i4mi/fhir_r4';
-import fhirData from 'src/data/fhirData.json';
 import { ObservationType } from 'src/plugins/midataService';
 
 export default defineComponent({
-  name: 'EditHeartrateDialog',
+  name: 'EditSingleValueDialog',
   props: {
     visible: Boolean,
-    actionType: String
+    actionType: String,
+    observationType: String as PropType<ObservationType>,
+    label: String,
+    unit: String,
+    options: Array,
+    min: Number,
+    max: Number,
+    step: Number,
+    defaultValue: Number
   },
   data() {
     return {
-      heartRate: 70,
       bodySite: '',
-      options: fhirData.HEART_RATE.map(e => {
-        return e.id
-      }),
+      value: this.defaultValue,
     };
   },
   computed: {
@@ -92,23 +96,22 @@ export default defineComponent({
   methods: {
     onReset() {
       this.bodySite = '';
-      this.heartRate = 70;
+      this.value = 36.8;
     },
     async updateObservation() {
       if (this.actionType == 'edit'){
         await this.$storage.updateObservation(
           this.$storage.getCurrentObservation().id,
           this.bodySite,
-          [this.heartRate],
-        ObservationType.HEART_RATE)
+          [this.value],
+        this.observationType);
       }
       else if (this.actionType == 'add'){
         await this.$storage.createObservation(
           ObservationStatus.PRELIMINARY,
           this.bodySite,
-          [this.heartRate],
-          ObservationType.HEART_RATE
-        );
+          [this.value],
+          this.observationType);
       }
       else {
         throw new Error('No correct type found')

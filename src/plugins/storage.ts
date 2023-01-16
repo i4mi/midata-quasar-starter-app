@@ -114,19 +114,19 @@ export default class Storage {
    * Creates a new Observation
    * @param _status Status of the Observation. Default is PRELIMINARY for newly created Observations
    * @param bodySite String representing a bodySite. Needs to be present in the fhirData.json file
-   * @param value Observation Value
+   * @param values Observation Value or Values with multivalued Observations
    * @param observationType Type of the Observation (ObservationType enum)
    * @returns
    */
   public createObservation(
     _status: ObservationStatus,
     bodySite: string,
-    value: number,
+    values: number[],
     observationType: ObservationType
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
       this.midata
-        .createObservation(_status, bodySite, value, observationType)
+        .createObservation(_status, bodySite, values, observationType)
         .then((result) => {
           if (result) {
             this.midata
@@ -163,7 +163,7 @@ export default class Storage {
    * @param _id Midata id of the Observation
    * @param bodySite String representing the bodySite of the Observation.
    * Needs to be present in the fhirData.json file
-   * @param value Observation Value
+   * @param values Observation Value or Values with multivalued Observations
    * @param observationType Type of the Observation (ObservationType enum)
    * @param observationStatus Status of the Observation. Default is PRELIMINARY.
    * A deleted Observation gets the type ENTERED_IN_ERROR
@@ -172,13 +172,13 @@ export default class Storage {
   public updateObservation(
     _id: string,
     bodySite: string,
-    value: number,
+    values: number[],
     observationType: ObservationType,
     observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
       this.midata
-        .updateObservation(_id, bodySite, value, observationType, observationStatus)
+        .updateObservation(_id, bodySite, values, observationType, observationStatus)
         .then((result) => {
           if (result) {
             this.midata

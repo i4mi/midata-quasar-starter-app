@@ -44,7 +44,7 @@ export default defineComponent({
       await this.$storage.updateObservation(
         this.$storage.getCurrentObservation().id,
         this.$storage.getCurrentObservation().bodySite.coding[0].display,
-        this.$storage.getCurrentObservation().valueInteger,
+        [this.$storage.getCurrentObservation().valueInteger],
         this.observationType,
         ObservationStatus.ENTERED_IN_ERROR
       );
