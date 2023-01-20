@@ -109,9 +109,12 @@
   </q-card>
   <div style="height: 25px"></div>
 
-  <SingleValueObservationChart :data='filteredList'
-                    :observation-type='"Körpertemperatur"'
-                    :unit='"C°"'>
+  <SingleValueObservationChart
+    :data='filteredList'
+    :observation-type='"Körpertemperatur"'
+    :unit='"C°"'
+    :min='34'
+    :max='42'>
   </SingleValueObservationChart>
 
   <edit-single-value-dialog

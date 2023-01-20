@@ -11,7 +11,8 @@
       Um einen ersten Überblick über die Möglichkeiten von Midata zu erhalten,
       können sie hier ein paar Daten generieren lassen. Diese folgen einem Trend,
       sind aber sonst zufällig generiert. Vom ausgewählten Datum an, werden 16
-      zufällige Observationen generiert.
+      zufällige Observationen generiert. Das aktualisieren der Daten kann manchmal
+      einige Sekunden länger dauern als angezeigt.
     </p>
     <p>
       Im Moment haben sie {{this.$storage.getObservations().length}} Observationen
@@ -34,24 +35,28 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
-import { Notify } from 'quasar';
+import { defineComponent } from 'vue';
+import { Notify, Loading } from 'quasar';
 import LoginCard from 'components/LoginCard.vue';
 
 export default defineComponent({
   name: 'RandomData',
   components: { LoginCard },
-  setup() {
+  data() {
     return {
-      model: ref('')
+      loading: false,
+      model: ''
     };
   },
   computed: {},
   methods: {
     updateRandomData(){
       if (this.model.length !== 0){
+        Loading.show({
+          message: '48 Observationen werden erstellt...'
+        })
         this.$midata.generateRandomData(this.model).then(() => {
-          console.log('done')
+          Loading.hide()
         })
       }
       else {

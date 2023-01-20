@@ -112,7 +112,10 @@
   <DoubleValueObservationChart
     :data='filteredList'
     :observation-type='"Blutdruck"'
-    :unit='"mmHg"'>
+    :unit='"mmHg"'
+    :min='20'
+    :max='220'
+  >
   </DoubleValueObservationChart>
 
   <edit-blood-pressure-dialog

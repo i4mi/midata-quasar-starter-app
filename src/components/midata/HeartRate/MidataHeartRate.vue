@@ -109,9 +109,12 @@
   </q-card>
   <div style="height: 25px"></div>
 
-  <SingleValueObservationChart :data='filteredList'
-                    :observation-type='"Puls"'
-                    :unit='"beats/min"'>
+  <SingleValueObservationChart
+    :data='filteredList'
+    :observation-type='"Puls"'
+    :unit='"beats/min"'
+    :min='20'
+    :max='200'>
   </SingleValueObservationChart>
 
   <edit-single-value-dialog

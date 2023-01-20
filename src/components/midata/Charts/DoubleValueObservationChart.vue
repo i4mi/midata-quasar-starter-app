@@ -20,7 +20,9 @@ export default defineComponent({
   props: {
     data: Array as PropType<Observation[]>,
     observationType: String,
-    unit: String
+    unit: String,
+    min: Number,
+    max: Number
 
   },
   data() {
@@ -81,6 +83,8 @@ export default defineComponent({
           })
         },
         yaxis: {
+          min: this.min,
+          max: this.max,
           title: {
             text: `${this.observationType} in ${this.unit}`,
             align: 'center',

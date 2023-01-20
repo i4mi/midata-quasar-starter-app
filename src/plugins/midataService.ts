@@ -541,6 +541,15 @@ export default class MidataService {
       return hr + Math.round(Math.random()*4)
     })
 
+    const sysPressure = [145, 142, 149, 151, 153, 147, 149, 153, 150, 154, 162, 168, 163, 156, 150, 151];
+    const sysPressureNoised = sysPressure.map(sp => {
+      return sp + Math.round(Math.random()*5)
+    })
+    const diasPressure = [87, 84, 90, 91, 92, 90, 94, 92, 96, 104, 98, 93, 92, 86, 90, 87];
+    const diasPressureNoised = diasPressure.map(dp => {
+      return dp + Math.round(Math.random()*5)
+    })
+
     const dat = moment(dateString, 'YYYY-MM-DD HH:mm')
     const dates = []
     for (let i = 0; i < heartRateBase.length; i++){
@@ -563,9 +572,15 @@ export default class MidataService {
           [bodyTemperaturesNoised[i]],
           ObservationType.BODY_TEMPERATURE,
           dates[i]);
+
+        await this.createObservation(ObservationStatus.PRELIMINARY,
+          this.getRandomBodySite(ObservationType.BLOOD_PRESSURE),
+          [sysPressureNoised[i], diasPressureNoised[i]],
+          ObservationType.BLOOD_PRESSURE,
+          dates[i]);
       }
       Notify.create({
-        message: '16 randomisierte Observationen wurden erstellt. Bitte die Seite neu laden',
+        message: '48 randomisierte Observationen wurden erstellt. Bitte die Seite neu laden',
         color: 'green',
         position: 'top',
         icon: 'announcement'
@@ -593,6 +608,10 @@ export default class MidataService {
 
     else if (observationType == ObservationType.HEART_RATE){
       return fhirDataJson.HEART_RATE[Math.floor(Math.random() * fhirDataJson.HEART_RATE.length)].bodySite.coding[0].display
+    }
+
+    else if (observationType == ObservationType.BLOOD_PRESSURE){
+      return fhirDataJson.BLOOD_PRESSURE[Math.floor(Math.random() * fhirDataJson.BLOOD_PRESSURE.length)].bodySite.coding[0].display
     }
 
     else {
