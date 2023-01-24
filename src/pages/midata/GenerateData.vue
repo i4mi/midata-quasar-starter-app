@@ -10,8 +10,8 @@
     <p>
       Um einen ersten Überblick über die Möglichkeiten von Midata zu erhalten,
       können sie hier ein paar Daten generieren lassen. Diese folgen einem Trend,
-      sind aber sonst zufällig generiert. Vom ausgewählten Datum an, werden 16
-      zufällige Observationen generiert. Das aktualisieren der Daten kann manchmal
+      sind aber sonst zufällig generiert. Vom ausgewählten Datum an, werden 48
+      zufällige Observationen generiert. Das Aktualisieren der Daten kann manchmal
       einige Sekunden länger dauern als angezeigt.
     </p>
     <p>
