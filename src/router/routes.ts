@@ -52,7 +52,34 @@ const routes: RouteRecordRaw[] = [
     path: '/midata/demo',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/midata/MidataDemo.vue') },
+      {
+        path: '',
+        component: () => import('pages/midata/MidataDemo.vue'),
+        children: [
+          {
+            path: '', redirect: '/midata/demo/bodytemperature'
+          },
+          {
+            path: 'bodytemperature', component: () => import('components/midata/BodyTemperature/MidataBodyTemperature.vue')
+          },
+          {
+            path: 'heartrate', component: () => import('components/midata/HeartRate/MidataHeartRate.vue')
+          },
+          {
+            path: 'bloodpressure', component: () => import('components/midata/BloodPressure/MidataBloodPressure.vue')
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/midata/generate',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('pages/midata/GenerateData.vue'),
+      },
     ],
   },
   {

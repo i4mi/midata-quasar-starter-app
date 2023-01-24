@@ -2,11 +2,11 @@
   <q-dialog v-model="show" persistent>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Neue Observation hinzufügen</div>
+        <div class="text-h6">Körpertemperatur hinzufügen/bearbeiten</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-form
-          @submit="createObservation()"
+          @submit="updateObservation()"
           @reset="onReset"
           class="q-gutter-md"
         >
@@ -14,7 +14,6 @@
             v-model="bodySite"
             :options="options"
             label="Körperregion der Messung"
-            style="width: 90%"
             :rules="[
               (val:String) =>
                 (val !== null && val !== '') ||
@@ -58,27 +57,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import bodySites from '../data/bodySites.json';
+import { defineComponent } from 'vue';
+import fhirData from '../../../data/fhirData.json'
 import { ObservationStatus } from '@i4mi/fhir_r4';
+import { ObservationType } from 'src/plugins/midataService';
 
 export default defineComponent({
-  name: 'AddObservationDialog',
-  props: ['visible'],
-  setup() {
-    const bodySite = ref('');
-    const bodyTemperature = ref(36.8);
+  name: 'EditBodyTemperatureDialog',
+  props: {
+    visible: Boolean,
+    actionType: String
+  },
+  data() {
     return {
-      bodySite,
-      options: bodySites.bodySites,
-      bodyTemperature,
-      onReset() {
-        bodySite.value = '';
-        bodyTemperature.value = 36.8;
-      },
+      bodyTemperature: 36.8,
+      bodySite: '',
+      options: fhirData.BODY_TEMPERATURE.map(e => {
+        return e.id
+      }),
     };
   },
-  data: () => ({}),
   computed: {
     show: {
       get() {
@@ -92,13 +90,36 @@ export default defineComponent({
     },
   },
   methods: {
-    createObservation() {
-      this.$storage.createObservation(
-        ObservationStatus.PRELIMINARY,
-        this.bodySite,
-        this.bodyTemperature
-      );
+    onReset() {
+      this.bodySite = '';
+      this.bodyTemperature = 36.8;
+    },
+    async updateObservation() {
+      if (this.actionType == 'edit'){
+        await this.$storage.updateObservation(
+          this.$storage.getCurrentObservation().id,
+          this.bodySite,
+          [this.bodyTemperature],
+        ObservationType.BODY_TEMPERATURE)
+      }
+      else if (this.actionType == 'add'){
+        await this.$storage.createObservation(
+          ObservationStatus.PRELIMINARY,
+          this.bodySite,
+          [this.bodyTemperature],
+          ObservationType.BODY_TEMPERATURE
+        );
+      }
+      else {
+        throw new Error('No correct type found')
+      }
+      this.show = false
     },
   },
 });
 </script>
+
+<style lang="sass" scoped>
+.fade
+    background-image: linear-gradient(to bottom right, #087add, #32c6b6)
+</style>

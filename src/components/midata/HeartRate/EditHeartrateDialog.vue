@@ -2,7 +2,7 @@
   <q-dialog v-model="show" persistent>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Observation bearbeiten</div>
+        <div class="text-h6">Puls hinzufügen/bearbeiten</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-form
@@ -21,19 +21,19 @@
             ]"
           />
           <q-badge class="midata-fade">
-            Körpertemperatur: {{ bodyTemperature }} °C
+            Schläge pro Minute: {{ heartRate }}
           </q-badge>
 
           <q-slider
-            v-model="bodyTemperature"
-            :min="34"
-            :max="42"
-            :step="0.1"
+            v-model="heartRate"
+            :min="20"
+            :max="200"
+            :step="5"
             style="max-width: 90%"
           />
           <div>
             <q-btn
-              label="Observation speichern"
+              label="Puls speichern"
               type="submit"
               color="primary"
               class="q-ml-sm"
@@ -57,26 +57,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import bodySites from '../data/bodySites.json';
+import { defineComponent } from 'vue';
+import { ObservationStatus } from '@i4mi/fhir_r4';
+import fhirData from 'src/data/fhirData.json';
+import { ObservationType } from 'src/plugins/midataService';
 
 export default defineComponent({
-  name: 'EditObservationDialog',
-  props: ['visible'],
-  setup() {
-    const bodySite = ref('');
-    const bodyTemperature = ref(36.8);
+  name: 'EditHeartrateDialog',
+  props: {
+    visible: Boolean,
+    actionType: String
+  },
+  data() {
     return {
-      bodySite,
-      options: bodySites.bodySites,
-      bodyTemperature,
-      onReset() {
-        bodySite.value = '';
-        bodyTemperature.value = 36.8;
-      },
+      heartRate: 70,
+      bodySite: '',
+      options: fhirData.HEART_RATE.map(e => {
+        return e.id
+      }),
     };
   },
-  data: () => ({}),
   computed: {
     show: {
       get() {
@@ -90,12 +90,30 @@ export default defineComponent({
     },
   },
   methods: {
-    updateObservation() {
-      this.$storage.updateObservation(
-        this.$storage.getCurrentObservation().id,
-        this.bodySite,
-        this.bodyTemperature
-      );
+    onReset() {
+      this.bodySite = '';
+      this.heartRate = 70;
+    },
+    async updateObservation() {
+      if (this.actionType == 'edit'){
+        await this.$storage.updateObservation(
+          this.$storage.getCurrentObservation().id,
+          this.bodySite,
+          [this.heartRate],
+        ObservationType.HEART_RATE)
+      }
+      else if (this.actionType == 'add'){
+        await this.$storage.createObservation(
+          ObservationStatus.PRELIMINARY,
+          this.bodySite,
+          [this.heartRate],
+          ObservationType.HEART_RATE
+        );
+      }
+      else {
+        throw new Error('No correct type found')
+      }
+      this.show = false
     },
   },
 });

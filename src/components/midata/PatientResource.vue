@@ -1,0 +1,106 @@
+<template>
+  <q-card v-if="flag">
+    <q-card-section v-if="!isEmpty(patientResource)">
+      <q-card flat bordered>
+        <q-card-section>
+          <q-img src="../../assets/midata/demo/masks.png" height="200px">
+          </q-img>
+
+          <div class="text-h6">Steckbrief</div>
+          <div class="text-subtitle">
+            {{
+              patientResource.name[0].given +
+              ' ' +
+              patientResource.name[0].family
+            }}
+          </div>
+          <div class="text-body text-grey">
+            {{ 'Geschlecht: ' + patientResource.gender }} <br />
+            {{ 'Patienten id: ' + patientResource.id }} <br />
+            {{ 'E-Mail: ' + patientResource.telecom[0].value }}
+          </div>
+        </q-card-section>
+
+        <q-card-actions>
+          <q-space></q-space>
+          <q-btn
+            color="grey"
+            round
+            flat
+            dense
+            :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expanded = !expanded"
+            class="gt-xs"
+          >Vollständige Ressource anzeigen</q-btn
+          >
+          <q-btn
+            color="grey"
+            round
+            flat
+            dense
+            :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expanded = !expanded"
+            class="lt-sm"
+          ></q-btn>
+        </q-card-actions>
+        <q-slide-transition>
+          <div v-show="expanded">
+            <q-separator />
+            <q-card-section class="innerCardScroll">
+              <highlightjs
+                lang="json"
+                :code="JSON.stringify(patientResource, null, 2)"
+              ></highlightjs>
+            </q-card-section>
+          </div>
+        </q-slide-transition>
+      </q-card>
+    </q-card-section>
+  </q-card>
+</template>
+
+<script lang='ts'>
+
+import { defineComponent } from 'vue';
+import { copyToClipboard, Notify } from 'quasar';
+
+export default defineComponent({
+
+  name: 'PatientResource',
+  props: ['flag', 'patientResource'],
+  data() {
+    return {
+      expanded: false
+    }
+  },
+  methods: {
+    copyToClipBoard(item: any, identifier = 'Resource') {
+      copyToClipboard(JSON.stringify(item, null, 2))
+        .then(() => {
+          Notify.create({
+            message: `${identifier} kopiert`,
+            color: 'green',
+            position: 'top',
+            icon: 'announcement',
+          })
+        }).catch(() => {
+      Notify.create({
+        message: `Kopieren von ${identifier} fehlgeschlagen`,
+        color: 'red',
+        position: 'top',
+        icon: 'announcement',
+      })
+    })
+    },
+    isEmpty(obj: any) {
+      return JSON.stringify(obj) === '{}';
+    }
+  }
+});
+
+</script>
+<style lang="sass" scoped>
+.innerCardScroll
+  overflow: scroll
+  height: 300px
+</style>

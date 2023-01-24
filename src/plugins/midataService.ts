@@ -1,9 +1,20 @@
 import { JSOnFhir } from '@i4mi/js-on-fhir';
-import { Patient, Bundle, ObservationStatus, Observation } from '@i4mi/fhir_r4';
+import { Bundle, Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import moment from 'moment';
+import fhirDataJson from '../data/fhirData.json';
+import { Notify } from 'quasar';
 
 // import moment library. More information under https://momentjs.com
 const now = moment();
+
+/**
+ * ENUM for all the supported Observation Types.
+ */
+export const enum ObservationType {
+  BODY_TEMPERATURE = 'Body temperature',
+  HEART_RATE = 'Heart rate',
+  BLOOD_PRESSURE = 'Blood pressure'
+}
 
 export default class MidataService {
   jsOnFhir: JSOnFhir;
@@ -43,7 +54,7 @@ export default class MidataService {
    * Initiates the oAuth process.
    * @param params
    */
-  public authenticate(params?: Record<string, unknown>): void {
+  public authenticate(params?: {[p: string]: string}): void {
     this.jsOnFhir.authenticate(params);
   }
 
@@ -59,17 +70,19 @@ export default class MidataService {
 
   /**
    * Gets the patient resource from the fhir endpoint.
-   * @returns patient resource as JSON
+   * @returns patient resource as JSON.
    */
   public getPatientResource(): Promise<Patient> {
     return new Promise((resolve, reject) => {
       this.jsOnFhir
-        .search('Patient', { _id: this.jsOnFhir.getPatient() })
+        .getResource('Patient', this.jsOnFhir.getUserId())
         .then((result) => {
-          const patientBundle = result as Bundle;
-          (patientBundle.entry?.length !== undefined && patientBundle.entry?.length > 0 && patientBundle.entry[0].resource)
-            ? resolve(patientBundle.entry[0].resource as Patient)
-            : reject('No entry in patient bundle found!');
+          if (result.resourceType === 'Patient'){
+            resolve(result as Patient)
+          }
+          else {
+            reject('No Patient resource found');
+          }
         })
         .catch((error) => reject(error));
     });
@@ -84,9 +97,8 @@ export default class MidataService {
       this.jsOnFhir
         .search('Observation')
         .then((result) => {
-          const observationBundle = result as Bundle;
-          observationBundle.entry?.length > 0
-            ? resolve(observationBundle)
+          result.entry?.length > 0
+            ? resolve(result)
             : reject('No entries in observation bundle found!');
         })
         .catch((error) => reject(error));
@@ -94,27 +106,20 @@ export default class MidataService {
   }
 
   /**
-   * Gets all observations from the fhir endpoint.
-   * @returns bundle with observations
+   * Gets all observations from the fhir endpoint that do not have the status
+   * "ENTERED_IN_ERROR".
+   * @returns bundle with observations.
    */
-  public loadObservations() {
-    return new Promise((resolve, reject) => {
-      this.jsOnFhir.search('Observation').then((result) => {
-        result
-          ? resolve(
-              (result as Bundle).entry?.map(
-                (entry) => entry.resource as Observation
-              ) || []
-            )
-          : reject('Error');
-      }).catch((error)=> reject(error));
-    });
+  public async loadObservations() {
+    const result = await this.jsOnFhir.search('Observation',
+      {'status:not': 'entered-in-error'});
+    return result.entry?.map(entry => entry.resource as Observation) || [];
   }
 
   /**
-   * searches the fhir endpoint for one or more resources.
-   * @param resourceType resource type to look up
-   * @param params search parameters according to fhir resource guide (not mandatory)
+   * Searches the fhir endpoint for one or more resources.
+   * @param resourceType resource type to look up.
+   * @param params search parameters according to fhir resource guide (not mandatory).
    * @returns a promise:
    *              - if successfull -> response with resource(s) as JSON
    *              - if not successfull -> error message
@@ -128,10 +133,29 @@ export default class MidataService {
   }
 
   /**
-   * Creates a observation (of type bodytemperature) resource on the fhir server
+   * Searches the fhir endpoint for one resource with the id.
+   * @param resourceType resource type to look up.
+   * @param _id The id of the fhir resource.
+   * @returns a promise:
+   *              - if successfull -> response with resource(s) as JSON
+   *              - if not successfull -> error message
+   */
+  searchWithId(resourceType: any, _id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.jsOnFhir.getResource(resourceType, _id).then((result) => {
+        result ? resolve(result) : reject('Error');
+      }).catch((error)=> reject(error));
+    });
+  }
+
+  /**
+   * Creates an observation resource on the fhir server.
    * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @param value the measured body temperature value.
+   * @param bodySite String representing the bodySite of the observation.
+   * It needs to be present in the fhirData.json file.
+   * @param values Observation value or values with multivalued observations.
+   * @param observationType Type of the Observation (ObservationType enum).
+   * @param dateString String representing a by momentJS readable date.
    * @returns a promise:
    *              - if successfull -> response with the created resource as JSON
    *              - if not successfull -> error message
@@ -139,10 +163,25 @@ export default class MidataService {
   public createObservation(
     _status: ObservationStatus,
     bodySite: string,
-    value: number
+    values: number[],
+    observationType: ObservationType,
+    dateString: string = now.format()
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
-      const observation = this.newBtObservation(_status, bodySite, value);
+
+      let observation;
+      if (observationType == ObservationType.BODY_TEMPERATURE){
+        observation = this.newBtObservation(_status, bodySite, values[0], dateString);
+      }
+      else if (observationType == ObservationType.HEART_RATE){
+        observation = this.newHrObservation(_status, bodySite, values[0], dateString);
+      }
+      else if (observationType == ObservationType.BLOOD_PRESSURE){
+        observation = this.newBpObservation(_status, bodySite, values[0], values[1], dateString);
+      }
+      else {
+        throw new Error('No matching ObservationType found for input');
+      }
       this.jsOnFhir.create(observation).then((result) => {
         result ? resolve(result as Observation) : reject('internal error');
       }).catch((error)=> reject(error));
@@ -150,10 +189,13 @@ export default class MidataService {
   }
 
   /**
-   * Updates a observation (of type bodytemperature) resource on the fhir server.
+   * Updates an observation resource (of type bodytemperature) on the fhir server.
    * @param _id identification for the observation to be updated.
    * @param bodySite the body site where the bodytemperature was measured.
-   * @param value the measured body temperature value.
+   * @param values Observation value or values with multivalued observations.
+   * @param observationType Type of the fhir observation.
+   * @param observationStatus optional status for observation. The default is
+   * ObservationStatus.PRELIMINARY
    * @returns a promise:
    *              - if successfull -> response with the updated resource as JSON
    *              - if not successfull -> error message
@@ -161,16 +203,27 @@ export default class MidataService {
   updateObservation(
     _id: string,
     bodySite: string,
-    value: number
+    values: number[],
+    observationType: ObservationType,
+    observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
-      this.jsOnFhir.search('Observation/' + _id).then((result) => {
+      this.jsOnFhir.getResource('Observation', _id).then((result) => {
         if (result) {
           const fhirObservation = result as Observation;
-          fhirObservation.valueQuantity.value = value;
-          fhirObservation.bodySite = this.getBodySite(bodySite);
-          fhirObservation.method = this.getMethod(bodySite);
+          fhirObservation.bodySite = this.getBodySiteFromJson(bodySite, observationType);
+          fhirObservation.method = this.getMethodFromJson(bodySite, observationType);
           fhirObservation.issued = now.format();
+          fhirObservation.status = observationStatus;
+
+          if (observationType == ObservationType.BLOOD_PRESSURE){
+            fhirObservation.component[0].valueQuantity.value = values[0];
+            fhirObservation.component[1].valueQuantity.value = values[1];
+          }
+          else {
+            fhirObservation.valueQuantity.value = values[0];
+          }
+
           this.jsOnFhir
             .update(fhirObservation)
             .then((res) => {
@@ -192,16 +245,20 @@ export default class MidataService {
   }
 
   /**
-   * Creates observation (of type Bodytemperature) where you can specify the status, bodySite and value.
-   * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
-   * @param bodySite the body site where the bodytemperature was measured.
+   * Creates an observation (of type body temperature).
+   * @param _status the status of the observation
+   * according to: http://hl7.org/fhir/observation-status
+   * @param bodySite String representing the bodySite of the observation.
+   * Needs to be present in the fhirData.json file.
    * @param value the measured body temperature value.
+   * @param dateString String representing a momentJS readable date format.
    * @returns
    */
   newBtObservation(
     _status: ObservationStatus,
     bodySite: string,
-    value: number
+    value: number,
+    dateString: string
   ): Observation {
     return {
       resourceType: 'Observation',
@@ -229,9 +286,9 @@ export default class MidataService {
         text: 'Temperature',
       },
       subject: {
-        reference: 'Patient/' + this.jsOnFhir.getPatient(),
+        reference: 'Patient/' + this.jsOnFhir.getUserId(),
       },
-      issued: now.format(),
+      issued: dateString,
       performer: [
         {
           reference: 'Practitioner/mdh0us3',
@@ -243,200 +300,325 @@ export default class MidataService {
         system: 'http://unitsofmeasure.org',
         code: 'Cel',
       },
-      bodySite: this.getBodySite(bodySite),
-      method: this.getMethod(bodySite),
+      bodySite: this.getBodySiteFromJson(bodySite, ObservationType.BODY_TEMPERATURE),
+      method: this.getMethodFromJson(bodySite, ObservationType.BODY_TEMPERATURE),
     };
   }
 
   /**
-   * Helper function that creates a bodySite object to be used in an observation.
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @returns bodySite with coding as JSON.
+   * Creates an observation (of type body heart rate)
+   * @param _status the status of the observation
+   * according to: http://hl7.org/fhir/observation-status
+   * @param bodySite String representing the bodySite of the Observation
+   * Needs to be present in the fhirData.json file
+   * @param value the measured heart rate value
+   * @param dateString String representing a by momentJS readable date
+   * @returns
    */
-  getBodySite(bodySite: string) {
-    switch (bodySite) {
-      case 'Axillary':
-        return {
+  newHrObservation(
+    _status: ObservationStatus,
+    bodySite: string,
+    value: number,
+    dateString: string
+  ): Observation {
+    return {
+      resourceType: 'Observation',
+      status: _status,
+      category: [
+        {
           coding: [
             {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Axillary',
+              system:
+                'http://terminology.hl7.org/CodeSystem/observation-category',
+              code: 'vital-signs',
+              display: 'Vital Signs',
             },
           ],
-        };
-      case 'Oral':
-        return {
+        },
+      ],
+      code: {
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '8867-4',
+            display: 'Heart rate',
+          },
+        ],
+        text: 'Heart rate',
+      },
+      subject: {
+        reference: 'Patient/' + this.jsOnFhir.getUserId(),
+      },
+      issued: dateString,
+      performer: [
+        {
+          reference: 'Practitioner/mdh0us3',
+        },
+      ],
+      valueQuantity: {
+        value: value,
+        unit: '{beats}/min',
+        system: 'http://unitsofmeasure.org',
+        code: '{beats}/min',
+      },
+      bodySite: this.getBodySiteFromJson(bodySite, ObservationType.HEART_RATE),
+      method: this.getMethodFromJson(bodySite, ObservationType.HEART_RATE),
+    };
+  }
+
+  /**
+   * Creates an observation (of type blood pressure).
+   * @param _status the status of the observation.
+   * according to: http://hl7.org/fhir/observation-status
+   * @param bodySite String representing the bodySite of the observation
+   * Needs to be present in the fhirData.json file.
+   * @param valueSystolic Systolic blood pressure value in mmHg.
+   * @param valueDiastolic Diastolic blood pressure value in mmHg.
+   * @param dateString String representing a momentJS readable date format.
+   * @returns
+   * @returns
+   */
+  newBpObservation(
+    _status: ObservationStatus,
+    bodySite: string,
+    valueSystolic: number,
+    valueDiastolic: number,
+    dateString: string
+  ): Observation {
+    return {
+      resourceType: 'Observation',
+      status: _status,
+      category: [
+        {
           coding: [
             {
-              system: 'http://loinc.org',
-              code: 'LA9367-9',
-              display: 'Oral',
+              system:
+                'http://terminology.hl7.org/CodeSystem/observation-category',
+              code: 'vital-signs',
+              display: 'Vital Signs',
             },
           ],
-        };
-      case 'Ear':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA21929-7',
-              display: 'Ear',
-            },
-          ],
-        };
-      case 'Tympanic membrane':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9368-7',
-              display: 'Tympanic membrane',
-            },
-          ],
-        };
-      case 'Temporal artery (forehead)':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Temporal artery (forehead)',
-            },
-          ],
-        };
-      case 'Rectal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Rectal',
-            },
-          ],
-        };
-      case 'Urinary bladder':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9371-1',
-              display: 'Urinary bladder',
-            },
-          ],
-        };
-      case 'Nasal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9263-0',
-              display: 'Nasal',
-            },
-          ],
-        };
-      case 'Nasopharyngeal':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA18005-1',
-              display: 'Nasopharyngeal',
-            },
-          ],
-        };
-      case 'Finger':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA11862-2',
-              display: 'Finger',
-            },
-          ],
-        };
-      case 'Toe':
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: '	LA21930-5',
-              display: 'Toe',
-            },
-          ],
-        };
+        },
+      ],
+      code: {
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '85354-9',
+            display: 'Blood pressure panel with all children optional',
+          },
+        ],
+        text: 'Blood pressure systolic & diastolic',
+      },
+      subject: {
+        reference: 'Patient/' + this.jsOnFhir.getUserId(),
+      },
+      issued: dateString,
+      performer: [
+        {
+          reference: 'Practitioner/mdh0us3',
+        },
+      ],
+      component: [
+        {
+          code: {
+            coding: [
+              {
+                system: 'http://snomed.info/sct',
+                code: '271649006',
+                display: 'Systolic blood pressure'
+              }
+            ]
+          },
+          valueQuantity: {
+            value: valueSystolic,
+            unit: 'mmHg',
+            system: 'http://unitsofmeasure.org',
+            code: 'mm[Hg]'
+          }
+        },
+        {
+          code: {
+            coding: [
+              {
+                system: 'http://loinc.org',
+                code: '8462-4',
+                display: 'Diastolic blood pressure'
+              }
+            ]
+          },
+          valueQuantity: {
+            value: valueDiastolic,
+            unit: 'mmHg',
+            system: 'http://unitsofmeasure.org',
+            code: 'mm[Hg]'
+          }
+        }
+      ],
+      bodySite: this.getBodySiteFromJson(bodySite, ObservationType.BLOOD_PRESSURE),
+      method: this.getMethodFromJson(bodySite, ObservationType.BLOOD_PRESSURE),
+    };
+  }
+
+  /**
+   * Function for getting a fhir Body site object from a given
+   * bodySite string. It searches the fhirDataJson file in the data folder.
+   * @param bodySite body site String to search with.
+   * @param observationType Type of the Observation to get the bodySite.
+   */
+  getBodySiteFromJson(bodySite: string, observationType: ObservationType) {
+    let dataArray;
+    switch (observationType) {
+      case ObservationType.BLOOD_PRESSURE:
+        dataArray = fhirDataJson.BLOOD_PRESSURE;
+        break;
+      case ObservationType.BODY_TEMPERATURE:
+        dataArray = fhirDataJson.BODY_TEMPERATURE;
+        break;
+      case ObservationType.HEART_RATE:
+        dataArray = fhirDataJson.HEART_RATE;
+        break;
       default:
-        return {
-          coding: [
-            {
-              system: 'http://loinc.org',
-              code: 'LA9370-3',
-              display: 'Axillary',
-            },
-          ],
-        };
+        throw new Error('No matching Observation Type found');
+    }
+
+    for (const data of dataArray) {
+      if (data.id === bodySite){
+        return data.bodySite;
+      }
+    }
+    throw new Error(`No matching body Site found in fhirJson for input [${bodySite}]`);
+  }
+
+  /**
+   * Function for getting a fhir observation method object from a given
+   * bodySite string. It searches the fhirDataJson file in the data folder.
+   * @param bodySite body site string to search with.
+   * @param observationType Type of the Observation to get the method.
+   */
+  getMethodFromJson(bodySite: string, observationType: ObservationType) {
+    let dataArray;
+    switch (observationType) {
+      case ObservationType.BLOOD_PRESSURE:
+        dataArray = fhirDataJson.BLOOD_PRESSURE;
+        break;
+      case ObservationType.BODY_TEMPERATURE:
+        dataArray = fhirDataJson.BODY_TEMPERATURE;
+        break;
+      case ObservationType.HEART_RATE:
+        dataArray = fhirDataJson.HEART_RATE;
+        break;
+      default:
+        throw new Error('No matching Observation Type found')
+    }
+    for (const data of dataArray) {
+      if (data.id === bodySite){
+        return data.method
+      }
+    }
+    throw new Error(`No matching body Site found in fhirJson for input [${bodySite}]`)
+  }
+
+  /**
+   * Generates 16 fhir observation objects for each supported observation type
+   * and adds them to the Midata-Account. The data is modelled with a progression
+   * in mind. The values first rise and then fall of again. There is some noise
+   * applied to each of the values every time they get generated.
+   * @param dateString String representing a Date in the format of (YYYY-MM-DD HH:mm)
+   */
+  async generateRandomData(dateString: string) {
+    const bodyTemperaturesBase = [36, 36.5, 37, 37.5, 38, 38, 38.5, 39.5, 41,
+      39, 38.5, 40, 41, 39.5, 38, 36.5];
+    const bodyTemperaturesNoised = bodyTemperaturesBase.map(bt => {
+      return bt + (Math.round(Math.random()*10)/10);
+    })
+
+    const heartRateBase = [70, 70, 75, 80, 90, 95, 105, 110, 115, 120, 110,
+      100, 95, 85, 80, 70];
+    const heartRateNoised = heartRateBase.map(hr => {
+      return hr + Math.round(Math.random() * 4);
+    })
+
+    const sysPressure = [145, 142, 149, 151, 153, 147, 149, 153, 150, 154,
+      162, 168, 163, 156, 150, 151];
+    const sysPressureNoised = sysPressure.map(sp => {
+      return sp + Math.round(Math.random() * 5);
+    })
+    const diasPressure = [87, 84, 90, 91, 92, 90, 94, 92, 96, 104, 98, 93, 92,
+      86, 90, 87];
+    const diasPressureNoised = diasPressure.map(dp => {
+      return dp + Math.round(Math.random() * 5);
+    })
+
+    const dat = moment(dateString, 'YYYY-MM-DD HH:mm');
+    const dates = [];
+    for (let i = 0; i < heartRateBase.length; i++){
+      dat.subtract(Math.round(Math.random() * 4), 'h');
+      dat.subtract(Math.round(Math.random() * 10), 'm');
+      dat.subtract(Math.round(Math.random() * 10), 's');
+      dates.push(dat.format());
+    }
+    try {
+      for (let i = 0; i < heartRateBase.length; i++) {
+        await this.createObservation(ObservationStatus.PRELIMINARY,
+          this.getRandomBodySite(ObservationType.HEART_RATE),
+          [heartRateNoised[i]],
+          ObservationType.HEART_RATE,
+          dates[i]);
+
+        await this.createObservation(ObservationStatus.PRELIMINARY,
+          this.getRandomBodySite(ObservationType.BODY_TEMPERATURE),
+          [bodyTemperaturesNoised[i]],
+          ObservationType.BODY_TEMPERATURE,
+          dates[i]);
+
+        await this.createObservation(ObservationStatus.PRELIMINARY,
+          this.getRandomBodySite(ObservationType.BLOOD_PRESSURE),
+          [sysPressureNoised[i], diasPressureNoised[i]],
+          ObservationType.BLOOD_PRESSURE,
+          dates[i]);
+      }
+      Notify.create({
+        message: '48 randomisierte Observationen wurden erstellt. Bitte die Seite neu laden',
+        color: 'green',
+        position: 'top',
+        icon: 'announcement'
+      });
+    }
+    catch (error) {
+      console.log(error)
+      Notify.create({
+        message: 'Ein Fehler ist aufgetreten beim erstellen der Observationen',
+        color: 'green',
+        position: 'top',
+        icon: 'announcement'
+      });
     }
   }
 
   /**
-   * Helper function that creates a Method of measurement to be used in an observation.
-   * @param bodySite the body site where the bodytemperature was measured.
-   * @returns method of temperature taking with coding as JSON.
+   * Helper for the generateRandomData() function. It picks a random body site
+   * from the options provided in the json data file.
+   * @param observationType Type of the Observation for picking the random body site
    */
-  getMethod(bodySite: string) {
-    switch (bodySite) {
-      case 'Oral':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '89003005',
-              display: 'Oral temperature taking (procedure)',
-            },
-          ],
-        };
-      case 'Ear':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '448093005',
-              display:
-                'Measurement of temperature using tympanic thermometer (procedure)',
-            },
-          ],
-        };
-      case 'Tympanic membrane':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '448093005',
-              display:
-                'Measurement of temperature using tympanic thermometer (procedure)',
-            },
-          ],
-        };
-      case 'Rectal':
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '18649001',
-              display: 'Rectal temperature taking (procedure)',
-            },
-          ],
-        };
-      default:
-        return {
-          coding: [
-            {
-              system: 'http://snomed.info/sct',
-              code: '56342008',
-              display: 'Temperature taking (procedure)',
-            },
-          ],
-        };
+  getRandomBodySite(observationType: ObservationType): any {
+    if (observationType == ObservationType.BODY_TEMPERATURE){
+      return fhirDataJson.BODY_TEMPERATURE[Math.floor(Math.random() *
+        fhirDataJson.BODY_TEMPERATURE.length)].bodySite.coding[0].display;
+    }
+
+    else if (observationType == ObservationType.HEART_RATE){
+      return fhirDataJson.HEART_RATE[Math.floor(Math.random() *
+        fhirDataJson.HEART_RATE.length)].bodySite.coding[0].display;
+    }
+
+    else if (observationType == ObservationType.BLOOD_PRESSURE){
+      return fhirDataJson.BLOOD_PRESSURE[Math.floor(Math.random() *
+        fhirDataJson.BLOOD_PRESSURE.length)].bodySite.coding[0].display;
+    }
+
+    else {
+      throw new Error('No matching Observation Type found');
     }
   }
 }

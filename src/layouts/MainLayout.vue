@@ -84,9 +84,14 @@ const midataLinksList = [
     icon: 'auto_fix_high',
     link: '/midata/demo',
   },
+  {
+    title: 'Daten generieren',
+    icon: 'description',
+    link: '/midata/generate',
+  },
 ];
 
-const deveelopmentLinksList = [
+const developmentLinksList = [
   {
     title: 'Basics',
     icon: 'keyboard_arrow_right',
@@ -124,7 +129,7 @@ export default defineComponent({
     return {
       pageLinks: linksList,
       midataPageLinks: midataLinksList,
-      developmentLinks: deveelopmentLinksList,
+      developmentLinks: developmentLinksList,
 
       drawerExpanded,
       toggleLeftDrawer() {

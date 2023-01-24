@@ -1,14 +1,15 @@
-import MidataService from './midataService';
+import MidataService, { ObservationType } from './midataService';
 import { Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
-import { Notify } from 'quasar';
+import { copyToClipboard, Notify } from 'quasar';
 
 const STORAGE_KEY = 'demo-app-storage';
 
 export default class Storage {
+
   private currentLanguage = 'de';
-  private observations = new Array<Observation>();
   private patientResource = {} as Patient;
   private currentObservation = {} as Observation;
+  private observations = [] as Observation[];
 
   midata: MidataService;
 
@@ -42,7 +43,7 @@ export default class Storage {
   }
 
   /**
-   *
+   * Restores data from the midata server.
    * @returns a promise:
    *              - if successfull ->
    *              - if not successfull ->
@@ -55,7 +56,7 @@ export default class Storage {
       ])
         .then((results) => {
           this.patientResource = results[0];
-          this.observations = results[1] as Array<Observation>;
+          this.observations = results[1]
           this.persist();
           resolve();
         })
@@ -88,7 +89,7 @@ export default class Storage {
    */
   public deleteDataInStore(): void {
     this.currentLanguage = 'de';
-    this.observations = new Array<Observation>();
+    this.observations = [];
     this.patientResource = {} as Patient;
     this.currentObservation = {} as Observation;
     this.persist();
@@ -96,41 +97,47 @@ export default class Storage {
 
   /**
    * Gets the patient resource from the store.
-   * @returns
+   * @returns Fhir patient resource.
    */
   public getPatient(): Patient {
     return this.patientResource;
   }
 
   /**
-   * Gets all Observation from the store.
-   * @returns
+   * Gets all the observations from the store.
+   * @returns Array of observations.
    */
-  public getObservations(): Array<Observation> {
-    return this.observations;
+  public getObservations(): Observation[] {
+    return this.observations
   }
 
   /**
-   * Creates a new Observation
-   * @param _status
-   * @param bodySite
-   * @param value
-   * @returns
+   * Creates a new Observation.
+   * @param _status Status of the Observation. Default is PRELIMINARY for newly
+   * created Observations.
+   * @param bodySite String representing a bodySite. Needs to be present in
+   * the fhirData.json file.
+   * @param values Observation value or values with multivalued Observations.
+   * @param observationType Type of the Observation.
+   * @returns a promise:
+   *              - if successfull -> Midata server observation resource response.
+   *              - if not successfull -> Error response.
    */
   public createObservation(
     _status: ObservationStatus,
     bodySite: string,
-    value: number
+    values: number[],
+    observationType: ObservationType
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
       this.midata
-        .createObservation(_status, bodySite, value)
+        .createObservation(_status, bodySite, values, observationType)
         .then((result) => {
           if (result) {
             this.midata
               .loadObservations()
               .then((res) => {
-                this.observations = res as Array<Observation>;
+                this.observations = res
                 this.persist();
                 Notify.create({
                   message: 'Observation erfolgreich gespeichert',
@@ -156,29 +163,38 @@ export default class Storage {
   }
 
   /**
-   *
-   * @param _id
-   * @param bodySite
-   * @param value
-   * @returns
+   * Updates an Observation with a new value and bodySite. Changes the issued
+   * date to the current date and time
+   * @param _id Midata id of the Observation
+   * @param bodySite String representing the bodySite of the Observation.
+   * Needs to be present in the fhirData.json file
+   * @param values Observation Value or Values with multivalued Observations
+   * @param observationType Type of the Observation (ObservationType enum)
+   * @param observationStatus Status of the Observation. Default is PRELIMINARY.
+   * A deleted Observation gets the type ENTERED_IN_ERROR
+   * @returns a promise:
+   *              - if successfull -> Midata server observation resource response.
+   *              - if not successfull -> Error response.
    */
   public updateObservation(
     _id: string,
     bodySite: string,
-    value: number
+    values: number[],
+    observationType: ObservationType,
+    observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
       this.midata
-        .updateObservation(_id, bodySite, value)
+        .updateObservation(_id, bodySite, values, observationType, observationStatus)
         .then((result) => {
           if (result) {
             this.midata
               .loadObservations()
               .then((res) => {
-                this.observations = res as Array<Observation>;
+                this.observations = res
                 this.persist();
                 Notify.create({
-                  message: 'Observation erfolgreich gespeichert',
+                  message: 'Observation erfolgreich bearbeitet',
                   color: 'green',
                   position: 'top',
                   icon: 'announcement',
@@ -188,7 +204,7 @@ export default class Storage {
               .catch((error) => reject(error));
           } else {
             Notify.create({
-              message: 'Die Observation konnte nicht erstellt werden',
+              message: 'Die Observation konnte nicht bearbeitet werden',
               color: 'red',
               position: 'top',
               icon: 'announcement',
@@ -201,21 +217,47 @@ export default class Storage {
   }
 
   /**
-   *
-   * @param _id
+   * Sets the selected observation. Used to observations them in the UI
+   * @param _id Midata id of the observation.
    */
   public setCurrentObservation(_id: string): void {
-    void this.midata.search('Observation/' + _id).then((result) => {
+    void this.midata.searchWithId('Observation', _id).then((result) => {
       this.currentObservation = result as Observation;
       this.persist();
     });
   }
 
   /**
-   *
-   * @returns
+   * Retrieves the selected observation
+   * @returns Observation object
    */
   public getCurrentObservation(): Observation {
     return this.currentObservation;
+  }
+
+  /**
+   * Copies an item to the clipboard in JSON-Format.
+   * @param item Item that should be copied to the clipboard. Preferably
+   * a JSON Object or a string.
+   * @param label Label to display in the quasar notify component.
+   */
+  public copyToClipBoard(item: any, label = 'Resource') {
+    copyToClipboard(JSON.stringify(item, null, 2))
+      .then(() => {
+        Notify.create({
+          message: `${label} kopiert`,
+          color: 'green',
+          position: 'top',
+          icon: 'announcement',
+        })
+      })
+      .catch(() => {
+        Notify.create({
+          message: `Kopieren von ${label} fehlgeschlagen`,
+          color: 'red',
+          position: 'top',
+          icon: 'announcement',
+        })
+      })
   }
 }
