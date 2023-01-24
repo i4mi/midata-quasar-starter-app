@@ -91,7 +91,7 @@ const midataLinksList = [
   },
 ];
 
-const deveelopmentLinksList = [
+const developmentLinksList = [
   {
     title: 'Basics',
     icon: 'keyboard_arrow_right',
@@ -129,7 +129,7 @@ export default defineComponent({
     return {
       pageLinks: linksList,
       midataPageLinks: midataLinksList,
-      developmentLinks: deveelopmentLinksList,
+      developmentLinks: developmentLinksList,
 
       drawerExpanded,
       toggleLeftDrawer() {

@@ -15,8 +15,9 @@
       einige Sekunden länger dauern als angezeigt.
     </p>
     <p>
-      Im Moment haben sie {{this.$storage.getObservations().length}} Observationen
+      Im Moment haben sie <b>{{this.$storage.getObservations().length}}</b> Observationen
       in Midata gespeichert.
+      {{model}}
     </p>
     <q-btn
       @click="updateRandomData"
@@ -28,8 +29,9 @@
       Daten generieren
     </q-btn>
     <div class="q-gutter-md row items-start">
-      <q-date v-model="model" mask="YYYY-MM-DD HH:mm" color="blue" />
-      <q-time v-model="model" format24h mask="YYYY-MM-DD HH:mm" color="blue" />
+      <q-date v-model="model" mask="YYYY-MM-DD HH:mm" color="blue" today-btn
+              :options='dateOptions'/>
+      <q-time v-model="model" format24h mask="YYYY-MM-DD HH:mm" color="blue"/>
     </div>
   </q-page>
 </template>
@@ -68,6 +70,9 @@ export default defineComponent({
           });
       }
     },
+    dateOptions (date) {
+      return date <= this.$moment().format('YYYY/MM/DD')
+    }
   },
 });
 </script>

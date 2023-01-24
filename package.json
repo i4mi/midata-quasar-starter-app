@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
-    "@i4mi/fhir_r4": "2.0.0",
-    "@i4mi/js-on-fhir": "^1.0.0-beta.13",
+    "@i4mi/fhir_r4": "2.1.2",
+    "@i4mi/js-on-fhir": "^1.0.0",
     "@quasar/extras": "^1.0.0",
     "core-js": "^3.6.5",
     "highlight.js": "^11.3.1",

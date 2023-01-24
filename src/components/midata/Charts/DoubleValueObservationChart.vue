@@ -41,7 +41,6 @@ export default defineComponent({
     series() {
       return [
         {
-          //Tood change this label
           name: this.labels[0],
           data: this.data.map(obs => {
             return obs.component[0].valueQuantity.value
@@ -68,7 +67,7 @@ export default defineComponent({
           enabled: false
         },
         markers: {
-          size: 10
+          size: this.$q.screen.lt.sm ? 5 : 10
         },
         xaxis: {
           labels: {
@@ -83,8 +82,8 @@ export default defineComponent({
           })
         },
         yaxis: {
-          min: this.min,
-          max: this.max,
+          min: this.$q.screen.lt.md ? undefined : Math.min(...this.data.map(o => o.component[1].valueQuantity.value)),
+          max: this.$q.screen.lt.md ? undefined : Math.max(...this.data.map(o => o.component[0].valueQuantity.value)),
           title: {
             text: `${this.observationType} in ${this.unit}`,
             align: 'center',

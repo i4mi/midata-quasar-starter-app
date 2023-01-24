@@ -105,6 +105,12 @@
         @click.stop="showAddDialog = true"
         label="Körpertemperatur Observation hinzufügen"
       />
+      <q-space></q-space>
+      <q-toggle
+        v-model="expanded"
+        label="Vollständige Ressourcen anzeigen"
+        left-label
+      />
     </q-card-actions>
   </q-card>
   <div style="height: 25px"></div>
@@ -112,9 +118,7 @@
   <SingleValueObservationChart
     :data='filteredList'
     :observation-type='"Körpertemperatur"'
-    :unit='"C°"'
-    :min='34'
-    :max='42'>
+    :unit='"C°"'>
   </SingleValueObservationChart>
 
   <edit-single-value-dialog
@@ -166,9 +170,6 @@ export default defineComponent({
     SingleValueObservationChart,
     DeleteObservationDialog
   },
-  props: {
-    expanded: Boolean
-  },
   data() {
     return {
       options: fhirData.BODY_TEMPERATURE.map(e => {
@@ -178,6 +179,7 @@ export default defineComponent({
       showAddDialog: false,
       showEditDialog: false,
       showDeleteDialog: false,
+      expanded: false,
       observationType: ObservationType.BODY_TEMPERATURE
     }
   },
@@ -185,7 +187,7 @@ export default defineComponent({
     ObservationType() {
       return ObservationType.BODY_TEMPERATURE
     },
-    filteredList() {
+    filteredList(): Observation[] {
       return this.observations
         .filter((obs: Observation) => {
           return obs.code.coding[0].code === '8310-5'

@@ -105,6 +105,12 @@
         @click.stop="showAddDialog = true"
         label="Blutdruck Observation hinzufügen"
       />
+      <q-space></q-space>
+      <q-toggle
+        v-model="expanded"
+        label="Vollständige Ressourcen anzeigen"
+        left-label
+      />
     </q-card-actions>
   </q-card>
   <div style="height: 25px"></div>
@@ -150,15 +156,13 @@ export default defineComponent({
     DeleteObservationDialog,
     EditBloodPressureDialog
   },
-  props: {
-    expanded: Boolean
-  },
   data() {
     return {
       observations: this.$storage.getObservations(),
       showAddDialog: false,
       showEditDialog: false,
       showDeleteDialog: false,
+      expanded: false,
       observationType: ObservationType.BLOOD_PRESSURE
     }
   },
@@ -166,7 +170,7 @@ export default defineComponent({
     ObservationType() {
       return ObservationType.BODY_TEMPERATURE
     },
-    filteredList() {
+    filteredList(): Observation[] {
       return this.observations
         .filter((obs: Observation) => {
           return obs.code.coding[0].code === '85354-9'

@@ -8,7 +8,7 @@ import { Notify } from 'quasar';
 const now = moment();
 
 /**
- * ENUM for all the supported Observation Types of the application
+ * ENUM for all the supported Observation Types.
  */
 export const enum ObservationType {
   BODY_TEMPERATURE = 'Body temperature',
@@ -70,7 +70,7 @@ export default class MidataService {
 
   /**
    * Gets the patient resource from the fhir endpoint.
-   * @returns patient resource as JSON
+   * @returns patient resource as JSON.
    */
   public getPatientResource(): Promise<Patient> {
     return new Promise((resolve, reject) => {
@@ -107,19 +107,19 @@ export default class MidataService {
 
   /**
    * Gets all observations from the fhir endpoint that do not have the status
-   * "ENTERED_IN_ERROR"
-   * @returns bundle with observations
+   * "ENTERED_IN_ERROR".
+   * @returns bundle with observations.
    */
   public async loadObservations() {
-      const result = await this.jsOnFhir.search('Observation');
-      const observations = result.entry?.map(entry => entry.resource as Observation) || [];
-      return observations.filter(obs => obs.status !== ObservationStatus.ENTERED_IN_ERROR);
+    const result = await this.jsOnFhir.search('Observation',
+      {'status:not': 'entered-in-error'});
+    return result.entry?.map(entry => entry.resource as Observation) || [];
   }
 
   /**
-   * searches the fhir endpoint for one or more resources.
-   * @param resourceType resource type to look up
-   * @param params search parameters according to fhir resource guide (not mandatory)
+   * Searches the fhir endpoint for one or more resources.
+   * @param resourceType resource type to look up.
+   * @param params search parameters according to fhir resource guide (not mandatory).
    * @returns a promise:
    *              - if successfull -> response with resource(s) as JSON
    *              - if not successfull -> error message
@@ -133,9 +133,9 @@ export default class MidataService {
   }
 
   /**
-   * searches the fhir endpoint for one resource with the id.
-   * @param resourceType resource type to look up
-   * @param _id The id of the fhir resource
+   * Searches the fhir endpoint for one resource with the id.
+   * @param resourceType resource type to look up.
+   * @param _id The id of the fhir resource.
    * @returns a promise:
    *              - if successfull -> response with resource(s) as JSON
    *              - if not successfull -> error message
@@ -149,13 +149,13 @@ export default class MidataService {
   }
 
   /**
-   * Creates an observation resource on the fhir server
+   * Creates an observation resource on the fhir server.
    * @param _status the status of the observation according to: http://hl7.org/fhir/observation-status
-   * @param bodySite String representing the bodySite of the Observation.
-   * Needs to be present in the fhirData.json file
-   * @param values Observation Value or Values with multivalued Observations
-   * @param observationType Type of the Observation (ObservationType enum)
-   * @param dateString String representing a by momentJS readable date
+   * @param bodySite String representing the bodySite of the observation.
+   * It needs to be present in the fhirData.json file.
+   * @param values Observation value or values with multivalued observations.
+   * @param observationType Type of the Observation (ObservationType enum).
+   * @param dateString String representing a by momentJS readable date.
    * @returns a promise:
    *              - if successfull -> response with the created resource as JSON
    *              - if not successfull -> error message
@@ -180,7 +180,7 @@ export default class MidataService {
         observation = this.newBpObservation(_status, bodySite, values[0], values[1], dateString);
       }
       else {
-        throw new Error('No matching ObservationType found for creating an Observation')
+        throw new Error('No matching ObservationType found for input');
       }
       this.jsOnFhir.create(observation).then((result) => {
         result ? resolve(result as Observation) : reject('internal error');
@@ -189,12 +189,12 @@ export default class MidataService {
   }
 
   /**
-   * Updates an observation (of type bodytemperature) resource on the fhir server.
+   * Updates an observation resource (of type bodytemperature) on the fhir server.
    * @param _id identification for the observation to be updated.
    * @param bodySite the body site where the bodytemperature was measured.
-   * @param values Observation Value or Values with multivalued Observations
-   * @param observationType Type of the fhir Observation
-   * @param observationStatus optional status for Observation. The default is
+   * @param values Observation value or values with multivalued observations.
+   * @param observationType Type of the fhir observation.
+   * @param observationStatus optional status for observation. The default is
    * ObservationStatus.PRELIMINARY
    * @returns a promise:
    *              - if successfull -> response with the updated resource as JSON
@@ -214,7 +214,7 @@ export default class MidataService {
           fhirObservation.bodySite = this.getBodySiteFromJson(bodySite, observationType);
           fhirObservation.method = this.getMethodFromJson(bodySite, observationType);
           fhirObservation.issued = now.format();
-          fhirObservation.status = observationStatus
+          fhirObservation.status = observationStatus;
 
           if (observationType == ObservationType.BLOOD_PRESSURE){
             fhirObservation.component[0].valueQuantity.value = values[0];
@@ -245,13 +245,13 @@ export default class MidataService {
   }
 
   /**
-   * Creates an observation (of type body temperature)
+   * Creates an observation (of type body temperature).
    * @param _status the status of the observation
    * according to: http://hl7.org/fhir/observation-status
-   * @param bodySite String representing the bodySite of the Observation.
-   * Needs to be present in the fhirData.json file
+   * @param bodySite String representing the bodySite of the observation.
+   * Needs to be present in the fhirData.json file.
    * @param value the measured body temperature value.
-   * @param dateString String representing a by momentJS readable date
+   * @param dateString String representing a momentJS readable date format.
    * @returns
    */
   newBtObservation(
@@ -367,14 +367,14 @@ export default class MidataService {
   }
 
   /**
-   * Creates an observation (of type blood pressure)
-   * @param _status the status of the observation
+   * Creates an observation (of type blood pressure).
+   * @param _status the status of the observation.
    * according to: http://hl7.org/fhir/observation-status
-   * @param bodySite String representing the bodySite of the Observation
-   * Needs to be present in the fhirData.json file
-   * @param valueSystolic Systolic blood pressure value in mmHg
-   * @param valueDiastolic Diastolic blood pressure value in mmHg
-   * @param dateString String representing a by momentJS readable date
+   * @param bodySite String representing the bodySite of the observation
+   * Needs to be present in the fhirData.json file.
+   * @param valueSystolic Systolic blood pressure value in mmHg.
+   * @param valueDiastolic Diastolic blood pressure value in mmHg.
+   * @param dateString String representing a momentJS readable date format.
    * @returns
    * @returns
    */
@@ -462,12 +462,11 @@ export default class MidataService {
 
   /**
    * Function for getting a fhir Body site object from a given
-   * bodySite string. It searches the fhirDataJson file in the data folder
-   * @param bodySite body site String to search with
-   * @param observationType
+   * bodySite string. It searches the fhirDataJson file in the data folder.
+   * @param bodySite body site String to search with.
+   * @param observationType Type of the Observation to get the bodySite.
    */
   getBodySiteFromJson(bodySite: string, observationType: ObservationType) {
-
     let dataArray;
     switch (observationType) {
       case ObservationType.BLOOD_PRESSURE:
@@ -480,25 +479,24 @@ export default class MidataService {
         dataArray = fhirDataJson.HEART_RATE;
         break;
       default:
-        throw new Error('No matching Observation Type found')
+        throw new Error('No matching Observation Type found');
     }
 
     for (const data of dataArray) {
       if (data.id === bodySite){
-        return data.bodySite
+        return data.bodySite;
       }
     }
-    throw new Error('No matching body Site found in fhirJson')
+    throw new Error(`No matching body Site found in fhirJson for input [${bodySite}]`);
   }
 
   /**
-   * Function for getting a fhir Observation method object from a given
-   * bodySite string. It searches the fhirDataJson file in the data folder
-   * @param bodySite body site String to search with
-   * @param observationType
+   * Function for getting a fhir observation method object from a given
+   * bodySite string. It searches the fhirDataJson file in the data folder.
+   * @param bodySite body site string to search with.
+   * @param observationType Type of the Observation to get the method.
    */
   getMethodFromJson(bodySite: string, observationType: ObservationType) {
-
     let dataArray;
     switch (observationType) {
       case ObservationType.BLOOD_PRESSURE:
@@ -513,54 +511,55 @@ export default class MidataService {
       default:
         throw new Error('No matching Observation Type found')
     }
-
     for (const data of dataArray) {
       if (data.id === bodySite){
         return data.method
       }
     }
-    throw new Error('No matching body Site found in fhirJson')
+    throw new Error(`No matching body Site found in fhirJson for input [${bodySite}]`)
   }
 
   /**
-   * Generates 16 fhir Observations of Type "body temperature" and "heart rate"
-   * and adds them to the Midata Account. The Data is modelled with a progression
+   * Generates 16 fhir observation objects for each supported observation type
+   * and adds them to the Midata-Account. The data is modelled with a progression
    * in mind. The values first rise and then fall of again. There is some noise
-   * applied with the Math.random() function to each of the values every time
-   * they get generated.
+   * applied to each of the values every time they get generated.
    * @param dateString String representing a Date in the format of (YYYY-MM-DD HH:mm)
    */
   async generateRandomData(dateString: string) {
-    const bodyTemperaturesBase = [36, 36.5, 37, 37.5, 38, 38, 38.5, 39.5, 41, 39, 38.5, 40, 41, 39.5, 38, 36.5]
+    const bodyTemperaturesBase = [36, 36.5, 37, 37.5, 38, 38, 38.5, 39.5, 41,
+      39, 38.5, 40, 41, 39.5, 38, 36.5];
     const bodyTemperaturesNoised = bodyTemperaturesBase.map(bt => {
-      return bt + Math.round(Math.random()*10)/10
+      return bt + (Math.round(Math.random()*10)/10);
     })
 
-    const heartRateBase = [70, 70, 75, 80, 90, 95, 105, 110, 115, 120, 110, 100, 95, 85, 80, 70]
+    const heartRateBase = [70, 70, 75, 80, 90, 95, 105, 110, 115, 120, 110,
+      100, 95, 85, 80, 70];
     const heartRateNoised = heartRateBase.map(hr => {
-      return hr + Math.round(Math.random()*4)
+      return hr + Math.round(Math.random() * 4);
     })
 
-    const sysPressure = [145, 142, 149, 151, 153, 147, 149, 153, 150, 154, 162, 168, 163, 156, 150, 151];
+    const sysPressure = [145, 142, 149, 151, 153, 147, 149, 153, 150, 154,
+      162, 168, 163, 156, 150, 151];
     const sysPressureNoised = sysPressure.map(sp => {
-      return sp + Math.round(Math.random()*5)
+      return sp + Math.round(Math.random() * 5);
     })
-    const diasPressure = [87, 84, 90, 91, 92, 90, 94, 92, 96, 104, 98, 93, 92, 86, 90, 87];
+    const diasPressure = [87, 84, 90, 91, 92, 90, 94, 92, 96, 104, 98, 93, 92,
+      86, 90, 87];
     const diasPressureNoised = diasPressure.map(dp => {
-      return dp + Math.round(Math.random()*5)
+      return dp + Math.round(Math.random() * 5);
     })
 
-    const dat = moment(dateString, 'YYYY-MM-DD HH:mm')
-    const dates = []
+    const dat = moment(dateString, 'YYYY-MM-DD HH:mm');
+    const dates = [];
     for (let i = 0; i < heartRateBase.length; i++){
-      dat.subtract(Math.round(Math.random()*4), 'h')
-      dat.subtract(Math.round(Math.random()*10), 'm')
-      dat.subtract(Math.round(Math.random()*10), 's')
-      dates.push(dat.format())
+      dat.subtract(Math.round(Math.random() * 4), 'h');
+      dat.subtract(Math.round(Math.random() * 10), 'm');
+      dat.subtract(Math.round(Math.random() * 10), 's');
+      dates.push(dat.format());
     }
     try {
       for (let i = 0; i < heartRateBase.length; i++) {
-
         await this.createObservation(ObservationStatus.PRELIMINARY,
           this.getRandomBodySite(ObservationType.HEART_RATE),
           [heartRateNoised[i]],
@@ -585,7 +584,8 @@ export default class MidataService {
         position: 'top',
         icon: 'announcement'
       });
-    } catch (error) {
+    }
+    catch (error) {
       console.log(error)
       Notify.create({
         message: 'Ein Fehler ist aufgetreten beim erstellen der Observationen',
@@ -603,19 +603,22 @@ export default class MidataService {
    */
   getRandomBodySite(observationType: ObservationType): any {
     if (observationType == ObservationType.BODY_TEMPERATURE){
-      return fhirDataJson.BODY_TEMPERATURE[Math.floor(Math.random() * fhirDataJson.BODY_TEMPERATURE.length)].bodySite.coding[0].display
+      return fhirDataJson.BODY_TEMPERATURE[Math.floor(Math.random() *
+        fhirDataJson.BODY_TEMPERATURE.length)].bodySite.coding[0].display;
     }
 
     else if (observationType == ObservationType.HEART_RATE){
-      return fhirDataJson.HEART_RATE[Math.floor(Math.random() * fhirDataJson.HEART_RATE.length)].bodySite.coding[0].display
+      return fhirDataJson.HEART_RATE[Math.floor(Math.random() *
+        fhirDataJson.HEART_RATE.length)].bodySite.coding[0].display;
     }
 
     else if (observationType == ObservationType.BLOOD_PRESSURE){
-      return fhirDataJson.BLOOD_PRESSURE[Math.floor(Math.random() * fhirDataJson.BLOOD_PRESSURE.length)].bodySite.coding[0].display
+      return fhirDataJson.BLOOD_PRESSURE[Math.floor(Math.random() *
+        fhirDataJson.BLOOD_PRESSURE.length)].bodySite.coding[0].display;
     }
 
     else {
-      throw new Error('No matching Observation Type found')
+      throw new Error('No matching Observation Type found');
     }
   }
 }

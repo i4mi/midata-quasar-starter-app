@@ -20,10 +20,33 @@
             {{ 'E-Mail: ' + patientResource.telecom[0].value }}
           </div>
         </q-card-section>
+
+        <q-card-actions>
+          <q-space></q-space>
+          <q-btn
+            color="grey"
+            round
+            flat
+            dense
+            :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expanded = !expanded"
+            class="gt-xs"
+          >Vollständige Ressource anzeigen</q-btn
+          >
+          <q-btn
+            color="grey"
+            round
+            flat
+            dense
+            :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="expanded = !expanded"
+            class="lt-sm"
+          ></q-btn>
+        </q-card-actions>
         <q-slide-transition>
           <div v-show="expanded">
             <q-separator />
-            <q-card-section class="innerCardScroll" clickable @click='copyToClipBoard(patientResource, "Patienten Resource")'>
+            <q-card-section class="innerCardScroll">
               <highlightjs
                 lang="json"
                 :code="JSON.stringify(patientResource, null, 2)"
@@ -44,7 +67,12 @@ import { copyToClipboard, Notify } from 'quasar';
 export default defineComponent({
 
   name: 'PatientResource',
-  props: ['flag', 'patientResource', 'expanded'],
+  props: ['flag', 'patientResource'],
+  data() {
+    return {
+      expanded: false
+    }
+  },
   methods: {
     copyToClipBoard(item: any, identifier = 'Resource') {
       copyToClipboard(JSON.stringify(item, null, 2))

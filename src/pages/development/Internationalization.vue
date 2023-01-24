@@ -299,6 +299,7 @@ export default defineComponent({
     changeLanguage(value: string) {
       if (this.$i18n.availableLocales.includes(value)) {
         this.$i18n.locale = value;
+        this.$storage.setCurrentLanguage(value)
       }
     },
     changeLocale(value: string) {

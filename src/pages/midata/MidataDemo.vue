@@ -32,11 +32,6 @@
       >
       </q-btn>
       <q-space />
-      <q-toggle
-        v-model="expanded"
-        label="Resourcen-JSON anzeigen"
-        left-label
-      />
       <q-btn
         color="black"
         label="Logout"
@@ -57,7 +52,7 @@
     </div>
     <div style="height: 25px"></div>
 
-    <PatientResource :flag='flag' :patient-resource='patientResource' :expanded='expanded'></PatientResource>
+    <PatientResource :flag='flag' :patient-resource='patientResource'></PatientResource>
 
     <div style="height: 25px" />
     <q-tabs
@@ -87,7 +82,7 @@
     </q-tabs>
     <div style="height: 25px" />
 
-    <RouterView :expanded='expanded' />
+    <RouterView/>
   </q-page>
 </template>
 
@@ -105,7 +100,7 @@ export default defineComponent({
   },
   setup() {
     return {
-      expanded: ref(false),
+      listExpanded: ref(false),
       obsType: ref(),
     };
   },

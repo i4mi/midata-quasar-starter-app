@@ -33,7 +33,7 @@ export default class Storage {
     if (persisted) {
       const storage = JSON.parse(persisted);
       this.currentLanguage = storage.currentLanguage;
-      this.observations = storage.observations
+      this.observations = storage.observations;
       this.patientResource = storage.patientResource;
     } else if (this.midata.isLoggedIn()) {
       void this.restoreFromMidata();
@@ -43,7 +43,7 @@ export default class Storage {
   }
 
   /**
-   *
+   * Restores data from the midata server.
    * @returns a promise:
    *              - if successfull ->
    *              - if not successfull ->
@@ -97,26 +97,31 @@ export default class Storage {
 
   /**
    * Gets the patient resource from the store.
-   * @returns
+   * @returns Fhir patient resource.
    */
   public getPatient(): Patient {
     return this.patientResource;
   }
 
   /**
-   * Returns all observations from Midata
+   * Gets all the observations from the store.
+   * @returns Array of observations.
    */
-  public getObservations() {
+  public getObservations(): Observation[] {
     return this.observations
   }
 
   /**
-   * Creates a new Observation
-   * @param _status Status of the Observation. Default is PRELIMINARY for newly created Observations
-   * @param bodySite String representing a bodySite. Needs to be present in the fhirData.json file
-   * @param values Observation Value or Values with multivalued Observations
-   * @param observationType Type of the Observation (ObservationType enum)
-   * @returns
+   * Creates a new Observation.
+   * @param _status Status of the Observation. Default is PRELIMINARY for newly
+   * created Observations.
+   * @param bodySite String representing a bodySite. Needs to be present in
+   * the fhirData.json file.
+   * @param values Observation value or values with multivalued Observations.
+   * @param observationType Type of the Observation.
+   * @returns a promise:
+   *              - if successfull -> Midata server observation resource response.
+   *              - if not successfull -> Error response.
    */
   public createObservation(
     _status: ObservationStatus,
@@ -167,7 +172,9 @@ export default class Storage {
    * @param observationType Type of the Observation (ObservationType enum)
    * @param observationStatus Status of the Observation. Default is PRELIMINARY.
    * A deleted Observation gets the type ENTERED_IN_ERROR
-   * @returns
+   * @returns a promise:
+   *              - if successfull -> Midata server observation resource response.
+   *              - if not successfull -> Error response.
    */
   public updateObservation(
     _id: string,
@@ -210,8 +217,8 @@ export default class Storage {
   }
 
   /**
-   * Sets the selected Observation. Used to Observations them in the UI
-   * @param _id
+   * Sets the selected observation. Used to observations them in the UI
+   * @param _id Midata id of the observation.
    */
   public setCurrentObservation(_id: string): void {
     void this.midata.searchWithId('Observation', _id).then((result) => {
@@ -221,18 +228,18 @@ export default class Storage {
   }
 
   /**
-   * Retrieves the selected Observation
-   * @returns
+   * Retrieves the selected observation
+   * @returns Observation object
    */
   public getCurrentObservation(): Observation {
     return this.currentObservation;
   }
 
   /**
-   * Copies an Item to the clipboard in JSON-Format
+   * Copies an item to the clipboard in JSON-Format.
    * @param item Item that should be copied to the clipboard. Preferably
-   * a JSON Object or a String
-   * @param label Label to display in the quasar notify component
+   * a JSON Object or a string.
+   * @param label Label to display in the quasar notify component.
    */
   public copyToClipBoard(item: any, label = 'Resource') {
     copyToClipboard(JSON.stringify(item, null, 2))

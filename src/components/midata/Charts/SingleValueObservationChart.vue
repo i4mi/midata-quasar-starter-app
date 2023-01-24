@@ -21,10 +21,7 @@ export default defineComponent({
   props: {
     data: Array as PropType<Observation[]>,
     observationType: String,
-    unit: String,
-    max: Number,
-    min: Number
-
+    unit: String
   },
   data() {
     return {}
@@ -52,7 +49,7 @@ export default defineComponent({
           enabled: false
         },
         markers: {
-          size: 10
+          size: this.$q.screen.lt.sm ? 5 : 10
         },
         xaxis: {
           labels: {
@@ -67,8 +64,8 @@ export default defineComponent({
           })
         },
         yaxis: {
-          min: this.min,
-          max: this.max,
+          min: this.$q.screen.lt.md ? undefined : Math.min(...this.data.map(o => o.valueQuantity.value)),
+          max: this.$q.screen.lt.md ? undefined : Math.max(...this.data.map(o => o.valueQuantity.value)),
           title: {
             text: `${this.observationType} in ${this.unit}`,
             align: 'center',
