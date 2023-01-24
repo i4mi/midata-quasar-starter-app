@@ -2,7 +2,7 @@
   <q-dialog v-model="show" persistent>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Herzfrequenz hinzufügen/bearbeiten</div>
+        <div class="text-h6">Puls hinzufügen/bearbeiten</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-form
@@ -33,7 +33,7 @@
           />
           <div>
             <q-btn
-              label="Herzfrequenz speichern"
+              label="Puls speichern"
               type="submit"
               color="primary"
               class="q-ml-sm"

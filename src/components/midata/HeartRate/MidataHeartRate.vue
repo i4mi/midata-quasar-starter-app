@@ -26,7 +26,7 @@
               <q-item-label
                 lines="1"
               >
-                Körpertemperatur
+                Puls
               </q-item-label>
               <q-item-label caption>
                 Wert: {{ item.valueQuantity.value }}
@@ -103,7 +103,7 @@
         flat
         icon="add"
         @click.stop="showAddDialog = true"
-        label="Körpertemperatur Observation hinzufügen"
+        label="Puls Observation hinzufügen"
       />
       <q-space></q-space>
       <q-toggle
@@ -125,7 +125,7 @@
     :visible="showEditDialog"
     :actionType='"edit"'
     :observation-type='observationType'
-    :label='"Herzfrequenz"'
+    :label='"Puls"'
     :unit='"bpm"'
     :options='options'
     :min='20'
@@ -138,7 +138,7 @@
     :visible="showAddDialog"
     :actionType='"add"'
     :observation-type='observationType'
-    :label='"Herzfrequenz"'
+    :label='"Puls"'
     :unit='"bpm"'
     :options='options'
     :min='20'
