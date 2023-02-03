@@ -22,17 +22,12 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { midata } from 'boot/plugins';
 
-export default defineComponent({
-  name: 'LoginCard',
-  methods: {
-    connect() {
-      this.$midata.authenticate();
-    },
-  },
-});
+function connect() {
+  midata.authenticate();
+}
 </script>
 
 <style lang="sass" scoped>

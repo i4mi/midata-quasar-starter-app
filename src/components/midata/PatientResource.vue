@@ -46,7 +46,11 @@
         <q-slide-transition>
           <div v-show="expanded">
             <q-separator />
-            <q-card-section class="innerCardScroll">
+            <q-card-section
+              class="innerCardScroll"
+              clickable
+              @click='storage.copyToClipBoard
+              (patientResource, "Patienten Resource")'>
               <highlightjs
                 lang="json"
                 :code="JSON.stringify(patientResource, null, 2)"
@@ -59,44 +63,17 @@
   </q-card>
 </template>
 
-<script lang='ts'>
+<script setup lang='ts'>
 
-import { defineComponent } from 'vue';
-import { copyToClipboard, Notify } from 'quasar';
+import { ref } from 'vue';
+import { storage } from 'boot/plugins';
 
-export default defineComponent({
+defineProps(['flag', 'patientResource'])
+const expanded = ref(false)
 
-  name: 'PatientResource',
-  props: ['flag', 'patientResource'],
-  data() {
-    return {
-      expanded: false
-    }
-  },
-  methods: {
-    copyToClipBoard(item: any, identifier = 'Resource') {
-      copyToClipboard(JSON.stringify(item, null, 2))
-        .then(() => {
-          Notify.create({
-            message: `${identifier} kopiert`,
-            color: 'green',
-            position: 'top',
-            icon: 'announcement',
-          })
-        }).catch(() => {
-      Notify.create({
-        message: `Kopieren von ${identifier} fehlgeschlagen`,
-        color: 'red',
-        position: 'top',
-        icon: 'announcement',
-      })
-    })
-    },
-    isEmpty(obj: any) {
-      return JSON.stringify(obj) === '{}';
-    }
-  }
-});
+function isEmpty(obj: any) {
+  return JSON.stringify(obj) === '{}';
+}
 
 </script>
 <style lang="sass" scoped>

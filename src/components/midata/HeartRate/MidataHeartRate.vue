@@ -154,63 +154,49 @@
   ></delete-observation-dialog>
 </template>
 
-<script lang='ts'>
+<script setup lang='ts'>
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
-import { defineComponent } from 'vue';
+import { ref, computed } from 'vue';
 import { Observation } from '@i4mi/fhir_r4';
 import SingleValueObservationChart from 'components/midata/Charts/SingleValueObservationChart.vue';
 import { ObservationType } from 'src/plugins/midataService';
 import EditSingleValueDialog from 'components/midata/EditSingleValueDialog.vue';
 import fhirData from 'src/data/fhirData.json';
+import { moment, storage } from 'boot/plugins';
 
-export default defineComponent({
-  name: 'MidataHeartRate',
-  components: {
-    EditSingleValueDialog,
-    SingleValueObservationChart,
-    DeleteObservationDialog
-  },
-  data() {
-    return {
-      options: fhirData.HEART_RATE.map(e => {
-        return e.id
-      }),
-      observations: this.$storage.getObservations(),
-      showAddDialog: false,
-      showEditDialog: false,
-      showDeleteDialog: false,
-      expanded: false,
-      observationType: ObservationType.HEART_RATE
-    }
-  },
-  computed: {
-    ObservationType() {
-      return ObservationType.HEART_RATE
-    },
-    filteredList(): Observation[] {
-      return this.observations
-        .filter((obs: Observation) => {
-          return obs.code.coding[0].code === '8867-4'
-        })
-        .sort((a: Observation, b: Observation) => {
-          return new Date(a.issued).getTime() - new Date(b.issued).getTime();
-        });
-    }
-  },
-  methods: {
-    formatDate(date: any) {
-      return this.$moment(date.toString()).format('lll');
-    },
-    getFullPatientName() {
-      let name = this.$storage.getPatient().name;
-      return name[0].given.toString() + ' ' + name[0].family;
-    },
-    onEdit() {
-      this.showEditDialog = false;
-      this.showAddDialog = false;
-      this.showDeleteDialog = false;
-      this.observations = this.$storage.getObservations();
-    }
-  }
-});
+const observations = ref(storage.getObservations())
+const showAddDialog = ref(false)
+const showEditDialog = ref(false)
+const showDeleteDialog = ref(false)
+const expanded = ref(false)
+const observationType = ref(ObservationType.HEART_RATE)
+
+const options = computed(() => {
+  return fhirData.HEART_RATE.map(e => {
+    return e.id
+  })
+})
+const filteredList = computed(() => {
+  return observations.value
+    .filter((obs: Observation) => {
+      return obs.code.coding[0].code === '8867-4'
+    })
+    .sort((a: Observation, b: Observation) => {
+      return new Date(a.issued).getTime() - new Date(b.issued).getTime();
+    });
+})
+
+function formatDate(date: any) {
+  return moment(date.toString()).format('lll');
+}
+function getFullPatientName() {
+  let name = storage.getPatient().name;
+  return name[0].given.toString() + ' ' + name[0].family;
+}
+function onEdit() {
+  showEditDialog.value = false;
+  showAddDialog.value = false;
+  showDeleteDialog.value = false;
+  observations.value = storage.getObservations();
+}
 </script>

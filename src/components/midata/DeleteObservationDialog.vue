@@ -15,43 +15,38 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script setup lang="ts">
+import { computed, PropType } from 'vue';
 import { ObservationStatus } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
+import { storage } from 'boot/plugins';
 
-export default defineComponent({
-  name: 'DeleteObservationDialog',
-  props: {
-    visible: Boolean,
-    observationType: String as PropType<ObservationType>
-  },
-  data: () => ({}),
-  computed: {
-    show: {
-      get() {
-        return this.visible;
-      },
-      set(value: any) {
-        if (!value) {
-          this.$emit('close');
-        }
-      },
-    },
-  },
-  methods: {
-    async updateObservation() {
-      await this.$storage.updateObservation(
-        this.$storage.getCurrentObservation().id,
-        this.$storage.getCurrentObservation().bodySite.coding[0].display,
-        [this.$storage.getCurrentObservation().valueInteger],
-        this.observationType,
-        ObservationStatus.ENTERED_IN_ERROR
-      );
-      this.show = false
-    },
-  },
-});
+const emit = defineEmits(['close'])
+
+const props = defineProps({
+  visible: Boolean,
+  observationType: String as PropType<ObservationType>
+})
+
+const show = computed({
+  get: () => props.visible,
+  set: (value: any) => {
+    if (!value) {
+      emit('close');
+    }
+  }
+})
+
+async function updateObservation() {
+  await storage.updateObservation(
+    storage.getCurrentObservation().id,
+    storage.getCurrentObservation().bodySite.coding[0].display,
+    [storage.getCurrentObservation().valueInteger],
+    props.observationType,
+    ObservationStatus.ENTERED_IN_ERROR
+  );
+  show.value = false
+}
 </script>
 
 <style lang="sass" scoped>

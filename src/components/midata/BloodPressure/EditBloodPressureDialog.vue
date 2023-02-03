@@ -2,7 +2,7 @@
   <q-dialog v-model="show" persistent>
     <q-card>
       <q-card-section>
-        <div class="text-h6">Blutdruck hinzufügen/bearbeiten</div>
+        <div class="text-h6">Blutdruck {{actionTypeLabel}}</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-form
@@ -67,80 +67,75 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed, ref } from 'vue';
 import fhirData from '../../../data/fhirData.json'
 import { ObservationStatus } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
 import { Notify } from 'quasar';
+import { storage } from 'boot/plugins';
 
-export default defineComponent({
-  name: 'EditBloodPressureDialog',
-  props: {
-    visible: Boolean,
-    actionType: String
-  },
-  data() {
-    return {
-      systolicPressure: 120,
-      diastolicPressure: 90,
-      bodySite: '',
-      options: fhirData.BLOOD_PRESSURE.map(e => {
-        return e.id
-      })
-    };
-  },
-  computed: {
-    show: {
-      get() {
-        return this.visible;
-      },
-      set(value: any) {
-        if (!value) {
-          this.$emit('close');
-        }
-      },
-    },
-  },
-  methods: {
-    onReset() {
-      this.bodySite = '';
-      this.systolicPressure = 120;
-      this.diastolicPressure = 90;
-    },
-    async updateObservation() {
+const props = defineProps({
+  visible: Boolean,
+  actionType: String
+})
+const emit = defineEmits(['close'])
 
-      if (this.systolicPressure < this.diastolicPressure){
-        Notify.create({
-          message: 'Der Systolische Blutdruck sollte nicht tiefer als der Diastolische sein',
-          color: 'red',
-          position: 'top',
-          icon: 'announcement',
-        });
-        return;
-      }
-      else if (this.actionType == 'edit'){
-        await this.$storage.updateObservation(
-          this.$storage.getCurrentObservation().id,
-          this.bodySite,
-          [this.systolicPressure, this.diastolicPressure],
-        ObservationType.BLOOD_PRESSURE)
-      }
-      else if (this.actionType == 'add'){
-        await this.$storage.createObservation(
-          ObservationStatus.PRELIMINARY,
-          this.bodySite,
-          [this.systolicPressure, this.diastolicPressure],
-          ObservationType.BLOOD_PRESSURE
-        );
-      }
-      else {
-        throw new Error('No correct type found')
-      }
-      this.show = false
-    },
-  },
-});
+const systolicPressure = ref(120)
+const diastolicPressure = ref(90)
+const bodySite = ref('')
+
+const options = computed(() => {
+  return fhirData.BLOOD_PRESSURE.map(e => {
+    return e.id
+  })
+})
+const show = computed({
+  get: () => props.visible,
+  set: (value: any) => {
+    if (!value) {
+      emit('close');
+    }
+  }
+})
+const actionTypeLabel = computed(() => props.actionType === 'edit' ?
+  'bearbeiten' : 'hinzufügen')
+
+function onReset() {
+  bodySite.value = '';
+  systolicPressure.value = 120;
+  diastolicPressure.value = 90;
+}
+async function updateObservation() {
+  if (systolicPressure.value < diastolicPressure.value){
+    Notify.create({
+      message: 'Der Systolische Blutdruck sollte nicht tiefer als der Diastolische sein',
+      color: 'red',
+      position: 'top',
+      icon: 'announcement',
+    });
+    return;
+  }
+  else if (props.actionType === 'edit'){
+    await storage.updateObservation(
+      storage.getCurrentObservation().id,
+      bodySite.value,
+      [systolicPressure.value, diastolicPressure.value],
+      ObservationType.BLOOD_PRESSURE)
+  }
+  else if (props.actionType == 'add'){
+    await storage.createObservation(
+      ObservationStatus.PRELIMINARY,
+      bodySite.value,
+      [systolicPressure.value, diastolicPressure.value],
+      ObservationType.BLOOD_PRESSURE
+    );
+  }
+  else {
+    throw new Error('No correct type found')
+  }
+  show.value = false
+}
 </script>
 
 <style lang="sass" scoped>

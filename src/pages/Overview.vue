@@ -68,16 +68,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue'
 
-export default defineComponent({
-  name: 'Overview',
-  setup() {
-    return {
-      slide: ref(1),
-      autoplay: ref(true),
-    };
-  },
-});
+const slide = ref(1)
+const autoplay = ref(true)
 </script>

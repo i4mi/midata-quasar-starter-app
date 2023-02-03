@@ -2,7 +2,7 @@
   <q-dialog v-model="show" persistent>
     <q-card>
       <q-card-section>
-        <div class="text-h6">{{this.label}} hinzufügen/bearbeiten</div>
+        <div class="text-h6">{{label}} {{actionTypeLabel}}</div>
       </q-card-section>
       <q-card-section class="q-pt-none">
         <q-form
@@ -21,14 +21,14 @@
             ]"
           />
           <q-badge class="midata-fade">
-            {{this.label}}: {{ value }} {{this.unit}}
+            {{label}}: {{ value }} {{unit}}
           </q-badge>
 
           <q-slider
             v-model="value"
-            :min="this.min"
-            :max="this.max"
-            :step="this.step"
+            :min="min"
+            :max="max"
+            :step="step"
             style="max-width: 90%"
           />
           <div>
@@ -56,70 +56,65 @@
   </q-dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from 'vue';
+<script setup lang="ts">
+import { PropType, ref, computed } from 'vue';
 import { ObservationStatus } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
+import { storage } from 'boot/plugins';
 
-export default defineComponent({
-  name: 'EditSingleValueDialog',
-  props: {
-    visible: Boolean,
-    actionType: String,
-    observationType: String as PropType<ObservationType>,
-    label: String,
-    unit: String,
-    options: Array,
-    min: Number,
-    max: Number,
-    step: Number,
-    defaultValue: Number
-  },
-  data() {
-    return {
-      bodySite: '',
-      value: this.defaultValue,
-    };
-  },
-  computed: {
-    show: {
-      get() {
-        return this.visible;
-      },
-      set(value: any) {
-        if (!value) {
-          this.$emit('close');
-        }
-      },
-    },
-  },
-  methods: {
-    onReset() {
-      this.bodySite = '';
-      this.value = 36.8;
-    },
-    async updateObservation() {
-      if (this.actionType == 'edit'){
-        await this.$storage.updateObservation(
-          this.$storage.getCurrentObservation().id,
-          this.bodySite,
-          [this.value],
-        this.observationType);
-      }
-      else if (this.actionType == 'add'){
-        await this.$storage.createObservation(
-          ObservationStatus.PRELIMINARY,
-          this.bodySite,
-          [this.value],
-          this.observationType);
-      }
-      else {
-        throw new Error('No correct type found')
-      }
-      this.show = false
-    },
-  },
-});
+const props = defineProps({
+  visible: Boolean,
+  actionType: String,
+  observationType: String as PropType<ObservationType>,
+  label: String,
+  unit: String,
+  options: Array,
+  min: Number,
+  max: Number,
+  step: Number,
+  defaultValue: Number
+})
+const emit = defineEmits(['close'])
+
+const bodySite = ref('')
+const value = ref(props.defaultValue)
+
+const show = computed({
+  get: () => props.visible,
+  set: (value: any) => {
+    if (!value) {
+      emit('close');
+    }
+  }
+})
+
+const actionTypeLabel = computed(() => props.actionType === 'edit' ?
+  'Bearbeiten' : 'Hinzufügen')
+
+function onReset() {
+  bodySite.value = '';
+  value.value = 36.8;
+}
+async function updateObservation() {
+  if (props.actionType == 'edit'){
+    await storage.updateObservation(
+      storage.getCurrentObservation().id,
+      bodySite.value,
+      [value.value],
+      props.observationType);
+  }
+  else if (props.actionType == 'add'){
+    await storage.createObservation(
+      ObservationStatus.PRELIMINARY,
+      bodySite.value,
+      [value.value],
+      props.observationType);
+  }
+  else {
+    throw new Error('No correct type found')
+  }
+  show.value = false
+}
 </script>
 
 <style lang="sass" scoped>

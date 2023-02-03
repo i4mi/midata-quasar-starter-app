@@ -43,7 +43,7 @@
               color="primary"
               outlined
               flat
-              @mouseover="this.$storage.setCurrentObservation(item.id)"
+              @mouseover="storage.setCurrentObservation(item.id)"
               @click.stop="showEditDialog = true"
               icon="edit"
               class="gt-xs"
@@ -54,7 +54,7 @@
               color="red"
               outlined
               flat
-              @mouseover="this.$storage.setCurrentObservation(item.id)"
+              @mouseover="storage.setCurrentObservation(item.id)"
               @click.stop="showDeleteDialog = true"
               icon="delete"
               class="gt-xs"
@@ -66,7 +66,7 @@
               outlined
               round
               flat
-              @mouseover="this.$storage.setCurrentObservation(item.id)"
+              @mouseover="storage.setCurrentObservation(item.id)"
               @click.stop="showEditDialog = true"
               icon="edit"
               class="lt-sm"
@@ -77,7 +77,7 @@
               outlined
               round
               flat
-              @mouseover="this.$storage.setCurrentObservation(item.id)"
+              @mouseover="storage.setCurrentObservation(item.id)"
               @click.stop="showDeleteDialog = true"
               icon="delete"
               class="lt-sm"
@@ -85,7 +85,7 @@
             </q-btn>
           </q-item>
           <q-item v-if='expanded' :key='index + "_codeblock"' >
-            <q-item-section clickable @click='this.$storage.copyToClipBoard(item, "Observation Resource")'>
+            <q-item-section clickable @click='storage.copyToClipBoard(item, "Observation Resource")'>
               <highlightjs
                 lang="json"
                 :code="JSON.stringify(item, null, 2)"
@@ -154,63 +154,49 @@
   ></delete-observation-dialog>
 </template>
 
-<script lang='ts'>
+<script setup lang='ts'>
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
-import { defineComponent } from 'vue';
+import { ref, computed } from 'vue';
 import { Observation } from '@i4mi/fhir_r4';
 import SingleValueObservationChart from 'components/midata/Charts/SingleValueObservationChart.vue';
 import { ObservationType } from 'src/plugins/midataService';
 import fhirData from 'src/data/fhirData.json';
 import EditSingleValueDialog from 'components/midata/EditSingleValueDialog.vue';
+import { moment, storage } from 'boot/plugins';
 
-export default defineComponent({
-  name: 'MidataBodyTemperature',
-  components: {
-    EditSingleValueDialog,
-    SingleValueObservationChart,
-    DeleteObservationDialog
-  },
-  data() {
-    return {
-      options: fhirData.BODY_TEMPERATURE.map(e => {
-        return e.id
-      }),
-      observations: this.$storage.getObservations(),
-      showAddDialog: false,
-      showEditDialog: false,
-      showDeleteDialog: false,
-      expanded: false,
-      observationType: ObservationType.BODY_TEMPERATURE
-    }
-  },
-  computed: {
-    ObservationType() {
-      return ObservationType.BODY_TEMPERATURE
-    },
-    filteredList(): Observation[] {
-      return this.observations
-        .filter((obs: Observation) => {
-          return obs.code.coding[0].code === '8310-5'
-        })
-        .sort((a: Observation, b: Observation) => {
-          return new Date(a.issued).getTime() - new Date(b.issued).getTime();
-        });
-    }
-  },
-  methods: {
-    formatDate(date: any) {
-      return this.$moment(date.toString()).format('lll');
-    },
-    getFullPatientName() {
-      let name = this.$storage.getPatient().name;
-      return name[0].given.toString() + ' ' + name[0].family;
-    },
-    onEdit() {
-      this.showEditDialog = false;
-      this.showAddDialog = false;
-      this.showDeleteDialog = false;
-      this.observations = this.$storage.getObservations();
-    }
-  },
-});
+const observations = ref(storage.getObservations())
+const showAddDialog = ref(false)
+const showEditDialog = ref(false)
+const showDeleteDialog = ref(false)
+const expanded = ref(false)
+const observationType = ref(ObservationType.BODY_TEMPERATURE)
+
+const options = computed(() => {
+  return fhirData.BODY_TEMPERATURE.map(e => {
+    return e.id
+  })
+})
+const filteredList = computed(() => {
+  return observations.value
+    .filter((obs: Observation) => {
+      return obs.code.coding[0].code === '8310-5'
+    })
+    .sort((a: Observation, b: Observation) => {
+      return new Date(a.issued).getTime() - new Date(b.issued).getTime();
+    });
+})
+
+function formatDate(date: any) {
+  return moment(date.toString()).format('lll');
+}
+function getFullPatientName() {
+  let name = storage.getPatient().name;
+  return name[0].given.toString() + ' ' + name[0].family;
+}
+function onEdit() {
+  showEditDialog.value = false;
+  showAddDialog.value = false;
+  showDeleteDialog.value = false;
+  observations.value = storage.getObservations();
+}
 </script>

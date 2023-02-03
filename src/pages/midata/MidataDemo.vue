@@ -1,6 +1,6 @@
 <template>
-  <login-card v-if="!$midata.isLoggedIn()"></login-card>
-  <q-page v-if="$midata.isLoggedIn()">
+  <login-card v-if="!midata.isLoggedIn()"></login-card>
+  <q-page v-if="midata.isLoggedIn()">
     <div class="q-mb-xl">
       <div class="text-h3 text-weight-thin">Midata Demo</div>
       <q-separator spaced class="midata-fade"></q-separator>
@@ -86,50 +86,24 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
 import LoginCard from '../../components/LoginCard.vue';
 import { Patient } from '@i4mi/fhir_r4';
 import PatientResource from 'components/midata/PatientResource.vue';
+import { midata, storage } from 'boot/plugins';
 
-export default defineComponent({
-  name: 'MidataDemo',
-  components: {
-    PatientResource,
-    'login-card': LoginCard,
-  },
-  setup() {
-    return {
-      listExpanded: ref(false),
-      obsType: ref(),
-    };
-  },
-  data: () => ({
-    patientResource: {} as Patient,
-    flag: false,
-  }),
-  computed: {},
-  methods: {
-    getFullPatientName() {
-      let name = this.$storage.getPatient().name;
-      return name[0].given.toString() + ' ' + name[0].family;
-    },
-    isEmpty(obj: any) {
-      return JSON.stringify(obj) === '{}';
-    },
-    getPatient() {
-      this.patientResource = this.$storage.getPatient();
-      console.log(this.patientResource);
-    },
-    formatDate(date: any) {
-      return this.$moment(date.toString()).format('lll');
-    },
-    logout() {
-      this.$midata.logout();
-      location.reload();
-    }
-  },
-});
+const flag = ref(false)
+const patientResource = ref<Patient>()
+
+function getPatient() {
+  patientResource.value = storage.getPatient();
+  console.log(patientResource.value);
+}
+function logout() {
+  midata.logout();
+  location.reload();
+}
 </script>
 
 <style lang="sass" scoped>
