@@ -247,16 +247,10 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import { openURL } from 'quasar';
 
-export default defineComponent({
-  name: 'Github',
-  methods: {
-    openNewTab(link: string) {
-      openURL(link, null);
-    },
-  },
-});
+function openNewTab(link: string) {
+  openURL(link, null);
+}
 </script>

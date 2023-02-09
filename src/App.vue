@@ -1,52 +1,49 @@
 <template>
   <router-view />
 </template>
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { midata, moment, storage } from 'boot/plugins';
+import { useRouter } from 'vue-router';
 
-export default defineComponent({
-  name: 'App',
-  methods: {
-    setLanguage(_lang: string): void {
-      this.$i18n.locale = _lang;
-      this.$moment.locale(_lang === 'de' ? 'de-ch' : 'fr-ch');
-      this.$storage.setCurrentLanguage(_lang);
-    },
-    logout(): void {
-      if (this.$midata.isLoggedIn()) {
-        this.$midata.logout();
-      }
-    },
-  },
-  mounted() {
-    this.$i18n.locale = this.$storage.getCurrentLanguage();
-    this.setLanguage(this.$i18n.locale);
-    this.$midata
-      .handleAuthResponse()
-      .then((response: any) => {
-        if (response && this.$midata.isLoggedIn()) {
-          Promise.all([
-            this.$storage.restoreFromMidata(),
-            this.$midata.getPatientResource(),
-          ])
-            .then((results) => {
-              const preferredCom = results[1].communication.find((coms) => {
-                return coms.preferred;
-              });
-              if (preferredCom) {
-                const lang = preferredCom.language.coding[0].code;
-                if (lang) {
-                  this.setLanguage(lang);
-                }
+const i18n = useI18n()
+const router = useRouter()
+
+onMounted(() => {
+  i18n.locale.value = storage.getCurrentLanguage();
+  setLanguage(i18n.locale.value);
+  midata
+    .handleAuthResponse()
+    .then((response: any) => {
+      if (response && midata.isLoggedIn()) {
+        Promise.all([
+          storage.restoreFromMidata(),
+          midata.getPatientResource(),
+        ])
+          .then((results) => {
+            const preferredCom = results[1].communication.find((coms) => {
+              return coms.preferred;
+            });
+            if (preferredCom) {
+              const lang = preferredCom.language.coding[0].code;
+              if (lang) {
+                setLanguage(lang);
               }
-              this.$router.push('/midata/demo');
-            })
-            .catch();
-        } else if (this.$midata.isLoggedIn()) {
-          this.$storage.restoreFromMidata();
-        }
-      })
-      .catch();
-  },
-});
+            }
+            router.push('/midata/demo');
+          })
+          .catch();
+      } else if (midata.isLoggedIn()) {
+        storage.restoreFromMidata();
+      }
+    })
+    .catch();
+})
+
+function setLanguage(_lang: string): void {
+  i18n.locale.value = _lang;
+  moment.locale(_lang === 'de' ? 'de-ch' : 'fr-ch');
+  storage.setCurrentLanguage(_lang);
+}
 </script>

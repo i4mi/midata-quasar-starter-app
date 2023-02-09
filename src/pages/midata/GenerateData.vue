@@ -1,7 +1,7 @@
 <template>
 
-  <login-card v-if="!midata.isLoggedIn()"></login-card>
-  <q-page v-if="midata.isLoggedIn()">
+  <login-card v-if="!$midata.isLoggedIn()"></login-card>
+  <q-page v-if="$midata.isLoggedIn()">
 
     <div class="q-mb-xl">
       <div class="text-h3 text-weight-thin">Daten generieren lassen</div>
@@ -15,7 +15,7 @@
       einige Sekunden länger dauern als angezeigt.
     </p>
     <p>
-      Im Moment haben sie <b>{{storage.getObservations().length}}</b> Observationen
+      Im Moment haben sie <b>{{$storage.getObservations().length}}</b> Observationen
       in Midata gespeichert.
     </p>
     <q-btn
@@ -37,9 +37,9 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue';
-import { Notify, Loading } from 'quasar';
+import { Loading, Notify } from 'quasar';
 import LoginCard from 'components/LoginCard.vue';
-import { midata, moment, storage } from 'boot/plugins';
+import { midata, moment } from 'boot/plugins';
 
 const model = ref('')
 

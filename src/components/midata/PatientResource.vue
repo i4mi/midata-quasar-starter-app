@@ -65,10 +65,21 @@
 
 <script setup lang='ts'>
 
-import { ref } from 'vue';
+import { PropType, ref } from 'vue';
 import { storage } from 'boot/plugins';
+import { Patient } from '@i4mi/fhir_r4';
 
-defineProps(['flag', 'patientResource'])
+defineProps({
+  flag: {
+    type: Boolean,
+    required: true,
+  },
+  patientResource: {
+    type: Object as PropType<Patient>,
+    required: false
+  }
+})
+
 const expanded = ref(false)
 
 function isEmpty(obj: any) {

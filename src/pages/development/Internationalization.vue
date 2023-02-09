@@ -80,25 +80,25 @@ return {
     <q-separator spaced class="midata-fade"></q-separator>
     <q-btn-dropdown
       class="q-mt-lg midata-fade text-white"
-      :label="$t('lang.option')"
+      :label="i18n.t('lang.option')"
       icon="language"
     >
       <q-list>
-        <q-item clickable v-close-popup @click="changeLanguage('de')">
+        <q-item clickable v-close-popup @click="changeLanguage('de-ch')">
           <q-item-section>
-            <q-item-label>{{ $t('lang.de') }}</q-item-label>
+            <q-item-label>{{ i18n.t('lang.de') }}</q-item-label>
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-close-popup @click="changeLanguage('fr')">
+        <q-item clickable v-close-popup @click="changeLanguage('fr-ch')">
           <q-item-section>
-            <q-item-label>{{ $t('lang.fr') }}</q-item-label>
+            <q-item-label>{{ i18n.t('lang.fr') }}</q-item-label>
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-close-popup @click="changeLanguage('en')">
+        <q-item clickable v-close-popup @click="changeLanguage('en-gb')">
           <q-item-section>
-            <q-item-label>{{ $t('lang.en') }}</q-item-label>
+            <q-item-label>{{ i18n.t('lang.en') }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -117,16 +117,16 @@ return {
             style="top: 8px; right: 8px"
           >
             <q-tooltip>
-              {{ $t('card.info') }}
+              {{ i18n.t('card.info') }}
             </q-tooltip>
           </q-icon>
         </q-img>
         <q-card-section>
-          <div class="text-h6">{{ $t('card.title') }}</div>
-          <div class="text-subtitle2">{{ $t('card.subTitle') }}</div>
+          <div class="text-h6">{{ i18n.t('card.title') }}</div>
+          <div class="text-subtitle2">{{ i18n.t('card.subTitle') }}</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          {{ $t('card.text') }}
+          {{ i18n.t('card.text') }}
         </q-card-section>
         <q-card-actions>
           <q-space />
@@ -134,7 +134,7 @@ return {
             type="a"
             target="_blank"
             :href="'https://www.zermatt.ch/matterhorn'"
-            :label="$t('card.more')"
+            :label="i18n.t('card.more')"
             color="primary"
             flat
           />
@@ -148,16 +148,16 @@ return {
         filled
         v-model="model"
         :options="options"
-        :label="$t('interpolation.label')"
+        :label="i18n.t('interpolation.label')"
         :display-value="`${
-          model.label ? $t('interpolation.weather.' + model.label) : ''
+          model.label ? i18n.t('interpolation.weather.' + model.label) : ''
         }`"
       >
         <template v-slot:option="scope">
           <q-item v-bind="scope.itemProps">
             <q-item-section>
               <q-item-label>{{
-                $t('interpolation.weather.' + scope.opt.label)
+                  i18n.t('interpolation.weather.' + scope.opt.label)
               }}</q-item-label>
             </q-item-section>
           </q-item>
@@ -165,8 +165,8 @@ return {
       </q-select>
       <div class="text-subtitle">
         {{
-          $t('interpolation.message', {
-            condition: $t('interpolation.weather.' + model.label),
+          i18n.t('interpolation.message', {
+            condition: i18n.t('interpolation.weather.' + model.label),
           })
         }}
       </div>
@@ -180,15 +180,15 @@ return {
         filled
         type="number"
         v-model="rrziel3"
-        :label="$t('interpolation.artBD.label')"
+        :label="i18n.t('interpolation.artBD.label')"
         lazy-rules
         :rules="[
           (val) =>
-            (val !== null && val !== '') || $t('interpolation.artBD.empty'),
+            (val !== null && val !== '') || i18n.t('interpolation.artBD.empty'),
           ,
           (val) =>
             (val >= 30 && val <= 120) ||
-            $t('interpolation.artBD.error', { value: val }),
+            i18n.t('interpolation.artBD.error', { value: val }),
         ]"
       />
     </div>
@@ -218,25 +218,19 @@ $ npm install moment"
           icon="today"
         >
           <q-list>
-            <q-item clickable v-close-popup @click="changeLocale('de-ch')">
+            <q-item clickable v-close-popup @click="changeLanguage('de-ch')">
               <q-item-section>
                 <q-item-label>Deutsch (Schweiz)</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="changeLocale('fr-ch')">
+            <q-item clickable v-close-popup @click="changeLanguage('fr-ch')">
               <q-item-section>
                 <q-item-label>Französisch (Schweiz)</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="changeLocale('it-ch')">
-              <q-item-section>
-                <q-item-label>Italienisch (Schweiz)</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item clickable v-close-popup @click="changeLocale('en-gb')">
+            <q-item clickable v-close-popup @click="changeLanguage('en-gb')">
               <q-item-section>
                 <q-item-label>Englisch (United Kingdom)</q-item-label>
               </q-item-section>
@@ -246,7 +240,7 @@ $ npm install moment"
       </div>
 
       <p>
-        Ausgewählte Sprache <b>({{ locale }})</b>:
+        Ausgewählte Sprache <b>({{ i18n.locale }})</b>:
       </p>
       <div
         style="overflow-x: scroll; background-color: #f6f6f6"
@@ -276,36 +270,39 @@ $ npm install moment"
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { moment, storage } from 'boot/plugins';
+import { useI18n } from 'vue-i18n';
 
-export default defineComponent({
-  name: 'Internationalization',
-  setup() {
-    return {
-      rrziel3: ref(null),
-      model: ref({ label: 'sun' }),
-      locale: ref('de-ch'),
-      options: [
-        { label: 'sun' },
-        { label: 'cloud' },
-        { label: 'rain' },
-        { label: 'storm' },
-        { label: 'mist' },
-      ],
-    };
-  },
-  methods: {
-    changeLanguage(value: string) {
-      if (this.$i18n.availableLocales.includes(value)) {
-        this.$i18n.locale = value;
-        this.$storage.setCurrentLanguage(value)
-      }
-    },
-    changeLocale(value: string) {
-      this.$moment.locale(value);
-      this.locale = value;
-    },
-  },
-});
+const i18n = useI18n()
+
+const rrziel3 = ref(null);
+const model = ref({ label: 'sun' });
+const options = [
+  { label: 'sun' },
+  { label: 'cloud' },
+  { label: 'rain' },
+  { label: 'storm' },
+  { label: 'mist' },
+]
+
+function changeLanguage(value: string) {
+  i18n.locale.value = localeConverter(value);
+  storage.setCurrentLanguage(localeConverter(value))
+  moment.locale(value)
+}
+
+function localeConverter(value: string): string {
+  switch (value){
+    case 'en-gb':
+      return 'en'
+    case 'fr-ch':
+      return 'fr'
+    case 'de-ch':
+      return 'de'
+    default:
+      return 'de'
+  }
+}
 </script>

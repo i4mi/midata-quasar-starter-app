@@ -1,6 +1,6 @@
 <template>
-  <login-card v-if="!midata.isLoggedIn()"></login-card>
-  <q-page v-if="midata.isLoggedIn()">
+  <login-card v-if="!$midata.isLoggedIn()"></login-card>
+  <q-page v-if="$midata.isLoggedIn()">
     <div class="q-mb-xl">
       <div class="text-h3 text-weight-thin">Midata Demo</div>
       <q-separator spaced class="midata-fade"></q-separator>
