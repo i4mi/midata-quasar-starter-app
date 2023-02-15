@@ -272,10 +272,12 @@ $ npm install moment"
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { moment, storage } from 'boot/plugins';
+import { moment } from 'boot/plugins';
 import { useI18n } from 'vue-i18n';
+import { useUserStore } from 'stores/user';
 
 const i18n = useI18n()
+const store = useUserStore()
 
 const rrziel3 = ref(null);
 const model = ref({ label: 'sun' });
@@ -289,7 +291,7 @@ const options = [
 
 function changeLanguage(value: string) {
   i18n.locale.value = localeConverter(value);
-  storage.setCurrentLanguage(localeConverter(value))
+  store.currentLanguage = localeConverter(value)
   moment.locale(value)
 }
 

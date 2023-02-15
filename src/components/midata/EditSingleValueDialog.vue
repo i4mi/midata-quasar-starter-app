@@ -60,7 +60,7 @@
 import { PropType, ref, computed } from 'vue';
 import { ObservationStatus } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
-import { storage } from 'boot/plugins';
+import { useUserStore } from 'stores/user';
 
 const props = defineProps({
   visible: Boolean,
@@ -75,6 +75,7 @@ const props = defineProps({
   defaultValue: Number
 })
 const emit = defineEmits(['close'])
+const store = useUserStore()
 
 const bodySite = ref('')
 const value = ref(props.defaultValue)
@@ -97,14 +98,14 @@ function onReset() {
 }
 async function updateObservation() {
   if (props.actionType == 'edit'){
-    await storage.updateObservation(
-      storage.getCurrentObservation().id,
+    await store.updateObservation(
+      store.currentObservation.id,
       bodySite.value,
       [value.value],
       props.observationType);
   }
   else if (props.actionType == 'add'){
-    await storage.createObservation(
+    await store.createObservation(
       ObservationStatus.PRELIMINARY,
       bodySite.value,
       [value.value],

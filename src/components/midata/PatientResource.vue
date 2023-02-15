@@ -49,7 +49,7 @@
             <q-card-section
               class="innerCardScroll"
               clickable
-              @click='storage.copyToClipBoard
+              @click='store.copyToClipBoard
               (patientResource, "Patienten Resource")'>
               <highlightjs
                 lang="json"
@@ -66,8 +66,8 @@
 <script setup lang='ts'>
 
 import { PropType, ref } from 'vue';
-import { storage } from 'boot/plugins';
 import { Patient } from '@i4mi/fhir_r4';
+import { useUserStore } from 'stores/user';
 
 defineProps({
   flag: {
@@ -81,6 +81,7 @@ defineProps({
 })
 
 const expanded = ref(false)
+const store = useUserStore()
 
 function isEmpty(obj: any) {
   return JSON.stringify(obj) === '{}';

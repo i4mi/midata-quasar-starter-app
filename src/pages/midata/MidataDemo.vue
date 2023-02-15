@@ -8,10 +8,7 @@
 
     <div class="row justify-end">
       <q-btn
-        @click="
-          getPatient();
-          flag = true;
-        "
+        @click="flag = true;"
         flat
         text-color="white"
         class="gt-xs midata-fade"
@@ -20,10 +17,7 @@
         Patientenresource von MIDATA abfragen
       </q-btn>
       <q-btn
-        @click="
-          getPatient();
-          flag = true;
-        "
+        @click="flag = true;"
         flat
         icon="person"
         text-color="white"
@@ -52,7 +46,7 @@
     </div>
     <div style="height: 25px"></div>
 
-    <PatientResource :flag='flag' :patient-resource='patientResource'></PatientResource>
+    <PatientResource :flag='flag' :patient-resource='store.patientResource'></PatientResource>
 
     <div style="height: 25px" />
     <q-tabs
@@ -89,20 +83,17 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import LoginCard from '../../components/LoginCard.vue';
-import { Patient } from '@i4mi/fhir_r4';
 import PatientResource from 'components/midata/PatientResource.vue';
-import { midata, storage } from 'boot/plugins';
+import { midata } from 'boot/plugins';
+import { useUserStore } from 'stores/user';
 
 const flag = ref(false)
-const patientResource = ref<Patient>()
+const store = useUserStore()
 
-function getPatient() {
-  patientResource.value = storage.getPatient();
-  console.log(patientResource.value);
-}
 function logout() {
   midata.logout();
   location.reload();
+  store.deleteDataInStore()
 }
 </script>
 

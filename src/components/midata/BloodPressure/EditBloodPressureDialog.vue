@@ -73,13 +73,14 @@ import fhirData from '../../../data/fhirData.json'
 import { ObservationStatus } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
 import { Notify } from 'quasar';
-import { storage } from 'boot/plugins';
+import { useUserStore } from 'stores/user';
 
 const props = defineProps({
   visible: Boolean,
   actionType: String
 })
 const emit = defineEmits(['close'])
+const store = useUserStore()
 
 const systolicPressure = ref(120)
 const diastolicPressure = ref(90)
@@ -117,14 +118,14 @@ async function updateObservation() {
     return;
   }
   else if (props.actionType === 'edit'){
-    await storage.updateObservation(
-      storage.getCurrentObservation().id,
+    await store.updateObservation(
+      store.currentObservation.id,
       bodySite.value,
       [systolicPressure.value, diastolicPressure.value],
       ObservationType.BLOOD_PRESSURE)
   }
   else if (props.actionType == 'add'){
-    await storage.createObservation(
+    await store.createObservation(
       ObservationStatus.PRELIMINARY,
       bodySite.value,
       [systolicPressure.value, diastolicPressure.value],

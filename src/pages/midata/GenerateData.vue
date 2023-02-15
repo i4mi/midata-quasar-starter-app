@@ -15,7 +15,7 @@
       einige Sekunden länger dauern als angezeigt.
     </p>
     <p>
-      Im Moment haben sie <b>{{$storage.getObservations().length}}</b> Observationen
+      Im Moment haben sie <b>{{store.observations.length}}</b> Observationen
       in Midata gespeichert.
     </p>
     <q-btn
@@ -40,8 +40,10 @@ import { ref } from 'vue';
 import { Loading, Notify } from 'quasar';
 import LoginCard from 'components/LoginCard.vue';
 import { midata, moment } from 'boot/plugins';
+import { useUserStore } from 'stores/user';
 
 const model = ref('')
+const store = useUserStore()
 
 async function updateRandomData() {
   if (model.value.length !== 0){

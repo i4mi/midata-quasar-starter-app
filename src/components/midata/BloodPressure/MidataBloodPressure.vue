@@ -43,7 +43,7 @@
               color="primary"
               outlined
               flat
-              @mouseover="storage.setCurrentObservation(item.id)"
+              @mouseover="store.setCurrentObservation(item.id)"
               @click.stop="showEditDialog = true"
               icon="edit"
               class="gt-xs"
@@ -54,7 +54,7 @@
               color="red"
               outlined
               flat
-              @mouseover="storage.setCurrentObservation(item.id)"
+              @mouseover="store.setCurrentObservation(item.id)"
               @click.stop="showDeleteDialog = true"
               icon="delete"
               class="gt-xs"
@@ -66,7 +66,7 @@
               outlined
               round
               flat
-              @mouseover="storage.setCurrentObservation(item.id)"
+              @mouseover="store.setCurrentObservation(item.id)"
               @click.stop="showEditDialog = true"
               icon="edit"
               class="lt-sm"
@@ -77,7 +77,7 @@
               outlined
               round
               flat
-              @mouseover="storage.setCurrentObservation(item.id)"
+              @mouseover="store.setCurrentObservation(item.id)"
               @click.stop="showDeleteDialog = true"
               icon="delete"
               class="lt-sm"
@@ -85,7 +85,7 @@
             </q-btn>
           </q-item>
           <q-item v-if='expanded' :key='index + "_codeblock"' >
-            <q-item-section clickable @click='storage.copyToClipBoard(item, "Observation Resource")'>
+            <q-item-section clickable @click='store.copyToClipBoard(item, "Observation Resource")'>
               <highlightjs
                 lang="json"
                 :code="JSON.stringify(item, null, 2)"
@@ -148,9 +148,11 @@ import { Observation } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
 import EditBloodPressureDialog from 'components/midata/BloodPressure/EditBloodPressureDialog.vue';
 import DoubleValueObservationChart from 'components/midata/Charts/DoubleValueObservationChart.vue';
-import { moment, storage } from 'boot/plugins';
+import { moment } from 'boot/plugins';
+import { useUserStore } from 'stores/user';
 
-const observations = ref<Observation[]>(storage.getObservations())
+const store = useUserStore()
+
 const showAddDialog = ref(false)
 const showEditDialog = ref(false)
 const showDeleteDialog = ref(false)
@@ -158,7 +160,7 @@ const expanded = ref(false)
 const observationType = ref<ObservationType>(ObservationType.BLOOD_PRESSURE)
 
 const filteredList = computed(() => {
-  return observations.value
+  return store.observations
     .filter((obs: Observation) => {
       return obs.code.coding[0].code === '85354-9'
     })
@@ -171,13 +173,12 @@ function formatDate(date: any) {
   return moment(date.toString()).format('lll');
 }
 function getFullPatientName() {
-  let name = storage.getPatient().name;
+  let name = store.patientResource.name;
   return name[0].given.toString() + ' ' + name[0].family;
 }
 function onEdit() {
   showEditDialog.value = false;
   showAddDialog.value = false;
   showDeleteDialog.value = false;
-  observations.value = storage.getObservations();
 }
 </script>

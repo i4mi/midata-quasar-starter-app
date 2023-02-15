@@ -4,21 +4,23 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { midata, moment, storage } from 'boot/plugins';
+import { midata, moment } from 'boot/plugins';
 import { useRouter } from 'vue-router';
+import { useUserStore } from 'stores/user';
 
 const i18n = useI18n()
 const router = useRouter()
+const store = useUserStore()
 
 onMounted(() => {
-  i18n.locale.value = storage.getCurrentLanguage();
+  i18n.locale.value = store.currentLanguage
   setLanguage(i18n.locale.value);
   midata
     .handleAuthResponse()
     .then((response: any) => {
       if (response && midata.isLoggedIn()) {
         Promise.all([
-          storage.restoreFromMidata(),
+          store.restoreFromMidata(),
           midata.getPatientResource(),
         ])
           .then((results) => {
@@ -35,7 +37,7 @@ onMounted(() => {
           })
           .catch();
       } else if (midata.isLoggedIn()) {
-        storage.restoreFromMidata();
+        store.restoreFromMidata();
       }
     })
     .catch();
@@ -44,6 +46,6 @@ onMounted(() => {
 function setLanguage(_lang: string): void {
   i18n.locale.value = _lang;
   moment.locale(_lang === 'de' ? 'de-ch' : 'fr-ch');
-  storage.setCurrentLanguage(_lang);
+  store.currentLanguage = _lang
 }
 </script>

@@ -19,9 +19,10 @@
 import { computed, PropType } from 'vue';
 import { ObservationStatus } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
-import { storage } from 'boot/plugins';
+import { useUserStore } from 'stores/user';
 
 const emit = defineEmits(['close'])
+const store = useUserStore()
 
 const props = defineProps({
   visible: Boolean,
@@ -38,10 +39,10 @@ const show = computed({
 })
 
 async function updateObservation() {
-  await storage.updateObservation(
-    storage.getCurrentObservation().id,
-    storage.getCurrentObservation().bodySite.coding[0].display,
-    [storage.getCurrentObservation().valueInteger],
+  await store.updateObservation(
+    store.currentObservation.id,
+    store.currentObservation.bodySite.coding[0].display,
+    [store.currentObservation.valueInteger],
     props.observationType,
     ObservationStatus.ENTERED_IN_ERROR
   );
