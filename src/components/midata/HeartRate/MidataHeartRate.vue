@@ -3,10 +3,10 @@
     <q-card-section>
       <q-item-label header
       >Alle Puls Observationen von
-        {{ getFullPatientName() }}</q-item-label
+        {{ store.fullPatientName }}</q-item-label
       >
       <q-virtual-scroll
-        :items="filteredList"
+        :items="store.filteredList"
         bordered
         padding
         class="rounded-borders"
@@ -36,7 +36,7 @@
               </q-item-label>
               <q-item-label caption>
                 Datum:
-                {{ formatDate(item.issued) }}
+                {{ store.formatDate(item.issued) }} ({{$moment(item.issued).fromNow()}})
               </q-item-label>
             </q-item-section>
             <q-btn
@@ -84,7 +84,7 @@
             >
             </q-btn>
           </q-item>
-          <q-item v-if='expanded' :key='index + "_codeblock"' >
+          <q-item v-if='store.observationsExpanded' :key='index + "_codeblock"' >
             <q-item-section clickable @click='store.copyToClipBoard(item, "Observation Resource")'>
               <highlightjs
                 lang="json"
@@ -107,7 +107,7 @@
       />
       <q-space></q-space>
       <q-toggle
-        v-model="expanded"
+        v-model="store.observationsExpanded"
         label="Vollständige Ressourcen anzeigen"
         left-label
       />
@@ -116,7 +116,7 @@
   <div style="height: 25px"></div>
 
   <SingleValueObservationChart
-    :data='filteredList'
+    :data='store.filteredList'
     :observation-type='"Puls"'
     :unit='"beats/min"'>
   </SingleValueObservationChart>
@@ -157,44 +157,26 @@
 <script setup lang='ts'>
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
 import { ref, computed } from 'vue';
-import { Observation } from '@i4mi/fhir_r4';
 import SingleValueObservationChart from 'components/midata/Charts/SingleValueObservationChart.vue';
 import { ObservationType } from 'src/plugins/midataService';
 import EditSingleValueDialog from 'components/midata/EditSingleValueDialog.vue';
 import fhirData from 'src/data/fhirData.json';
-import { moment } from 'boot/plugins';
 import { useUserStore } from 'stores/user';
 
 const store = useUserStore()
+store.currentFilter = '8867-4'
 
 const showAddDialog = ref(false)
 const showEditDialog = ref(false)
 const showDeleteDialog = ref(false)
-const expanded = ref(false)
-const observationType = ref(ObservationType.HEART_RATE)
+const observationType = ref<ObservationType>(ObservationType.HEART_RATE)
 
 const options = computed(() => {
   return fhirData.HEART_RATE.map(e => {
     return e.id
   })
 })
-const filteredList = computed(() => {
-  return store.observations
-    .filter((obs: Observation) => {
-      return obs.code.coding[0].code === '8867-4'
-    })
-    .sort((a: Observation, b: Observation) => {
-      return new Date(a.issued).getTime() - new Date(b.issued).getTime();
-    });
-})
 
-function formatDate(date: any) {
-  return moment(date.toString()).format('lll');
-}
-function getFullPatientName() {
-  let name = store.patientResource.name;
-  return name[0].given.toString() + ' ' + name[0].family;
-}
 function onEdit() {
   showEditDialog.value = false;
   showAddDialog.value = false;

@@ -28,9 +28,9 @@
       Daten generieren
     </q-btn>
     <div class="q-gutter-md row items-start">
-      <q-date v-model="model" mask="YYYY-MM-DD HH:mm" color="blue" today-btn
+      <q-date v-model="date" mask="YYYY-MM-DD HH:mm" color="blue" today-btn
               :options='dateOptions'/>
-      <q-time v-model="model" format24h mask="YYYY-MM-DD HH:mm" color="blue"/>
+      <q-time v-model="date" format24h mask="YYYY-MM-DD HH:mm" color="blue"/>
     </div>
   </q-page>
 </template>
@@ -42,15 +42,15 @@ import LoginCard from 'components/LoginCard.vue';
 import { midata, moment } from 'boot/plugins';
 import { useUserStore } from 'stores/user';
 
-const model = ref('')
+const date = ref('')
 const store = useUserStore()
 
 async function updateRandomData() {
-  if (model.value.length !== 0){
+  if (date.value.length !== 0){
     Loading.show({
       message: '48 Observationen werden erstellt...'
     })
-    await midata.generateRandomData(model.value)
+    await midata.generateRandomData(date.value)
     Loading.hide()
   }
   else {

@@ -94,7 +94,7 @@ const actionTypeLabel = computed(() => props.actionType === 'edit' ?
 
 function onReset() {
   bodySite.value = '';
-  value.value = 36.8;
+  value.value = props.defaultValue;
 }
 async function updateObservation() {
   if (props.actionType == 'edit'){

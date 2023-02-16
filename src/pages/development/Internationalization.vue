@@ -84,19 +84,19 @@ return {
       icon="language"
     >
       <q-list>
-        <q-item clickable v-close-popup @click="changeLanguage('de-ch')">
+        <q-item clickable v-close-popup @click="store.changeLanguage('de-ch')">
           <q-item-section>
             <q-item-label>{{ i18n.t('lang.de') }}</q-item-label>
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-close-popup @click="changeLanguage('fr-ch')">
+        <q-item clickable v-close-popup @click="store.changeLanguage('fr-ch')">
           <q-item-section>
             <q-item-label>{{ i18n.t('lang.fr') }}</q-item-label>
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-close-popup @click="changeLanguage('en-gb')">
+        <q-item clickable v-close-popup @click="store.changeLanguage('en-gb')">
           <q-item-section>
             <q-item-label>{{ i18n.t('lang.en') }}</q-item-label>
           </q-item-section>
@@ -218,19 +218,19 @@ $ npm install moment"
           icon="today"
         >
           <q-list>
-            <q-item clickable v-close-popup @click="changeLanguage('de-ch')">
+            <q-item clickable v-close-popup @click="store.changeLanguage('de-ch')">
               <q-item-section>
                 <q-item-label>Deutsch (Schweiz)</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="changeLanguage('fr-ch')">
+            <q-item clickable v-close-popup @click="store.changeLanguage('fr-ch')">
               <q-item-section>
                 <q-item-label>Französisch (Schweiz)</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="changeLanguage('en-gb')">
+            <q-item clickable v-close-popup @click="store.changeLanguage('en-gb')">
               <q-item-section>
                 <q-item-label>Englisch (United Kingdom)</q-item-label>
               </q-item-section>
@@ -272,7 +272,6 @@ $ npm install moment"
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { moment } from 'boot/plugins';
 import { useI18n } from 'vue-i18n';
 import { useUserStore } from 'stores/user';
 
@@ -288,23 +287,4 @@ const options = [
   { label: 'storm' },
   { label: 'mist' },
 ]
-
-function changeLanguage(value: string) {
-  i18n.locale.value = localeConverter(value);
-  store.currentLanguage = localeConverter(value)
-  moment.locale(value)
-}
-
-function localeConverter(value: string): string {
-  switch (value){
-    case 'en-gb':
-      return 'en'
-    case 'fr-ch':
-      return 'fr'
-    case 'de-ch':
-      return 'de'
-    default:
-      return 'de'
-  }
-}
 </script>

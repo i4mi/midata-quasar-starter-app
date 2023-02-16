@@ -3,18 +3,15 @@
 </template>
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { midata, moment } from 'boot/plugins';
+import { midata } from 'boot/plugins';
 import { useRouter } from 'vue-router';
 import { useUserStore } from 'stores/user';
 
-const i18n = useI18n()
 const router = useRouter()
 const store = useUserStore()
 
 onMounted(() => {
-  i18n.locale.value = store.currentLanguage
-  setLanguage(i18n.locale.value);
+  store.changeLanguage(store.currentLanguage);
   midata
     .handleAuthResponse()
     .then((response: any) => {
@@ -30,7 +27,7 @@ onMounted(() => {
             if (preferredCom) {
               const lang = preferredCom.language.coding[0].code;
               if (lang) {
-                setLanguage(lang);
+                store.changeLanguage(lang);
               }
             }
             router.push('/midata/demo');
@@ -42,10 +39,4 @@ onMounted(() => {
     })
     .catch();
 })
-
-function setLanguage(_lang: string): void {
-  i18n.locale.value = _lang;
-  moment.locale(_lang === 'de' ? 'de-ch' : 'fr-ch');
-  store.currentLanguage = _lang
-}
 </script>
