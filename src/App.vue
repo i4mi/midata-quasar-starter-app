@@ -11,7 +11,6 @@ const router = useRouter()
 const store = useUserStore()
 
 onMounted(() => {
-  store.changeLanguage(store.currentLanguage);
   midata
     .handleAuthResponse()
     .then((response: any) => {

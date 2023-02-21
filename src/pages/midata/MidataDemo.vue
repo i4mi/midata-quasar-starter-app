@@ -46,7 +46,7 @@
     </div>
     <div style="height: 25px"></div>
 
-    <PatientResource :visible='flag' :patient-resource='store.patientResource'></PatientResource>
+    <PatientResource :visible='flag'></PatientResource>
 
     <div style="height: 25px" />
     <q-tabs
@@ -92,8 +92,8 @@ const store = useUserStore()
 
 function logout() {
   midata.logout();
-  location.reload();
   store.deleteDataInStore()
+  location.reload();
 }
 </script>
 

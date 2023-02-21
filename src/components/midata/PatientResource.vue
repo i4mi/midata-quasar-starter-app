@@ -1,6 +1,6 @@
 <template>
   <q-card v-if="visible">
-    <q-card-section v-if="!isEmpty(patientResource)">
+    <q-card-section v-if="store.patientResource">
       <q-card flat bordered>
         <q-card-section>
           <q-img src="../../assets/midata/demo/masks.png" height="200px">
@@ -64,27 +64,16 @@
 </template>
 
 <script setup lang='ts'>
-
-import { PropType } from 'vue';
-import { Patient } from '@i4mi/fhir_r4';
 import { useUserStore } from 'stores/user';
 
 defineProps({
   visible: {
     type: Boolean,
     required: true,
-  },
-  patientResource: {
-    type: Object as PropType<Patient>,
-    required: false
   }
 })
 
 const store = useUserStore()
-
-function isEmpty(obj: any) {
-  return JSON.stringify(obj) === '{}';
-}
 
 </script>
 <style lang="sass" scoped>

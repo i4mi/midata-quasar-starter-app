@@ -59,6 +59,7 @@
 
 <script lang="ts">
 import PageLinks from 'components/PageLinks.vue';
+import { defineComponent, ref } from 'vue';
 
 const linksList = [
   {
@@ -112,9 +113,12 @@ const developmentLinksList = [
     icon: 'language',
     link: '/internationalization',
   },
+  {
+    title: 'State-Management mit Pinia und Vue-Devtools',
+    icon: 'mdi-fruit-pineapple',
+    link: '/pinia'
+  }
 ];
-
-import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'MainLayout',
