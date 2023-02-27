@@ -44,7 +44,6 @@ export const useUserStore = defineStore('user', () => {
    *              - if not successfull ->
    */
   async function restoreFromMidata(): Promise<void> {
-    console.log('restoring from Midata')
     try {
       const results = await Promise.all([
         midata.getPatientResource(),
@@ -116,7 +115,6 @@ export const useUserStore = defineStore('user', () => {
     values: number[],
     observationType: ObservationType
   ): Promise<Observation> {
-    console.time('create')
     try {
       const result = await midata.createObservation(_status, bodySite, values, observationType);
       if (result) {
@@ -128,7 +126,6 @@ export const useUserStore = defineStore('user', () => {
           position: 'top',
           icon: 'announcement',
         });
-        console.timeEnd('create')
         return result;
       } else {
         throw new Error('Error');
@@ -165,7 +162,6 @@ export const useUserStore = defineStore('user', () => {
     observationType: ObservationType,
     observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
-    console.time('edit')
     try {
       const result = await midata.updateObservation(_id, bodySite, values, observationType, observationStatus);
       if (result) {
@@ -176,7 +172,6 @@ export const useUserStore = defineStore('user', () => {
           position: 'top',
           icon: 'announcement',
         });
-        console.timeEnd('edit')
         return result;
       } else {
         throw new Error('Error');
