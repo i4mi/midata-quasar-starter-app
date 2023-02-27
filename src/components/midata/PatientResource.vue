@@ -1,6 +1,6 @@
 <template>
   <q-card v-if="visible">
-    <q-card-section v-if="store.patientResource">
+    <q-card-section v-if="store.patientResource !== undefined">
       <q-card flat bordered>
         <q-card-section>
           <q-img src="../../assets/midata/demo/masks.png" height="200px">
@@ -9,15 +9,15 @@
           <div class="text-h6">Steckbrief</div>
           <div class="text-subtitle">
             {{
-              patientResource.name[0].given +
+              store.patientResource.name[0].given +
               ' ' +
-              patientResource.name[0].family
+              store.patientResource.name[0].family
             }}
           </div>
           <div class="text-body text-grey">
-            {{ 'Geschlecht: ' + patientResource.gender }} <br />
-            {{ 'Patienten id: ' + patientResource.id }} <br />
-            {{ 'E-Mail: ' + patientResource.telecom[0].value }}
+            {{ 'Geschlecht: ' + store.patientResource.gender }} <br />
+            {{ 'Patienten id: ' + store.patientResource.id }} <br />
+            {{ 'E-Mail: ' + store.patientResource.telecom[0].value }}
           </div>
         </q-card-section>
 
@@ -50,10 +50,10 @@
               class="innerCardScroll"
               clickable
               @click='store.copyToClipBoard
-              (patientResource, "Patienten Resource")'>
+              (store.patientResource, "Patienten Resource")'>
               <highlightjs
                 lang="json"
-                :code="JSON.stringify(patientResource, null, 2)"
+                :code="JSON.stringify(store.patientResource, null, 2)"
               ></highlightjs>
             </q-card-section>
           </div>

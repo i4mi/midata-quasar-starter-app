@@ -91,8 +91,9 @@ const flag = ref(false)
 const store = useUserStore()
 
 function logout() {
+  flag.value = false;
   midata.logout();
-  store.deleteDataInStore()
+  store.deleteDataInStore();
   location.reload();
 }
 </script>
