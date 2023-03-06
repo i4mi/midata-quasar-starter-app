@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, computed } from 'vue';
+import { PropType, ref, computed, onBeforeUpdate } from 'vue';
 import { ObservationStatus } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
 import { useUserStore } from 'stores/user';
@@ -80,8 +80,17 @@ const store = useUserStore()
 const bodySite = ref('')
 const value = ref(props.defaultValue)
 
+onBeforeUpdate(() => {
+  if(props.actionType === 'edit') {
+    bodySite.value = store.currentObservation.bodySite.coding[0].display;
+    value.value = value.value = store.currentObservation.valueQuantity.value;
+  }
+})
+
 const show = computed({
-  get: () => props.visible,
+  get: () => {
+    return props.visible
+  },
   set: (value: any) => {
     if (!value) {
       emit('close');

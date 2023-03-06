@@ -1,6 +1,6 @@
 <template>
-  <q-card v-if="visible">
-    <q-card-section v-if="store.patientResource !== undefined">
+  <q-card>
+    <q-card-section>
       <q-card flat bordered>
         <q-card-section>
           <q-img src="../../assets/midata/demo/masks.png" height="200px">
@@ -65,13 +65,6 @@
 
 <script setup lang='ts'>
 import { useUserStore } from 'stores/user';
-
-defineProps({
-  visible: {
-    type: Boolean,
-    required: true,
-  }
-})
 
 const store = useUserStore()
 

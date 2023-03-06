@@ -109,7 +109,7 @@ const developmentLinksList = [
     link: '/github',
   },
   {
-    title: 'Internationalisierung mit Vue-i18n und Moment.js',
+    title: 'Internationalisierung mit Vue-i18n und Intl',
     icon: 'language',
     link: '/internationalization',
   },

@@ -19,6 +19,7 @@ export const useUserStore = defineStore('user', () => {
   const currentObservation = useSessionStorage('currentObservation', {} as Observation)
   const observations = useSessionStorage('observations', [] as Observation[])
   const currentFilter = useSessionStorage('currentFilter', '')
+  const patientResourceVisible = useSessionStorage('patientResourceVisible', false)
   const patientResourceExpanded = useSessionStorage('patientResourceExpanded', false)
   const observationsExpanded = useSessionStorage('observationsExpanded', false)
 
@@ -254,7 +255,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return { currentLanguage, patientResource, currentObservation,
-    observations, currentFilter, filteredList, patientResourceExpanded,
+    observations, currentFilter, filteredList, patientResourceVisible, patientResourceExpanded,
     observationsExpanded, fullPatientName, numberOfObservations,
     deleteDataInStore, copyToClipBoard: copyItemToClipBoard, restoreFromMidata,
     createObservation, updateObservation, setCurrentObservation, changeLanguage,

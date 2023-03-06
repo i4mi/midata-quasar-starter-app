@@ -195,18 +195,19 @@ return {
     <q-separator spaced class="midata-fade"></q-separator>
 
     <div class="q-my-xl">
-      <div class="q-qb-sm text-h5">Lokalisation mit Moment.js</div>
+      <div class="q-qb-sm text-h5">Lokalisation mit der Javscript Internationalization API (Intl)</div>
       <p>
-        Das npm Paket moment.js macht ortsspezifische Datums- und Zeitformate
-        verfügbar.
+        Javascript besitzt eine eingebaute API, mit der man zum Beispiel Datum-Objekte in verschiedenen Sprachen anzeigen kann.
+        Um ein Datum in verschiedenen Sprachen anzeigen zu können, kann man Statische Funktionen des Intl Objekts zugreifen.
       </p>
-
-      <div class="q-qb-sm text-h5">Installation</div>
-      <highlightjs
-        language="javascript"
-        code="$ yarn add moment
-oder
-$ npm install moment"
+      <q-btn
+        type="a"
+        target="_blank"
+        :href="'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl'"
+        label="Javscript Internationalization API Dokumentation"
+        color="primary"
+        class="midata-fade text-white"
+        flat
       />
 
       <div class="q-my-md">
@@ -246,17 +247,14 @@ $ npm install moment"
         style="overflow-x: scroll; background-color: #f6f6f6"
         class="q-px-sm"
       >
-        <pre>moment.locale()          // {{ $moment.locale() }}</pre>
-        <pre>moment().format('LT')    // {{ $moment().format('LT') }}</pre>
-        <pre>moment().format('LTS')   // {{ $moment().format('LTS') }}</pre>
-        <pre>moment().format('L')     // {{ $moment().format('L') }}</pre>
-        <pre>moment().format('l')     // {{ $moment().format('l') }}</pre>
-        <pre>moment().format('LL')    // {{ $moment().format('LL') }}</pre>
-        <pre>moment().format('ll')    // {{ $moment().format('ll') }}</pre>
-        <pre>moment().format('LLL')   // {{ $moment().format('LLL') }}</pre>
-        <pre>moment().format('lll')   // {{ $moment().format('lll') }}</pre>
-        <pre>moment().format('LLLL')  // {{ $moment().format('LLLL') }}</pre>
-        <pre>moment().format('llll')  // {{ $moment().format('llll') }}</pre>
+        <pre><b>{{ store.currentLanguage }}</b>    // store.currentLanguage</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b>    // new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric', second: 'numeric'}).format(new Date) }}</b>   // new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric', second: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date) }}</b>   // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric'}).format(new Date) }}</b>    // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b>    // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b>   // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b> // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
       </div>
     </div>
     <div class="q-my-xl text-grey">
@@ -264,7 +262,7 @@ $ npm install moment"
       <ul>
         <li>https://kazupon.github.io/vue-i18n/</li>
 
-        <li>https://momentjs.com/</li>
+        <li>https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl</li>
       </ul>
     </div>
   </q-page>

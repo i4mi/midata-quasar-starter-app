@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, onBeforeUpdate } from 'vue';
 import fhirData from '../../../data/fhirData.json'
 import { ObservationStatus } from '@i4mi/fhir_r4';
 import { ObservationType } from 'src/plugins/midataService';
@@ -85,6 +85,14 @@ const store = useUserStore()
 const systolicPressure = ref(120)
 const diastolicPressure = ref(90)
 const bodySite = ref('')
+
+onBeforeUpdate(() => {
+  if(props.actionType === 'edit') {
+    bodySite.value = store.currentObservation.bodySite.coding[0].display;
+    systolicPressure.value = store.currentObservation.component[0].valueQuantity.value
+    diastolicPressure.value = store.currentObservation.component[1].valueQuantity.value
+  }
+})
 
 const options = computed(() => {
   return fhirData.BLOOD_PRESSURE.map(e => {
