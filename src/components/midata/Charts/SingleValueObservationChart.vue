@@ -15,9 +15,10 @@ import { computed } from 'vue';
 import type { PropType } from 'vue'
 import { Observation } from '@i4mi/fhir_r4';
 import { useQuasar } from 'quasar';
-import { moment } from 'boot/plugins';
+import { useUserStore } from 'stores/user';
 
 const $q = useQuasar()
+const store = useUserStore()
 
 const props = defineProps({
   data: Array as PropType<Observation[]>,
@@ -58,7 +59,14 @@ const chartOptions = computed(() => {
         enabled: false
       },
       categories: props.data.map(obs => {
-        return moment(obs.issued).format('ll HH:mm')
+        return new Intl.DateTimeFormat(store.currentLanguage,
+          {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric'
+          }).format(Date.parse(obs.issued))
       })
     },
     yaxis: {

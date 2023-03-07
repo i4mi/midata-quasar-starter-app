@@ -9,8 +9,8 @@
         State Management beschreibt das Verwalten des Zustands eines oder mehreren User-Interfaces (UI) einer Applikation.
         Eine moderne Web-Applikation sollte auf Veränderungen der Daten und Input des Users reagieren und diese Anzeigen können.
         Dabei sollten Veränderungen von irgendeiner Komponente oder Page in allen anderen Teilen der Applikation auch
-        angezeigt werden, falls Abhängigkeiten existieren. Bei komplexen Projekten mit vielen Pages und Komponenten
-        kann State Management sehr aufwändig werden. Pinia ist ein State Management Tool, dass diesen Prozess vereinfachen kann.
+        angezeigt werden. Bei komplexen Projekten mit vielen Pages und Komponenten kann State Management sehr
+        aufwändig werden. Pinia ist ein State Management Tool, dass diesen Prozess vereinfachen kann.
       </p>
     </div>
 
@@ -20,9 +20,9 @@
         Pinia ist ein vom Vue Core Team entwickeltes State Management Tool. Es ermöglicht das Teilen von einem gemeinsamen
         State über alle Pages und Komponenten einer Applikation. Pinia funktioniert am besten mit Vue3 und der
         Composition-API (diese Applikation wurde ebenfalls damit entwickelt). Pinia kann aber auch mit Vue2 und der
-        Options-API funktionieren. Mit Pinia kann man sogenannte "stores" erstellen, die dann thematisch zusammenhängenden
+        Options-API funktionieren. Mit Pinia kann man sogenannte "Stores" erstellen, die dann thematisch zusammenhängenden
         State beinhalten. Man könnte auch den gesamten State in einem Store verwalten, aber bei grösseren Projekten
-        liegt es nahe, diesen aufzuteilen. Diese Stores können in den Komponenten und Pages genutzt werden. Alle Veränderungen
+        liegt es nahe diesen aufzuteilen. Diese Stores können in den Komponenten und Pages genutzt werden. Alle Veränderungen
         dieses Stores werden automatisch in allen anderen Komponenten angezeigt. Weitere Infos und Anleitungen finden Sie in
         der offiziellen Pinia Dokumentation.
       </p>

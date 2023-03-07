@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
 import { copyToClipboard, Notify } from 'quasar';
 import { useSessionStorage } from '@vueuse/core';
-import { midata, moment } from 'boot/plugins';
+import { midata } from 'boot/plugins';
 import { ObservationType } from 'src/plugins/midataService';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -221,7 +221,6 @@ export const useUserStore = defineStore('user', () => {
     const validLocale = getValidLocale(locale);
     i18n.locale.value = validLocale;
     currentLanguage.value = validLocale;
-    moment.locale(validLocale)
   }
 
   /**
@@ -248,10 +247,34 @@ export const useUserStore = defineStore('user', () => {
 
   /**
    * Formats a date String to the format 'lll' (21. Feb. 2023 14:00)
-   * @param date
+   * @param date String representing a date in the ISO format.
    */
-  function formatDate(date: any) {
-    return moment(date.toString()).format('lll');
+  function formatDate(date: string) {
+    return new Intl.DateTimeFormat(currentLanguage.value,
+      {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+      }).format(Date.parse(date))
+  }
+
+  /**
+   * Generates a string to represent the difference in time from now to the
+   * specified date as a natural language string.
+   * @param date String representing a date in the ISO format.
+   */
+  function fromNow(date: string) {
+
+    //Difference in days
+    const difference = Math.round((new Date(date).getTime() - new Date().getTime()) / 1000 / 60 / 60 / 24)
+
+    return new Intl.RelativeTimeFormat(currentLanguage.value,
+      {
+        style: 'long'
+      }).format(difference, 'days')
+
   }
 
   return { currentLanguage, patientResource, currentObservation,
@@ -259,5 +282,5 @@ export const useUserStore = defineStore('user', () => {
     observationsExpanded, fullPatientName, numberOfObservations,
     deleteDataInStore, copyToClipBoard: copyItemToClipBoard, restoreFromMidata,
     createObservation, updateObservation, setCurrentObservation, changeLanguage,
-    formatDate}
+    formatDate, fromNow}
 })

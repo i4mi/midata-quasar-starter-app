@@ -199,6 +199,7 @@ return {
       <p>
         Javascript besitzt eine eingebaute API, mit der man zum Beispiel Datum-Objekte in verschiedenen Sprachen anzeigen kann.
         Um ein Datum in verschiedenen Sprachen anzeigen zu können, kann man Statische Funktionen des Intl Objekts zugreifen.
+        Intl kann noch mehr als ein Datum anzeigen, mehr dazu finden sie in der Intl-Dokumentation und unten in den Beispielen.
       </p>
       <q-btn
         type="a"
@@ -247,6 +248,7 @@ return {
         style="overflow-x: scroll; background-color: #f6f6f6"
         class="q-px-sm"
       >
+        <b>Daten</b>
         <pre><b>{{ store.currentLanguage }}</b>    // store.currentLanguage</pre>
         <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b>    // new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
         <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric', second: 'numeric'}).format(new Date) }}</b>   // new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric', second: 'numeric'}).format(new Date)</pre>
@@ -255,13 +257,23 @@ return {
         <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b>    // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
         <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b>   // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
         <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b> // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
-      </div>
+        <b>Relative Daten</b>
+        <pre><b>{{ new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(-32,'minutes') }}</b>    // new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long'' }).format(32, 'minutes')</pre>
+        <pre><b>{{ new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(16, 'days') }}</b>    // new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(16, 'days')</pre>
+        <pre><b>{{ new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(-4, 'months') }}</b>    // new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(4, 'months')</pre>
+        <pre><b>{{ new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(1, 'years') }}</b>    // new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(1, 'years')</pre>
+        <b>Zahlen und Währungen</b>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: 'currency', currency: 'EUR' }).format(123456.789) }}</b></pre>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: 'currency', currency: 'JPY' }).format(123456.789) }}</b></pre>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: 'currency', currency: 'USD' }).format(123456.789) }}</b></pre>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: "unit", unit: 'kilometer-per-hour', unitDisplay: 'long'}).format(32) }}</b></pre>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: "unit", unit: 'liter', unitDisplay: 'long'}).format(1.5) }}</b></pre>
+    </div>
     </div>
     <div class="q-my-xl text-grey">
       Quellen:
       <ul>
         <li>https://kazupon.github.io/vue-i18n/</li>
-
         <li>https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl</li>
       </ul>
     </div>

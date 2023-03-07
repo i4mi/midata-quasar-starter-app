@@ -28,9 +28,9 @@
       Daten generieren
     </q-btn>
     <div class="q-gutter-md row items-start">
-      <q-date v-model="date" mask="YYYY-MM-DD HH:mm" color="blue" today-btn
+      <q-date v-model="date" mask="YYYY-MM-DDTHH:mm:ss.sssZ" color="blue" today-btn
               :options='dateOptions'/>
-      <q-time v-model="date" format24h mask="YYYY-MM-DD HH:mm" color="blue"/>
+      <q-time v-model="date" format24h mask="YYYY-MM-DDTHH:mm:ss.sssZ" color="blue"/>
     </div>
   </q-page>
 </template>
@@ -39,7 +39,7 @@
 import { ref } from 'vue';
 import { Loading, Notify } from 'quasar';
 import LoginCard from 'components/LoginCard.vue';
-import { midata, moment } from 'boot/plugins';
+import { midata } from 'boot/plugins';
 import { useUserStore } from 'stores/user';
 
 const date = ref('')
@@ -64,7 +64,9 @@ async function updateRandomData() {
 }
 
 function dateOptions (date: string) {
-  return date <= moment().format('YYYY/MM/DD')
+  return date <= new Date()
+    .toISOString().split('T')[0]
+    .replace(new RegExp('-', 'g'), '/')
 }
 
 </script>

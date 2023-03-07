@@ -1,11 +1,7 @@
 import { JSOnFhir } from '@i4mi/js-on-fhir';
 import { Bundle, Observation, ObservationStatus, Patient } from '@i4mi/fhir_r4';
-import moment from 'moment';
 import fhirDataJson from '../data/fhirData.json';
 import { Notify } from 'quasar';
-
-// import moment library. More information under https://momentjs.com
-const now = moment();
 
 /**
  * ENUM for all the supported Observation Types.
@@ -155,7 +151,7 @@ export default class MidataService {
    * It needs to be present in the fhirData.json file.
    * @param values Observation value or values with multivalued observations.
    * @param observationType Type of the Observation (ObservationType enum).
-   * @param dateString String representing a by momentJS readable date.
+   * @param dateString String representing a Date in the ISO Format.
    * @returns a promise:
    *              - if successfull -> response with the created resource as JSON
    *              - if not successfull -> error message
@@ -165,7 +161,7 @@ export default class MidataService {
     bodySite: string,
     values: number[],
     observationType: ObservationType,
-    dateString: string = now.format()
+    dateString: string = new Date().toISOString()
   ): Promise<Observation> {
     return new Promise((resolve, reject) => {
 
@@ -213,7 +209,7 @@ export default class MidataService {
           const fhirObservation = result as Observation;
           fhirObservation.bodySite = this.getBodySiteFromJson(bodySite, observationType);
           fhirObservation.method = this.getMethodFromJson(bodySite, observationType);
-          fhirObservation.issued = now.format();
+          fhirObservation.issued = new Date().toISOString()
           fhirObservation.status = observationStatus;
 
           if (observationType == ObservationType.BLOOD_PRESSURE){
@@ -251,7 +247,7 @@ export default class MidataService {
    * @param bodySite String representing the bodySite of the observation.
    * Needs to be present in the fhirData.json file.
    * @param value the measured body temperature value.
-   * @param dateString String representing a momentJS readable date format.
+   * @param dateString String representing a Date in the ISO Format.
    * @returns
    */
   newBtObservation(
@@ -312,7 +308,7 @@ export default class MidataService {
    * @param bodySite String representing the bodySite of the Observation
    * Needs to be present in the fhirData.json file
    * @param value the measured heart rate value
-   * @param dateString String representing a by momentJS readable date
+   * @param dateString String representing a Date in the ISO Format.
    * @returns
    */
   newHrObservation(
@@ -374,7 +370,7 @@ export default class MidataService {
    * Needs to be present in the fhirData.json file.
    * @param valueSystolic Systolic blood pressure value in mmHg.
    * @param valueDiastolic Diastolic blood pressure value in mmHg.
-   * @param dateString String representing a momentJS readable date format.
+   * @param dateString String representing a Date in the ISO Format.
    * @returns
    * @returns
    */
@@ -524,7 +520,7 @@ export default class MidataService {
    * and adds them to the Midata-Account. The data is modelled with a progression
    * in mind. The values first rise and then fall of again. There is some noise
    * applied to each of the values every time they get generated.
-   * @param dateString String representing a Date in the format of (YYYY-MM-DD HH:mm)
+   * @param dateString String representing a Date in the ISO Format
    */
   async generateRandomData(dateString: string) {
     const bodyTemperaturesBase = [36, 36.5, 37, 37.5, 38, 38, 38.5, 39.5, 41,
@@ -550,13 +546,14 @@ export default class MidataService {
       return dp + Math.round(Math.random() * 5);
     })
 
-    const dat = moment(dateString, 'YYYY-MM-DD HH:mm');
+    let dat = Date.parse(dateString)
+    await new Promise(resolve => setTimeout(resolve, 1));
     const dates = [];
     for (let i = 0; i < heartRateBase.length; i++){
-      dat.subtract(Math.round(Math.random() * 4), 'h');
-      dat.subtract(Math.round(Math.random() * 10), 'm');
-      dat.subtract(Math.round(Math.random() * 10), 's');
-      dates.push(dat.format());
+      //Uses Epoch milliseconds to calculate an offset. Between 12 and 4 hours
+      const offset = Math.round(Math.random() * (60*60*12*1000 - 60*60*4*1000) + 60*60*4*1000)
+      dat = dat - offset
+      dates.push(new Date(dat).toISOString());
     }
     try {
       for (let i = 0; i < heartRateBase.length; i++) {

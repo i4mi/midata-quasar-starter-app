@@ -36,7 +36,7 @@
               </q-item-label>
               <q-item-label caption>
                 Datum:
-                {{ store.formatDate(item.issued) }} ({{$moment(item.issued).fromNow()}})
+                {{ store.formatDate(item.issued) }} ({{ store.fromNow(item.issued) }})
               </q-item-label>
             </q-item-section>
             <q-btn
