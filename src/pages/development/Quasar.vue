@@ -205,40 +205,33 @@ $ quasar create <folder_name>"
       </p>
       <p>
         Im Verzeichnis (src/boot/) können Sie beispielsweise eine Boot-Datei
-        plugins.ts erstellen. Für die MIDATA Demo wurden beispielsweise die
-        Module (MidataService und Storage) sowie das npm Paket Moment.js als
-        globale Properties deklariert. Dafür wurde eine Boot-Datei mit dem Namen
-        plugins.ts erstellt.
+        plugins.ts erstellen. Für die MIDATA Demo wurde beispielsweise das
+        Modul MidataService als globale Properties deklariert. Dafür wurde eine
+        Boot-Datei mit dem Namen plugins.ts erstellt.
       </p>
       <highlightjs
         language="javascript"
-        code="// src/boot/plugins.ts
-import { boot } from 'quasar/wrappers';
+        code="import { boot } from 'quasar/wrappers';
 
-import Storage from 'src/plugins/storage';
+// Import MidataService
 import MidataService from 'src/plugins/midataService';
-import moment from 'moment';
 
+// Create MidataService
 const midata = new MidataService();
-const storage = new Storage(midata);
 
-
+// Type declaration
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
     $midata: typeof midata;
-    $storage: typeof storage;
-    $moment: typeof moment;
   }
 }
 
 export default boot(({ app }) => {
+  // Set global variables
   app.config.globalProperties.$midata = midata;
-  app.config.globalProperties.$storage = storage;
-  app.config.globalProperties.$moment = moment;
-
 });
 
-export { midata, storage, moment };
+export { midata };
 "
       >
       </highlightjs>
@@ -247,7 +240,7 @@ export { midata, storage, moment };
         String 'plugins' ergänzt werden. Dies referenziert beim Boot-Prozess die
         zuvor erstellte plugins.ts Datei. Wie sie am Beispiel unten sehen, sind
         nebst 'plugins' /src/boot/plugins.ts die weiteren Boot-Dateien 'i18n'
-        /src/boot/i18n.ts, 'highlight' /src/boot/highlight.ts vorhanden und
+        /src/boot/i18n.ts, 'highlight' /src/boot/highlight.ts und
         'apexcharts' /src/boot/apexcharts.ts vorhanden.
       </p>
       <highlightjs

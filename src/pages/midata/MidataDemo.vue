@@ -46,7 +46,8 @@
     </div>
     <div style="height: 25px"></div>
 
-    <PatientResource v-if="store.patientResourceVisible && Object.keys((store.patientResource)).length !== 0"/>
+    <PatientResource v-if="store.patientResourceVisible &&
+    Object.keys((store.patientResource)).length !== 0"/>
 
     <div style="height: 25px" />
     <q-tabs

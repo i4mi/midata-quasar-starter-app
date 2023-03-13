@@ -55,7 +55,7 @@ async function updateRandomData() {
   }
   else {
     Notify.create({
-      message: 'Bitte das Datum und die Uhrzeit auswählen',
+      message: 'Bitte wählen sie das Datum und die Uhrzeit aus',
       color: 'red',
       position: 'top',
       icon: 'announcement'

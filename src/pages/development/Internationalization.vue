@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <div class="text-h3 text-weight-thin">
-      Internationalisierung mit Vue-i18n und Moment.js
+      Internationalisierung mit Vue-i18n und der Javascript Internationalization API (Intl)
     </div>
     <q-separator spaced class="midata-fade"></q-separator>
 
@@ -20,7 +20,7 @@
     <div class="q-my-xl">
       <div class="q-qb-sm text-h5">Vue-i18n Beschreibung</div>
       <p>
-        Vue I18n ist das Internationalisierungs-Plugin von Vue.js. Es integriert
+        Vue i18n ist das Internationalisierungs-Plugin von Vue.js. Es integriert
         einfach einige Lokalisierungsfunktionen in Ihre Vue.js Anwendung.
       </p>
       <div class="q-qb-sm text-h5">Installation</div>
@@ -40,11 +40,15 @@ $ npm install vue-i18n@next"
         language="javascript"
         code="import { boot } from 'quasar/wrappers';
 import { createI18n } from 'vue-i18n';
+
+// Import messages
 import messages from 'src/i18n';
 
 export default boot(({ app }) => {
+  // Create i18n instance with options
   const i18n = createI18n({
-    locale: 'de',
+    locale: 'de-ch',
+    legacy: false,
     messages,
   });
   // Set i18n instance on app
@@ -65,7 +69,7 @@ export default boot(({ app }) => {
       <p>Jetzt können Sie sie in Ihren Seiten verwenden.</p>
 
       <highlightjs
-        language="javscript"
+        language="javascript"
         code="// quasar.conf.js
 return {
   boot: [
@@ -195,7 +199,7 @@ return {
     <q-separator spaced class="midata-fade"></q-separator>
 
     <div class="q-my-xl">
-      <div class="q-qb-sm text-h5">Lokalisation mit der Javscript Internationalization API (Intl)</div>
+      <div class="q-qb-sm text-h5">Lokalisation mit der Javascript Internationalization API (Intl)</div>
       <p>
         Javascript besitzt eine eingebaute API, mit der man zum Beispiel Datum-Objekte in verschiedenen Sprachen anzeigen kann.
         Um ein Datum in verschiedenen Sprachen anzeigen zu können, kann man Statische Funktionen des Intl Objekts zugreifen.
@@ -205,7 +209,7 @@ return {
         type="a"
         target="_blank"
         :href="'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl'"
-        label="Javscript Internationalization API Dokumentation"
+        label="Javascript Internationalization API Dokumentation"
         color="primary"
         class="midata-fade text-white"
         flat

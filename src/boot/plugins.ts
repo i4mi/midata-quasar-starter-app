@@ -1,9 +1,9 @@
 import { boot } from 'quasar/wrappers';
 
-// Import Storage, MidataService and moment
+// Import MidataService
 import MidataService from 'src/plugins/midataService';
 
-// Create MidataService and Storage
+// Create MidataService
 const midata = new MidataService();
 
 // Type declaration

@@ -27,6 +27,7 @@ export const useUserStore = defineStore('user', () => {
    * Other variables
    */
   const i18n = useI18n()
+  const DAY_MILLISECONDS = 1000 * 60 * 60 * 24
 
   /**
    * Deletes all data from this store and sets the currentLanguage to 'de'.
@@ -39,7 +40,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   /**
-   * Restores data from the midata server.
+   * Restores data from the MIDATA server.
    * @returns a promise:
    *              - if successfull ->
    *              - if not successfull ->
@@ -53,13 +54,13 @@ export const useUserStore = defineStore('user', () => {
       patientResource.value = results[0];
       observations.value = results[1];
     } catch (error) {
-      console.warn('Error', error);
+      console.warn('Error while restoring from MIDATA: ', error);
       throw error;
     }
   }
 
   /**
-   * Computed property for the Observation List filtered by code. To change the
+   * Computed property for the Observationlist filtered by code. To change the
    * filter, edit "currentFilter.value" of this store
    * @param code Code of the Observations first code-able concept
    */
@@ -91,11 +92,14 @@ export const useUserStore = defineStore('user', () => {
   })
 
   /**
-   * Sets the selected observation. Used to observations them in the UI
-   * @param _id Midata id of the observation.
+   * Sets the selected observation if the id is different from the current Observation.
+   * Used to observations them in the UI
+   * @param _id MIDATA id of the observation.
    */
   async function setCurrentObservation(_id: string): Promise<void> {
-    currentObservation.value = await midata.searchWithId('Observation', _id)
+    if (_id !== currentObservation.value.id) {
+      currentObservation.value = await midata.searchWithId('Observation', _id)
+    }
   }
 
   /**
@@ -107,7 +111,7 @@ export const useUserStore = defineStore('user', () => {
    * @param values Observation value or values with multivalued Observations.
    * @param observationType Type of the Observation.
    * @returns a promise:
-   *              - if successfull -> Midata server observation resource response.
+   *              - if successfull -> MIDATA server observation resource response.
    *              - if not successfull -> Error response.
    */
   async function createObservation(
@@ -120,7 +124,6 @@ export const useUserStore = defineStore('user', () => {
       const result = await midata.createObservation(_status, bodySite, values, observationType);
       if (result) {
         observations.value.push(result)
-        //observations.value = await midata.loadObservations();
         Notify.create({
           message: 'Observation erfolgreich gespeichert',
           color: 'green',
@@ -129,7 +132,7 @@ export const useUserStore = defineStore('user', () => {
         });
         return result;
       } else {
-        throw new Error('Error');
+        throw new Error('Error while creating MIDATA Observation. No result from Server');
       }
     } catch (error) {
       console.log(error)
@@ -145,7 +148,7 @@ export const useUserStore = defineStore('user', () => {
   /**
    * Updates an Observation with a new value and bodySite. Changes the issued
    * date to the current date and time
-   * @param _id Midata id of the Observation
+   * @param _id MIDATA id of the Observation
    * @param bodySite String representing the bodySite of the Observation.
    * Needs to be present in the fhirData.json file
    * @param values Observation Value or Values with multivalued Observations
@@ -153,7 +156,7 @@ export const useUserStore = defineStore('user', () => {
    * @param observationStatus Status of the Observation. Default is PRELIMINARY.
    * A deleted Observation gets the type ENTERED_IN_ERROR
    * @returns a promise:
-   *              - if successfull -> Midata server observation resource response.
+   *              - if successfull -> MIDATA server observation resource response.
    *              - if not successfull -> Error response.
    */
   async function updateObservation(
@@ -175,7 +178,7 @@ export const useUserStore = defineStore('user', () => {
         });
         return result;
       } else {
-        throw new Error('Error');
+        throw new Error('Error while updating MIDATA Observation. No result from Server');
       }
     } catch (error) {
       console.log(error)
@@ -190,6 +193,7 @@ export const useUserStore = defineStore('user', () => {
 
   /**
    * Copies an item to the clipboard in JSON-Format. Uses the Quasar Function
+   * "copyToClipboard"
    * @param item Item that should be copied to the clipboard. Preferably
    * a JSON Object or a string.
    * @param label Label to display in the quasar notify component.
@@ -214,7 +218,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   /**
-   * Changes the locale of i18n, userStore and momentjs.
+   * Changes the locale of i18n and the Pinia userStore.
    * @param locale
    */
   function changeLanguage(locale: string) {
@@ -224,8 +228,8 @@ export const useUserStore = defineStore('user', () => {
   }
 
   /**
-   * Midata stores their locales in a slightly different format than the supported
-   * by this App ('de' instead of 'de-ch'). This method converts them to the
+   * MIDATA stores their locales in a slightly different format than supported
+   * by this App (for example 'de' instead of 'de-ch'). This method converts them to the
    * same format
    * @param locale
    */
@@ -262,19 +266,17 @@ export const useUserStore = defineStore('user', () => {
 
   /**
    * Generates a string to represent the difference in time from now to the
-   * specified date as a natural language string.
+   * specified date as a natural language string
    * @param date String representing a date in the ISO format.
    */
   function fromNow(date: string) {
 
     //Difference in days
-    const difference = Math.round((new Date(date).getTime() - new Date().getTime()) / 1000 / 60 / 60 / 24)
+    const difference = Math.round((new Date(date).getTime() -
+      new Date().getTime()) / DAY_MILLISECONDS)
 
     return new Intl.RelativeTimeFormat(currentLanguage.value,
-      {
-        style: 'long'
-      }).format(difference, 'days')
-
+      { numeric: 'auto' }).format(difference, 'days')
   }
 
   return { currentLanguage, patientResource, currentObservation,

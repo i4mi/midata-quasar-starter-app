@@ -517,7 +517,7 @@ export default class MidataService {
 
   /**
    * Generates 16 fhir observation objects for each supported observation type
-   * and adds them to the Midata-Account. The data is modelled with a progression
+   * and adds them to the MIDATA-Account. The data is modelled with a progression
    * in mind. The values first rise and then fall of again. There is some noise
    * applied to each of the values every time they get generated.
    * @param dateString String representing a Date in the ISO Format
@@ -576,7 +576,7 @@ export default class MidataService {
           dates[i]);
       }
       Notify.create({
-        message: '48 randomisierte Observationen wurden erstellt. Bitte die Seite neu laden',
+        message: '48 randomisierte Observationen wurden erstellt. Bitte laden sie die Seite neu',
         color: 'green',
         position: 'top',
         icon: 'announcement'
