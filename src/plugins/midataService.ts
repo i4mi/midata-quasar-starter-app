@@ -576,7 +576,7 @@ export default class MidataService {
           dates[i]);
       }
       Notify.create({
-        message: '48 randomisierte Observationen wurden erstellt. Bitte laden sie die Seite neu',
+        message: '48 randomisierte Observationen wurden erstellt. Bitte laden Sie die Seite neu',
         color: 'green',
         position: 'top',
         icon: 'announcement'
