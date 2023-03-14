@@ -4,97 +4,99 @@
   </q-card>
 </template>
 
-<script lang='ts'>
-import { defineComponent } from 'vue';
-import type { PropType } from 'vue'
-import { Observation } from '@i4mi/fhir_r4';
-
+<script setup lang='ts'>
 /**
  * Chart designed to use fhir Observations. Its intended usage is one type of
  * Observation that have 2 values. A working example is a Blood pressure
  * graph.
  */
-export default defineComponent({
-  name: 'DoubleValueObservationChart',
-  components: {},
-  props: {
-    data: Array as PropType<Observation[]>,
-    observationType: String,
-    unit: String,
-    min: Number,
-    max: Number
+import { defineProps, computed } from 'vue';
+import type { PropType } from 'vue'
+import { Observation } from '@i4mi/fhir_r4';
+import { useQuasar } from 'quasar';
+import { useUserStore } from 'stores/user';
 
-  },
-  data() {
-    return {}
-  },
-  computed: {
-    labels(){
-      if (this.data.length != 0){
-        return [this.data[0].component[0].code.coding[0].display,
-          this.data[0].component[1].code.coding[0].display]
-      }
-      else {
-        return ['', '']
-      }
+const props = defineProps({
+  data: Array as PropType<Observation[]>,
+  observationType: String,
+  unit: String,
+  min: Number,
+  max: Number
+})
+
+const $q = useQuasar()
+const store = useUserStore()
+
+const labels = computed(() => {
+  if (props.data.length != 0){
+    return [props.data[0].component[0].code.coding[0].display,
+      props.data[0].component[1].code.coding[0].display]
+  }
+  else {
+    return ['', '']
+  }
+})
+const series = computed(() => {
+  return [
+    {
+      name: labels.value[0],
+      data: props.data.map(obs => {
+        return obs.component[0].valueQuantity.value
+      })
     },
-    series() {
-      return [
-        {
-          name: this.labels[0],
-          data: this.data.map(obs => {
-            return obs.component[0].valueQuantity.value
-          })
-        },
-        {
-          name: this.labels[1],
-          data: this.data.map(obs => {
-            return obs.component[1].valueQuantity.value
-        })
-        }]
+    {
+      name: labels.value[1],
+      data: props.data.map(obs => {
+        return obs.component[1].valueQuantity.value
+      })
+    }]
+})
+const chartOptions = computed(() => {
+  return {
+    chart: {
+      id: `chart-${props.observationType}`,
     },
-    chartOptions() {
-      return {
-        chart: {
-          id: `chart-${this.observationType}`,
+    title: {
+      text: `${props.observationType} Observationen`,
+      align: 'center',
+      offsetY: 15,
+    },
+    dataLabels: {
+      enabled: false
+    },
+    markers: {
+      size: $q.screen.lt.sm ? 5 : 10
+    },
+    xaxis: {
+      labels: {
+        show: false
+      },
+      tickPlacement: 'between',
+      tooltip: {
+        enabled: false
+      },
+      categories: props.data.map(obs => {
+        return new Intl.DateTimeFormat(store.currentLanguage,
+          {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric'
+          }).format(Date.parse(obs.issued))
+      })
+    },
+    yaxis: {
+      min: $q.screen.lt.md ? undefined : Math.min(...props.data.map(o => o.component[1].valueQuantity.value)),
+      max: $q.screen.lt.md ? undefined : Math.max(...props.data.map(o => o.component[0].valueQuantity.value)),
+      title: {
+        text: `${props.observationType} in ${props.unit}`,
+        align: 'center',
+        style: {
+          fontSize: '14px',
         },
-        title: {
-          text: `${this.observationType} Observationen`,
-          align: 'center',
-          offsetY: 15,
-        },
-        dataLabels: {
-          enabled: false
-        },
-        markers: {
-          size: this.$q.screen.lt.sm ? 5 : 10
-        },
-        xaxis: {
-          labels: {
-            show: false
-          },
-          tickPlacement: 'between',
-          tooltip: {
-            enabled: false
-          },
-          categories: this.data.map(obs => {
-            return this.$moment(obs.issued).format('ll HH:mm')
-          })
-        },
-        yaxis: {
-          min: this.$q.screen.lt.md ? undefined : Math.min(...this.data.map(o => o.component[1].valueQuantity.value)),
-          max: this.$q.screen.lt.md ? undefined : Math.max(...this.data.map(o => o.component[0].valueQuantity.value)),
-          title: {
-            text: `${this.observationType} in ${this.unit}`,
-            align: 'center',
-            style: {
-              fontSize: '14px',
-            },
-          }
-        }
       }
     }
-  },
-  methods: {},
-});
+  }
+})
 </script>

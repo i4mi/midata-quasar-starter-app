@@ -29,6 +29,11 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/development/Github.vue') }],
   },
   {
+    path: '/pinia',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: () => import('pages/development/PiniaAndDevtools.vue') }],
+  },
+  {
     path: '/midata/introduction',
     component: () => import('layouts/MainLayout.vue'),
     children: [

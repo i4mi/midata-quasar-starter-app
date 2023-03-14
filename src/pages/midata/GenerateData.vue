@@ -15,9 +15,8 @@
       einige Sekunden länger dauern als angezeigt.
     </p>
     <p>
-      Im Moment haben sie <b>{{this.$storage.getObservations().length}}</b> Observationen
+      Im Moment haben sie <b>{{store.observations.length}}</b> Observationen
       in Midata gespeichert.
-      {{model}}
     </p>
     <q-btn
       @click="updateRandomData"
@@ -29,52 +28,47 @@
       Daten generieren
     </q-btn>
     <div class="q-gutter-md row items-start">
-      <q-date v-model="model" mask="YYYY-MM-DD HH:mm" color="blue" today-btn
+      <q-date v-model="date" mask="YYYY-MM-DDTHH:mm:ss.sssZ" color="blue" today-btn
               :options='dateOptions'/>
-      <q-time v-model="model" format24h mask="YYYY-MM-DD HH:mm" color="blue"/>
+      <q-time v-model="date" format24h mask="YYYY-MM-DDTHH:mm:ss.sssZ" color="blue"/>
     </div>
   </q-page>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
-import { Notify, Loading } from 'quasar';
+<script setup lang='ts'>
+import { ref } from 'vue';
+import { Loading, Notify } from 'quasar';
 import LoginCard from 'components/LoginCard.vue';
+import { midata } from 'boot/plugins';
+import { useUserStore } from 'stores/user';
 
-export default defineComponent({
-  name: 'RandomData',
-  components: { LoginCard },
-  data() {
-    return {
-      loading: false,
-      model: ''
-    };
-  },
-  computed: {},
-  methods: {
-    updateRandomData(){
-      if (this.model.length !== 0){
-        Loading.show({
-          message: '48 Observationen werden erstellt...'
-        })
-        this.$midata.generateRandomData(this.model).then(() => {
-          Loading.hide()
-        })
-      }
-      else {
-          Notify.create({
-            message: 'Bitte das Datum und die Uhrzeit auswählen',
-            color: 'red',
-            position: 'top',
-            icon: 'announcement'
-          });
-      }
-    },
-    dateOptions (date) {
-      return date <= this.$moment().format('YYYY/MM/DD')
-    }
-  },
-});
+const date = ref('')
+const store = useUserStore()
+
+async function updateRandomData() {
+  if (date.value.length !== 0){
+    Loading.show({
+      message: '48 Observationen werden erstellt...'
+    })
+    await midata.generateRandomData(date.value)
+    Loading.hide()
+  }
+  else {
+    Notify.create({
+      message: 'Bitte wählen sie das Datum und die Uhrzeit aus',
+      color: 'red',
+      position: 'top',
+      icon: 'announcement'
+    });
+  }
+}
+
+function dateOptions (date: string) {
+  return date <= new Date()
+    .toISOString().split('T')[0]
+    .replace(new RegExp('-', 'g'), '/')
+}
+
 </script>
 
 <style scoped>

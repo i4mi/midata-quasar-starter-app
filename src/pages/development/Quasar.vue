@@ -58,38 +58,34 @@
       <q-separator inset />
       <q-card-actions>
         <q-btn
-          flat
-          @click='connect()'
           class='midata-fade full-width'
           color='white'
-          >Mit MIDATA verbinden
-          </q-btn>
+          flat
+          @click='connect()'
+        >Mit MIDATA verbinden
+        </q-btn
+        >
       </q-card-actions>
     </q-card>
   </div>
 </template>
 
-<script lang='ts'>
-import { defineComponent } from 'vue';
+<script lang='ts' setup>
+import { midata } from 'boot/plugins';
 
-export default defineComponent({
-  name: 'LoginCard',
-  methods: {
-    connect() {
-      this.$midata.authenticate();
-    },
-  },
-});
+function connect() {
+  midata.authenticate();
+}
 </script>
 
 <style lang='sass' scoped>
 .card
-    max-width: 500px
+  max-width: 500px
 
 .container
-    display: flex
-    justify-content: center
-    margin-top: 50px
+  display: flex
+  justify-content: center
+  margin-top: 50px
 </style>
 "
       />
@@ -126,7 +122,7 @@ $ quasar create <folder_name>"
       </p>
       <highlightjs
         language="javascript"
-        code="$ sudo quasar create quasartestapp       
+        code="$ sudo quasar create quasartestapp
 
 ⠙  Downloading Quasar starter kit
 ? Project name (internal usage for dev) quasartestapp
@@ -209,40 +205,33 @@ $ quasar create <folder_name>"
       </p>
       <p>
         Im Verzeichnis (src/boot/) können Sie beispielsweise eine Boot-Datei
-        plugins.ts erstellen. Für die MIDATA Demo wurden beispielsweise die
-        Module (MidataService und Storage) sowie das npm Paket Moment.js als
-        globale Properties deklariert. Dafür wurde eine Boot-Datei mit dem Namen
-        plugins.ts erstellt.
+        plugins.ts erstellen. Für die MIDATA Demo wurde beispielsweise das
+        Modul MidataService als globale Properties deklariert. Dafür wurde eine
+        Boot-Datei mit dem Namen plugins.ts erstellt.
       </p>
       <highlightjs
         language="javascript"
-        code="// src/boot/plugins.ts
-import { boot } from 'quasar/wrappers';
+        code="import { boot } from 'quasar/wrappers';
 
-import Storage from 'src/plugins/storage';
+// Import MidataService
 import MidataService from 'src/plugins/midataService';
-import moment from 'moment';
 
+// Create MidataService
 const midata = new MidataService();
-const storage = new Storage(midata);
 
-
+// Type declaration
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
     $midata: typeof midata;
-    $storage: typeof storage;
-    $moment: typeof moment;
   }
 }
 
 export default boot(({ app }) => {
+  // Set global variables
   app.config.globalProperties.$midata = midata;
-  app.config.globalProperties.$storage = storage;
-  app.config.globalProperties.$moment = moment;
-
 });
 
-export { midata, storage, moment };
+export { midata };
 "
       >
       </highlightjs>
@@ -251,7 +240,8 @@ export { midata, storage, moment };
         String 'plugins' ergänzt werden. Dies referenziert beim Boot-Prozess die
         zuvor erstellte plugins.ts Datei. Wie sie am Beispiel unten sehen, sind
         nebst 'plugins' /src/boot/plugins.ts die weiteren Boot-Dateien 'i18n'
-        /src/boot/i18n.ts und 'highlight' /src/boot/highlight.ts vorhanden.
+        /src/boot/i18n.ts, 'highlight' /src/boot/highlight.ts und
+        'apexcharts' /src/boot/apexcharts.ts vorhanden.
       </p>
       <highlightjs
         language="javascript"
@@ -259,7 +249,7 @@ export { midata, storage, moment };
 module.exports = configure(function (ctx) {
   return {
     // ...
-    boot: ['i18n', 'plugins', 'highlight'],
+    boot: ['i18n', 'plugins', 'highlight', 'apexcharts'],
     // ...
       };
 });
@@ -280,7 +270,7 @@ module.exports = configure(function (ctx) {
       <q-btn
         type="a"
         target="_blank"
-        :href="'https://quasar.dev/quasar-cli#introduction'"
+        :href="'https://quasar.dev/start/quasar-cli#introduction'"
         label="Quasar CLI Dokumentation"
         color="primary"
         class="midata-fade text-white q-mb-lg"
@@ -288,14 +278,9 @@ module.exports = configure(function (ctx) {
       />
     </div>
 
-    <div class="q-my-xl text-grey">Quelle: https://quasar.dev/quasar-cli</div>
+    <div class="q-my-xl text-grey">Quelle: https://quasar.dev/start/quasar-cli#introduction</div>
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'Quasar',
-});
+<script setup lang="ts">
 </script>

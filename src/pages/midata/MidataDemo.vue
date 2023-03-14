@@ -8,10 +8,7 @@
 
     <div class="row justify-end">
       <q-btn
-        @click="
-          getPatient();
-          flag = true;
-        "
+        @click="store.patientResourceVisible = true;"
         flat
         text-color="white"
         class="gt-xs midata-fade"
@@ -20,10 +17,7 @@
         Patientenresource von MIDATA abfragen
       </q-btn>
       <q-btn
-        @click="
-          getPatient();
-          flag = true;
-        "
+        @click="store.patientResourceVisible = true;"
         flat
         icon="person"
         text-color="white"
@@ -52,7 +46,8 @@
     </div>
     <div style="height: 25px"></div>
 
-    <PatientResource :flag='flag' :patient-resource='patientResource'></PatientResource>
+    <PatientResource v-if="store.patientResourceVisible &&
+    Object.keys((store.patientResource)).length !== 0"/>
 
     <div style="height: 25px" />
     <q-tabs
@@ -86,50 +81,20 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
 import LoginCard from '../../components/LoginCard.vue';
-import { Patient } from '@i4mi/fhir_r4';
 import PatientResource from 'components/midata/PatientResource.vue';
+import { midata } from 'boot/plugins';
+import { useUserStore } from 'stores/user';
 
-export default defineComponent({
-  name: 'MidataDemo',
-  components: {
-    PatientResource,
-    'login-card': LoginCard,
-  },
-  setup() {
-    return {
-      listExpanded: ref(false),
-      obsType: ref(),
-    };
-  },
-  data: () => ({
-    patientResource: {} as Patient,
-    flag: false,
-  }),
-  computed: {},
-  methods: {
-    getFullPatientName() {
-      let name = this.$storage.getPatient().name;
-      return name[0].given.toString() + ' ' + name[0].family;
-    },
-    isEmpty(obj: any) {
-      return JSON.stringify(obj) === '{}';
-    },
-    getPatient() {
-      this.patientResource = this.$storage.getPatient();
-      console.log(this.patientResource);
-    },
-    formatDate(date: any) {
-      return this.$moment(date.toString()).format('lll');
-    },
-    logout() {
-      this.$midata.logout();
-      location.reload();
-    }
-  },
-});
+const store = useUserStore()
+
+function logout() {
+  store.patientResourceVisible = false;
+  midata.logout();
+  store.deleteDataInStore();
+  location.reload();
+}
 </script>
 
 <style lang="sass" scoped>

@@ -3,96 +3,98 @@
     <q-card-section>
       <q-item-label header
       >Alle Blutdruck Observationen von
-        {{ getFullPatientName() }}</q-item-label
+        {{ store.fullPatientName }}</q-item-label
       >
       <q-virtual-scroll
-        :items="filteredList"
+        :items="store.filteredList"
         bordered
         padding
         class="rounded-borders"
         style="max-height: 300px"
       >
         <template v-slot="{ item, index }">
-          <q-item clickable dense v-ripple :key="index">
-            <q-item-section avatar>
-              <q-avatar
-                icon="bloodtype"
-                text-color="white"
-                class="midata-fade"
+          <div>
+            <q-item clickable dense v-ripple :key="index">
+              <q-item-section avatar>
+                <q-avatar
+                  icon="bloodtype"
+                  text-color="white"
+                  class="midata-fade"
+                >
+                </q-avatar>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label
+                  lines="1"
+                >
+                  Blutdruck
+                </q-item-label>
+                <q-item-label caption>
+                  Wert: {{ item.component[0].valueQuantity.value }} / {{ item.component[1].valueQuantity.value }}
+                  {{ item.component[0].valueQuantity.unit }} ({{
+                    item.bodySite.coding[0].display
+                  }})
+                </q-item-label>
+                <q-item-label caption>
+                  Datum:
+                  {{ store.formatDate(item.issued) }} ({{ store.fromNow(item.issued) }})
+                </q-item-label>
+              </q-item-section>
+              <q-btn
+                color="primary"
+                outlined
+                flat
+                @mouseover="store.setCurrentObservation(item.id)"
+                @click.stop="showEditDialog = true"
+                icon="edit"
+                class="gt-xs"
               >
-              </q-avatar>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label
-                lines="1"
+                Bearbeiten
+              </q-btn>
+              <q-btn
+                color="red"
+                outlined
+                flat
+                @mouseover="store.setCurrentObservation(item.id)"
+                @click.stop="showDeleteDialog = true"
+                icon="delete"
+                class="gt-xs"
               >
-                Blutdruck
-              </q-item-label>
-              <q-item-label caption>
-                Wert: {{ item.component[0].valueQuantity.value }} / {{ item.component[1].valueQuantity.value }}
-                {{ item.component[0].valueQuantity.unit }} ({{
-                  item.bodySite.coding[0].display
-                }})
-              </q-item-label>
-              <q-item-label caption>
-                Datum:
-                {{ formatDate(item.issued) }}
-              </q-item-label>
-            </q-item-section>
-            <q-btn
-              color="primary"
-              outlined
-              flat
-              @mouseover="this.$storage.setCurrentObservation(item.id)"
-              @click.stop="showEditDialog = true"
-              icon="edit"
-              class="gt-xs"
-            >
-              Bearbeiten
-            </q-btn>
-            <q-btn
-              color="red"
-              outlined
-              flat
-              @mouseover="this.$storage.setCurrentObservation(item.id)"
-              @click.stop="showDeleteDialog = true"
-              icon="delete"
-              class="gt-xs"
-            >
-              Löschen
-            </q-btn>
-            <q-btn
-              color="primary"
-              outlined
-              round
-              flat
-              @mouseover="this.$storage.setCurrentObservation(item.id)"
-              @click.stop="showEditDialog = true"
-              icon="edit"
-              class="lt-sm"
-            >
-            </q-btn>
-            <q-btn
-              color="red"
-              outlined
-              round
-              flat
-              @mouseover="this.$storage.setCurrentObservation(item.id)"
-              @click.stop="showDeleteDialog = true"
-              icon="delete"
-              class="lt-sm"
-            >
-            </q-btn>
-          </q-item>
-          <q-item v-if='expanded' :key='index + "_codeblock"' >
-            <q-item-section clickable @click='this.$storage.copyToClipBoard(item, "Observation Resource")'>
-              <highlightjs
-                lang="json"
-                :code="JSON.stringify(item, null, 2)"
-              ></highlightjs>
-            </q-item-section>
-          </q-item>
-          <q-separator inset spaced />
+                Löschen
+              </q-btn>
+              <q-btn
+                color="primary"
+                outlined
+                round
+                flat
+                @mouseover="store.setCurrentObservation(item.id)"
+                @click.stop="showEditDialog = true"
+                icon="edit"
+                class="lt-sm"
+              >
+              </q-btn>
+              <q-btn
+                color="red"
+                outlined
+                round
+                flat
+                @mouseover="store.setCurrentObservation(item.id)"
+                @click.stop="showDeleteDialog = true"
+                icon="delete"
+                class="lt-sm"
+              >
+              </q-btn>
+            </q-item>
+            <q-item v-if='store.observationsExpanded' :key='index + "_codeblock"' >
+              <q-item-section clickable @click='store.copyToClipBoard(item, "Observation Resource")'>
+                <highlightjs
+                  lang="json"
+                  :code="JSON.stringify(item, null, 2)"
+                ></highlightjs>
+              </q-item-section>
+            </q-item>
+            <q-separator inset spaced />
+          </div>
         </template>
       </q-virtual-scroll>
     </q-card-section>
@@ -107,7 +109,7 @@
       />
       <q-space></q-space>
       <q-toggle
-        v-model="expanded"
+        v-model="store.observationsExpanded"
         label="Vollständige Ressourcen anzeigen"
         left-label
       />
@@ -116,7 +118,7 @@
   <div style="height: 25px"></div>
 
   <DoubleValueObservationChart
-    :data='filteredList'
+    :data='store.filteredList'
     :observation-type='"Blutdruck"'
     :unit='"mmHg"'
     :min='20'
@@ -141,59 +143,25 @@
   ></delete-observation-dialog>
 </template>
 
-<script lang='ts'>
+<script setup lang='ts'>
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
-import { defineComponent } from 'vue';
-import { Observation } from '@i4mi/fhir_r4';
+import { ref } from 'vue';
 import { ObservationType } from 'src/plugins/midataService';
 import EditBloodPressureDialog from 'components/midata/BloodPressure/EditBloodPressureDialog.vue';
 import DoubleValueObservationChart from 'components/midata/Charts/DoubleValueObservationChart.vue';
+import { useUserStore } from 'stores/user';
 
-export default defineComponent({
-  name: 'MidataBloodPressure',
-  components: {
-    DoubleValueObservationChart,
-    DeleteObservationDialog,
-    EditBloodPressureDialog
-  },
-  data() {
-    return {
-      observations: this.$storage.getObservations(),
-      showAddDialog: false,
-      showEditDialog: false,
-      showDeleteDialog: false,
-      expanded: false,
-      observationType: ObservationType.BLOOD_PRESSURE
-    }
-  },
-  computed: {
-    ObservationType() {
-      return ObservationType.BODY_TEMPERATURE
-    },
-    filteredList(): Observation[] {
-      return this.observations
-        .filter((obs: Observation) => {
-          return obs.code.coding[0].code === '85354-9'
-        })
-        .sort((a: Observation, b: Observation) => {
-          return new Date(a.issued).getTime() - new Date(b.issued).getTime();
-        });
-    }
-  },
-  methods: {
-    formatDate(date: any) {
-      return this.$moment(date.toString()).format('lll');
-    },
-    getFullPatientName() {
-      let name = this.$storage.getPatient().name;
-      return name[0].given.toString() + ' ' + name[0].family;
-    },
-    onEdit() {
-      this.showEditDialog = false;
-      this.showAddDialog = false;
-      this.showDeleteDialog = false;
-      this.observations = this.$storage.getObservations();
-    }
-  },
-});
+const store = useUserStore()
+store.currentFilter = '85354-9'
+
+const showAddDialog = ref(false)
+const showEditDialog = ref(false)
+const showDeleteDialog = ref(false)
+const observationType = ref<ObservationType>(ObservationType.BLOOD_PRESSURE)
+
+function onEdit() {
+  showEditDialog.value = false;
+  showAddDialog.value = false;
+  showDeleteDialog.value = false;
+}
 </script>

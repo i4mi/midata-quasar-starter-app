@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <div class="text-h3 text-weight-thin">
-      Internationalisierung mit Vue-i18n und Moment.js
+      Internationalisierung mit Vue-i18n und der Javascript Internationalization API (Intl)
     </div>
     <q-separator spaced class="midata-fade"></q-separator>
 
@@ -20,7 +20,7 @@
     <div class="q-my-xl">
       <div class="q-qb-sm text-h5">Vue-i18n Beschreibung</div>
       <p>
-        Vue I18n ist das Internationalisierungs-Plugin von Vue.js. Es integriert
+        Vue i18n ist das Internationalisierungs-Plugin von Vue.js. Es integriert
         einfach einige Lokalisierungsfunktionen in Ihre Vue.js Anwendung.
       </p>
       <div class="q-qb-sm text-h5">Installation</div>
@@ -40,11 +40,15 @@ $ npm install vue-i18n@next"
         language="javascript"
         code="import { boot } from 'quasar/wrappers';
 import { createI18n } from 'vue-i18n';
+
+// Import messages
 import messages from 'src/i18n';
 
 export default boot(({ app }) => {
+  // Create i18n instance with options
   const i18n = createI18n({
-    locale: 'de',
+    locale: 'de-ch',
+    legacy: false,
     messages,
   });
   // Set i18n instance on app
@@ -65,7 +69,7 @@ export default boot(({ app }) => {
       <p>Jetzt können Sie sie in Ihren Seiten verwenden.</p>
 
       <highlightjs
-        language="javscript"
+        language="javascript"
         code="// quasar.conf.js
 return {
   boot: [
@@ -80,25 +84,25 @@ return {
     <q-separator spaced class="midata-fade"></q-separator>
     <q-btn-dropdown
       class="q-mt-lg midata-fade text-white"
-      :label="$t('lang.option')"
+      :label="i18n.t('lang.option')"
       icon="language"
     >
       <q-list>
-        <q-item clickable v-close-popup @click="changeLanguage('de')">
+        <q-item clickable v-close-popup @click="store.changeLanguage('de-ch')">
           <q-item-section>
-            <q-item-label>{{ $t('lang.de') }}</q-item-label>
+            <q-item-label>{{ i18n.t('lang.de') }}</q-item-label>
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-close-popup @click="changeLanguage('fr')">
+        <q-item clickable v-close-popup @click="store.changeLanguage('fr-ch')">
           <q-item-section>
-            <q-item-label>{{ $t('lang.fr') }}</q-item-label>
+            <q-item-label>{{ i18n.t('lang.fr') }}</q-item-label>
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-close-popup @click="changeLanguage('en')">
+        <q-item clickable v-close-popup @click="store.changeLanguage('en-gb')">
           <q-item-section>
-            <q-item-label>{{ $t('lang.en') }}</q-item-label>
+            <q-item-label>{{ i18n.t('lang.en') }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -117,16 +121,16 @@ return {
             style="top: 8px; right: 8px"
           >
             <q-tooltip>
-              {{ $t('card.info') }}
+              {{ i18n.t('card.info') }}
             </q-tooltip>
           </q-icon>
         </q-img>
         <q-card-section>
-          <div class="text-h6">{{ $t('card.title') }}</div>
-          <div class="text-subtitle2">{{ $t('card.subTitle') }}</div>
+          <div class="text-h6">{{ i18n.t('card.title') }}</div>
+          <div class="text-subtitle2">{{ i18n.t('card.subTitle') }}</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          {{ $t('card.text') }}
+          {{ i18n.t('card.text') }}
         </q-card-section>
         <q-card-actions>
           <q-space />
@@ -134,7 +138,7 @@ return {
             type="a"
             target="_blank"
             :href="'https://www.zermatt.ch/matterhorn'"
-            :label="$t('card.more')"
+            :label="i18n.t('card.more')"
             color="primary"
             flat
           />
@@ -148,16 +152,16 @@ return {
         filled
         v-model="model"
         :options="options"
-        :label="$t('interpolation.label')"
+        :label="i18n.t('interpolation.label')"
         :display-value="`${
-          model.label ? $t('interpolation.weather.' + model.label) : ''
+          model.label ? i18n.t('interpolation.weather.' + model.label) : ''
         }`"
       >
         <template v-slot:option="scope">
           <q-item v-bind="scope.itemProps">
             <q-item-section>
               <q-item-label>{{
-                $t('interpolation.weather.' + scope.opt.label)
+                  i18n.t('interpolation.weather.' + scope.opt.label)
               }}</q-item-label>
             </q-item-section>
           </q-item>
@@ -165,8 +169,8 @@ return {
       </q-select>
       <div class="text-subtitle">
         {{
-          $t('interpolation.message', {
-            condition: $t('interpolation.weather.' + model.label),
+          i18n.t('interpolation.message', {
+            condition: i18n.t('interpolation.weather.' + model.label),
           })
         }}
       </div>
@@ -180,33 +184,35 @@ return {
         filled
         type="number"
         v-model="rrziel3"
-        :label="$t('interpolation.artBD.label')"
+        :label="i18n.t('interpolation.artBD.label')"
         lazy-rules
         :rules="[
           (val) =>
-            (val !== null && val !== '') || $t('interpolation.artBD.empty'),
+            (val !== null && val !== '') || i18n.t('interpolation.artBD.empty'),
           ,
           (val) =>
             (val >= 30 && val <= 120) ||
-            $t('interpolation.artBD.error', { value: val }),
+            i18n.t('interpolation.artBD.error', { value: val }),
         ]"
       />
     </div>
     <q-separator spaced class="midata-fade"></q-separator>
 
     <div class="q-my-xl">
-      <div class="q-qb-sm text-h5">Lokalisation mit Moment.js</div>
+      <div class="q-qb-sm text-h5">Lokalisation mit der Javascript Internationalization API (Intl)</div>
       <p>
-        Das npm Paket moment.js macht ortsspezifische Datums- und Zeitformate
-        verfügbar.
+        Javascript besitzt eine eingebaute API, mit der man zum Beispiel Datum-Objekte in verschiedenen Sprachen anzeigen kann.
+        Um ein Datum in verschiedenen Sprachen anzeigen zu können, kann man Statische Funktionen des Intl Objekts zugreifen.
+        Intl kann noch mehr als ein Datum anzeigen, mehr dazu finden sie in der Intl-Dokumentation und unten in den Beispielen.
       </p>
-
-      <div class="q-qb-sm text-h5">Installation</div>
-      <highlightjs
-        language="javascript"
-        code="$ yarn add moment
-oder
-$ npm install moment"
+      <q-btn
+        type="a"
+        target="_blank"
+        :href="'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl'"
+        label="Javascript Internationalization API Dokumentation"
+        color="primary"
+        class="midata-fade text-white"
+        flat
       />
 
       <div class="q-my-md">
@@ -218,25 +224,19 @@ $ npm install moment"
           icon="today"
         >
           <q-list>
-            <q-item clickable v-close-popup @click="changeLocale('de-ch')">
+            <q-item clickable v-close-popup @click="store.changeLanguage('de-ch')">
               <q-item-section>
                 <q-item-label>Deutsch (Schweiz)</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="changeLocale('fr-ch')">
+            <q-item clickable v-close-popup @click="store.changeLanguage('fr-ch')">
               <q-item-section>
                 <q-item-label>Französisch (Schweiz)</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="changeLocale('it-ch')">
-              <q-item-section>
-                <q-item-label>Italienisch (Schweiz)</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item clickable v-close-popup @click="changeLocale('en-gb')">
+            <q-item clickable v-close-popup @click="store.changeLanguage('en-gb')">
               <q-item-section>
                 <q-item-label>Englisch (United Kingdom)</q-item-label>
               </q-item-section>
@@ -246,66 +246,59 @@ $ npm install moment"
       </div>
 
       <p>
-        Ausgewählte Sprache <b>({{ locale }})</b>:
+        Ausgewählte Sprache <b>({{ i18n.locale }})</b>:
       </p>
       <div
         style="overflow-x: scroll; background-color: #f6f6f6"
         class="q-px-sm"
       >
-        <pre>moment.locale()          // {{ $moment.locale() }}</pre>
-        <pre>moment().format('LT')    // {{ $moment().format('LT') }}</pre>
-        <pre>moment().format('LTS')   // {{ $moment().format('LTS') }}</pre>
-        <pre>moment().format('L')     // {{ $moment().format('L') }}</pre>
-        <pre>moment().format('l')     // {{ $moment().format('l') }}</pre>
-        <pre>moment().format('LL')    // {{ $moment().format('LL') }}</pre>
-        <pre>moment().format('ll')    // {{ $moment().format('ll') }}</pre>
-        <pre>moment().format('LLL')   // {{ $moment().format('LLL') }}</pre>
-        <pre>moment().format('lll')   // {{ $moment().format('lll') }}</pre>
-        <pre>moment().format('LLLL')  // {{ $moment().format('LLLL') }}</pre>
-        <pre>moment().format('llll')  // {{ $moment().format('llll') }}</pre>
-      </div>
+        <b>Daten</b>
+        <pre><b>{{ store.currentLanguage }}</b>    // store.currentLanguage</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b>    // new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric', second: 'numeric'}).format(new Date) }}</b>   // new Intl.DateTimeFormat(store.currentLanguage, {hour: 'numeric', minute: 'numeric', second: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date) }}</b>   // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric'}).format(new Date) }}</b>    // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b>    // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b>   // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
+        <pre><b>{{ new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date) }}</b> // new Intl.DateTimeFormat(store.currentLanguage, {year: 'numeric', month: 'long', weekday: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'}).format(new Date)</pre>
+        <b>Relative Daten</b>
+        <pre><b>{{ new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(-32,'minutes') }}</b>    // new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long'' }).format(32, 'minutes')</pre>
+        <pre><b>{{ new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(16, 'days') }}</b>    // new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(16, 'days')</pre>
+        <pre><b>{{ new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(-4, 'months') }}</b>    // new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(4, 'months')</pre>
+        <pre><b>{{ new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(1, 'years') }}</b>    // new Intl.RelativeTimeFormat(store.currentLanguage, { style: 'long' }).format(1, 'years')</pre>
+        <b>Zahlen und Währungen</b>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: 'currency', currency: 'EUR' }).format(123456.789) }}</b></pre>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: 'currency', currency: 'JPY' }).format(123456.789) }}</b></pre>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: 'currency', currency: 'USD' }).format(123456.789) }}</b></pre>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: "unit", unit: 'kilometer-per-hour', unitDisplay: 'long'}).format(32) }}</b></pre>
+        <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: "unit", unit: 'liter', unitDisplay: 'long'}).format(1.5) }}</b></pre>
+    </div>
     </div>
     <div class="q-my-xl text-grey">
       Quellen:
       <ul>
         <li>https://kazupon.github.io/vue-i18n/</li>
-
-        <li>https://momentjs.com/</li>
+        <li>https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl</li>
       </ul>
     </div>
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useUserStore } from 'stores/user';
 
-export default defineComponent({
-  name: 'Internationalization',
-  setup() {
-    return {
-      rrziel3: ref(null),
-      model: ref({ label: 'sun' }),
-      locale: ref('de-ch'),
-      options: [
-        { label: 'sun' },
-        { label: 'cloud' },
-        { label: 'rain' },
-        { label: 'storm' },
-        { label: 'mist' },
-      ],
-    };
-  },
-  methods: {
-    changeLanguage(value: string) {
-      if (this.$i18n.availableLocales.includes(value)) {
-        this.$i18n.locale = value;
-        this.$storage.setCurrentLanguage(value)
-      }
-    },
-    changeLocale(value: string) {
-      this.$moment.locale(value);
-      this.locale = value;
-    },
-  },
-});
+const i18n = useI18n()
+const store = useUserStore()
+
+const rrziel3 = ref(null);
+const model = ref({ label: 'sun' });
+const options = [
+  { label: 'sun' },
+  { label: 'cloud' },
+  { label: 'rain' },
+  { label: 'storm' },
+  { label: 'mist' },
+]
 </script>

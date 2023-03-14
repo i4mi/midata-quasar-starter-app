@@ -1,6 +1,6 @@
 <template>
-  <q-card v-if="flag">
-    <q-card-section v-if="!isEmpty(patientResource)">
+  <q-card>
+    <q-card-section>
       <q-card flat bordered>
         <q-card-section>
           <q-img src="../../assets/midata/demo/masks.png" height="200px">
@@ -9,15 +9,15 @@
           <div class="text-h6">Steckbrief</div>
           <div class="text-subtitle">
             {{
-              patientResource.name[0].given +
+              store.patientResource.name[0].given +
               ' ' +
-              patientResource.name[0].family
+              store.patientResource.name[0].family
             }}
           </div>
           <div class="text-body text-grey">
-            {{ 'Geschlecht: ' + patientResource.gender }} <br />
-            {{ 'Patienten id: ' + patientResource.id }} <br />
-            {{ 'E-Mail: ' + patientResource.telecom[0].value }}
+            {{ 'Geschlecht: ' + store.patientResource.gender }} <br />
+            {{ 'Patienten id: ' + store.patientResource.id }} <br />
+            {{ 'E-Mail: ' + store.patientResource.telecom[0].value }}
           </div>
         </q-card-section>
 
@@ -28,8 +28,8 @@
             round
             flat
             dense
-            :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-            @click="expanded = !expanded"
+            :icon="store.patientResourceExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="store.patientResourceExpanded = !store.patientResourceExpanded"
             class="gt-xs"
           >Vollständige Ressource anzeigen</q-btn
           >
@@ -38,18 +38,22 @@
             round
             flat
             dense
-            :icon="expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-            @click="expanded = !expanded"
+            :icon="store.patientResourceExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
+            @click="store.patientResourceExpanded = !store.patientResourceExpanded"
             class="lt-sm"
           ></q-btn>
         </q-card-actions>
         <q-slide-transition>
-          <div v-show="expanded">
+          <div v-show="store.patientResourceExpanded">
             <q-separator />
-            <q-card-section class="innerCardScroll">
+            <q-card-section
+              class="innerCardScroll"
+              clickable
+              @click='store.copyToClipBoard
+              (store.patientResource, "Patienten Resource")'>
               <highlightjs
                 lang="json"
-                :code="JSON.stringify(patientResource, null, 2)"
+                :code="JSON.stringify(store.patientResource, null, 2)"
               ></highlightjs>
             </q-card-section>
           </div>
@@ -59,44 +63,10 @@
   </q-card>
 </template>
 
-<script lang='ts'>
+<script setup lang='ts'>
+import { useUserStore } from 'stores/user';
 
-import { defineComponent } from 'vue';
-import { copyToClipboard, Notify } from 'quasar';
-
-export default defineComponent({
-
-  name: 'PatientResource',
-  props: ['flag', 'patientResource'],
-  data() {
-    return {
-      expanded: false
-    }
-  },
-  methods: {
-    copyToClipBoard(item: any, identifier = 'Resource') {
-      copyToClipboard(JSON.stringify(item, null, 2))
-        .then(() => {
-          Notify.create({
-            message: `${identifier} kopiert`,
-            color: 'green',
-            position: 'top',
-            icon: 'announcement',
-          })
-        }).catch(() => {
-      Notify.create({
-        message: `Kopieren von ${identifier} fehlgeschlagen`,
-        color: 'red',
-        position: 'top',
-        icon: 'announcement',
-      })
-    })
-    },
-    isEmpty(obj: any) {
-      return JSON.stringify(obj) === '{}';
-    }
-  }
-});
+const store = useUserStore()
 
 </script>
 <style lang="sass" scoped>

@@ -101,7 +101,7 @@
       <q-btn
         type="a"
         target="_blank"
-        :href="'https://nodejs.dev/download/'"
+        :href="'https://nodejs.dev/en/download/'"
         label="Node.js download"
         color="primary"
         class="midata-fade text-white q-mb-lg"
@@ -253,12 +253,7 @@ $ npm -v
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'Quasar',
-});
+<script setup lang="ts">
 </script>
 <style lang="sass" scoped>
 .my-card
