@@ -53,14 +53,14 @@
             color="primary"
             text-color="black"
             icon="arrow_left"
-            @click="$refs.carousel.previous()"
+            @click="($refs.carousel as any).previous()"
           />
           <q-btn
             flat
             color="primary"
             text-color="black"
             icon="arrow_right"
-            @click="$refs.carousel.next()"
+            @click="($refs.carousel as any).next()"
           />
         </q-carousel-control>
       </template>

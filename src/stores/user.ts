@@ -27,6 +27,7 @@ export const useUserStore = defineStore('user', () => {
    * Other variables
    */
   const i18n = useI18n()
+  i18n.locale.value = currentLanguage.value;
   const DAY_MILLISECONDS = 1000 * 60 * 60 * 24
 
   /**
@@ -222,6 +223,7 @@ export const useUserStore = defineStore('user', () => {
    * @param locale
    */
   function changeLanguage(locale: string) {
+    console.log('-------------------- chaning: ', locale)
     const validLocale = getValidLocale(locale);
     i18n.locale.value = validLocale;
     currentLanguage.value = validLocale;

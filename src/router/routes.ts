@@ -4,12 +4,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Overview.vue') }],
+    children: [{ path: '', component: () => import('pages/DevOverview.vue') }],
   },
   {
     path: '/overview',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Overview.vue') }],
+    children: [{ path: '', component: () => import('pages/DevOverview.vue') }],
   },
   {
     path: '/developmentBasics',
@@ -21,12 +21,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/quasar',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/Quasar.vue') }],
+    children: [{ path: '', component: () => import('pages/development/QuasarIntro.vue') }],
   },
   {
     path: '/github',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/Github.vue') }],
+    children: [{ path: '', component: () => import('pages/development/GithubIntro.vue') }],
   },
   {
     path: '/pinia',
@@ -91,14 +91,14 @@ const routes: RouteRecordRaw[] = [
     path: '/internationalization',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/development/Internationalization.vue') },
+      { path: '', component: () => import('pages/development/InternationalizationIntro.vue') },
     ],
   },
   // Always leave this as last one,
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/Error404.vue'),
+    component: () => import('pages/ErrorPage.vue'),
   },
 ];
 

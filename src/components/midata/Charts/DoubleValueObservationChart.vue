@@ -10,7 +10,7 @@
  * Observation that have 2 values. A working example is a Blood pressure
  * graph.
  */
-import { defineProps, computed } from 'vue';
+import { computed } from 'vue';
 import type { PropType } from 'vue'
 import { Observation } from '@i4mi/fhir_r4';
 import { useQuasar } from 'quasar';

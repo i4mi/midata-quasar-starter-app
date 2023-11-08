@@ -120,7 +120,7 @@ export default class MidataService {
    *              - if successfull -> response with resource(s) as JSON
    *              - if not successfull -> error message
    */
-  search(resourceType: any, params?: any): Promise<any> {
+  search(resourceType: string, params?: { [key: string]: string; }): Promise<any> {
     return new Promise((resolve, reject) => {
       this.jsOnFhir.search(resourceType, params).then((result) => {
         result ? resolve(result) : reject('Error');
@@ -136,7 +136,7 @@ export default class MidataService {
    *              - if successfull -> response with resource(s) as JSON
    *              - if not successfull -> error message
    */
-  searchWithId(resourceType: any, _id: string): Promise<any> {
+  searchWithId(resourceType: string, _id: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.jsOnFhir.getResource(resourceType, _id).then((result) => {
         result ? resolve(result) : reject('Error');
@@ -598,7 +598,7 @@ export default class MidataService {
    * from the options provided in the json data file.
    * @param observationType Type of the Observation for picking the random body site
    */
-  getRandomBodySite(observationType: ObservationType): any {
+  getRandomBodySite(observationType: ObservationType): string {
     if (observationType == ObservationType.BODY_TEMPERATURE){
       return fhirDataJson.BODY_TEMPERATURE[Math.floor(Math.random() *
         fhirDataJson.BODY_TEMPERATURE.length)].bodySite.coding[0].display;
