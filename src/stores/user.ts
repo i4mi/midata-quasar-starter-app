@@ -8,27 +8,35 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 export const useUserStore = defineStore('user', () => {
-
   /**
    * Instance variables of this store. They are being saved to sessionStorage
    * automatically and reactively using the "useSessionStorage" composable from
    * VueUse
    */
-  const currentLanguage = useSessionStorage('currentLanguage', 'de')
-  const patientResource = useSessionStorage('patientResource', {} as Patient)
-  const currentObservation = useSessionStorage('currentObservation', {} as Observation)
-  const observations = useSessionStorage('observations', [] as Observation[])
-  const currentFilter = useSessionStorage('currentFilter', '')
-  const patientResourceVisible = useSessionStorage('patientResourceVisible', false)
-  const patientResourceExpanded = useSessionStorage('patientResourceExpanded', false)
-  const observationsExpanded = useSessionStorage('observationsExpanded', false)
+  const currentLanguage = useSessionStorage('currentLanguage', 'de');
+  const patientResource = useSessionStorage('patientResource', {} as Patient);
+  const currentObservation = useSessionStorage(
+    'currentObservation',
+    {} as Observation
+  );
+  const observations = useSessionStorage('observations', [] as Observation[]);
+  const currentFilter = useSessionStorage('currentFilter', '');
+  const patientResourceVisible = useSessionStorage(
+    'patientResourceVisible',
+    false
+  );
+  const patientResourceExpanded = useSessionStorage(
+    'patientResourceExpanded',
+    false
+  );
+  const observationsExpanded = useSessionStorage('observationsExpanded', false);
 
   /**
    * Other variables
    */
-  const i18n = useI18n()
+  const i18n = useI18n();
   i18n.locale.value = currentLanguage.value;
-  const DAY_MILLISECONDS = 1000 * 60 * 60 * 24
+  const DAY_MILLISECONDS = 1000 * 60 * 60 * 24;
 
   /**
    * Deletes all data from this store and sets the currentLanguage to 'de'.
@@ -68,29 +76,33 @@ export const useUserStore = defineStore('user', () => {
   const filteredList = computed(() => {
     return observations.value
       .filter((obs: Observation) => {
-        return obs.code.coding[0].code === currentFilter.value
+        return obs.code.coding[0].code === currentFilter.value;
       })
       .sort((a: Observation, b: Observation) => {
         return new Date(a.issued).getTime() - new Date(b.issued).getTime();
       });
-  })
+  });
 
   /**
    * Computed property for the full-name of the Patient resource
    */
   const fullPatientName = computed(() => {
-    if (patientResource.value.name){
-      return patientResource.value.name[0].given.toString() + ' ' + patientResource.value.name[0].family;
+    if (patientResource.value.name) {
+      return (
+        patientResource.value.name[0].given.toString() +
+        ' ' +
+        patientResource.value.name[0].family
+      );
     }
-    return undefined
-  })
+    return undefined;
+  });
 
   /**
    * Computed to display the number of Observations
    */
   const numberOfObservations = computed(() => {
-    return observations.value.length
-  })
+    return observations.value.length;
+  });
 
   /**
    * Sets the selected observation if the id is different from the current Observation.
@@ -99,7 +111,7 @@ export const useUserStore = defineStore('user', () => {
    */
   async function setCurrentObservation(_id: string): Promise<void> {
     if (_id !== currentObservation.value.id) {
-      currentObservation.value = await midata.searchWithId('Observation', _id)
+      currentObservation.value = await midata.searchWithId('Observation', _id);
     }
   }
 
@@ -122,9 +134,14 @@ export const useUserStore = defineStore('user', () => {
     observationType: ObservationType
   ): Promise<Observation> {
     try {
-      const result = await midata.createObservation(_status, bodySite, values, observationType);
+      const result = await midata.createObservation(
+        _status,
+        bodySite,
+        values,
+        observationType
+      );
       if (result) {
-        observations.value.push(result)
+        observations.value.push(result);
         Notify.create({
           message: 'Observation erfolgreich gespeichert',
           color: 'green',
@@ -133,10 +150,12 @@ export const useUserStore = defineStore('user', () => {
         });
         return result;
       } else {
-        throw new Error('Error while creating MIDATA Observation. No result from Server');
+        throw new Error(
+          'Error while creating MIDATA Observation. No result from Server'
+        );
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       Notify.create({
         message: 'Die Observation konnte nicht erstellt werden',
         color: 'red',
@@ -168,7 +187,13 @@ export const useUserStore = defineStore('user', () => {
     observationStatus: ObservationStatus = ObservationStatus.PRELIMINARY
   ): Promise<Observation> {
     try {
-      const result = await midata.updateObservation(_id, bodySite, values, observationType, observationStatus);
+      const result = await midata.updateObservation(
+        _id,
+        bodySite,
+        values,
+        observationType,
+        observationStatus
+      );
       if (result) {
         observations.value = await midata.loadObservations();
         Notify.create({
@@ -179,10 +204,12 @@ export const useUserStore = defineStore('user', () => {
         });
         return result;
       } else {
-        throw new Error('Error while updating MIDATA Observation. No result from Server');
+        throw new Error(
+          'Error while updating MIDATA Observation. No result from Server'
+        );
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       Notify.create({
         message: 'Die Observation konnte nicht bearbeitet werden',
         color: 'red',
@@ -199,14 +226,17 @@ export const useUserStore = defineStore('user', () => {
    * a JSON Object or a string.
    * @param label Label to display in the quasar notify component.
    */
-  async function copyItemToClipBoard(item: any, label = 'Resource'): Promise<void> {
+  async function copyItemToClipBoard(
+    item: any,
+    label = 'Resource'
+  ): Promise<void> {
     try {
       await copyToClipboard(JSON.stringify(item, null, 2));
       Notify.create({
         message: `${label} kopiert`,
         color: 'green',
         position: 'top',
-        icon: 'announcement'
+        icon: 'announcement',
       });
     } catch (e) {
       Notify.create({
@@ -214,7 +244,7 @@ export const useUserStore = defineStore('user', () => {
         color: 'red',
         position: 'top',
         icon: 'announcement',
-      })
+      });
     }
   }
 
@@ -223,7 +253,7 @@ export const useUserStore = defineStore('user', () => {
    * @param locale
    */
   function changeLanguage(locale: string) {
-    console.log('-------------------- chaning: ', locale)
+    console.log('-------------------- chaning: ', locale);
     const validLocale = getValidLocale(locale);
     i18n.locale.value = validLocale;
     currentLanguage.value = validLocale;
@@ -235,19 +265,19 @@ export const useUserStore = defineStore('user', () => {
    * same format
    * @param locale
    */
-  function getValidLocale(locale: string): string{
-    switch (locale){
+  function getValidLocale(locale: string): string {
+    switch (locale) {
       case 'de-ch':
       case 'de':
-        return 'de-ch'
+        return 'de-ch';
       case 'fr-ch':
       case 'fr':
-        return 'fr-ch'
+        return 'fr-ch';
       case 'en-gb':
       case 'en':
-        return 'en-gb'
+        return 'en-gb';
       default:
-        return 'de-ch'
+        return 'de-ch';
     }
   }
 
@@ -256,14 +286,13 @@ export const useUserStore = defineStore('user', () => {
    * @param date String representing a date in the ISO format.
    */
   function formatDate(date: string) {
-    return new Intl.DateTimeFormat(currentLanguage.value,
-      {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric'
-      }).format(Date.parse(date))
+    return new Intl.DateTimeFormat(currentLanguage.value, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+    }).format(Date.parse(date));
   }
 
   /**
@@ -272,19 +301,36 @@ export const useUserStore = defineStore('user', () => {
    * @param date String representing a date in the ISO format.
    */
   function fromNow(date: string) {
-
     //Difference in days
-    const difference = Math.round((new Date(date).getTime() -
-      new Date().getTime()) / DAY_MILLISECONDS)
+    const difference = Math.round(
+      (new Date(date).getTime() - new Date().getTime()) / DAY_MILLISECONDS
+    );
 
-    return new Intl.RelativeTimeFormat(currentLanguage.value,
-      { numeric: 'auto' }).format(difference, 'days')
+    return new Intl.RelativeTimeFormat(currentLanguage.value, {
+      numeric: 'auto',
+    }).format(difference, 'days');
   }
 
-  return { currentLanguage, patientResource, currentObservation,
-    observations, currentFilter, filteredList, patientResourceVisible, patientResourceExpanded,
-    observationsExpanded, fullPatientName, numberOfObservations,
-    deleteDataInStore, copyToClipBoard: copyItemToClipBoard, restoreFromMidata,
-    createObservation, updateObservation, setCurrentObservation, changeLanguage,
-    formatDate, fromNow}
-})
+  return {
+    currentLanguage,
+    patientResource,
+    currentObservation,
+    observations,
+    currentFilter,
+    filteredList,
+    patientResourceVisible,
+    patientResourceExpanded,
+    observationsExpanded,
+    fullPatientName,
+    numberOfObservations,
+    deleteDataInStore,
+    copyToClipBoard: copyItemToClipBoard,
+    restoreFromMidata,
+    createObservation,
+    updateObservation,
+    setCurrentObservation,
+    changeLanguage,
+    formatDate,
+    fromNow,
+  };
+});

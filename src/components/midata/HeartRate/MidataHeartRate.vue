@@ -2,8 +2,7 @@
   <q-card>
     <q-card-section>
       <q-item-label header
-      >Alle Puls Observationen von
-        {{ store.fullPatientName }}</q-item-label
+        >Alle Puls Observationen von {{ store.fullPatientName }}</q-item-label
       >
       <q-virtual-scroll
         :items="store.filteredList"
@@ -24,11 +23,7 @@
                 </q-avatar>
               </q-item-section>
               <q-item-section>
-                <q-item-label
-                  lines="1"
-                >
-                  Puls
-                </q-item-label>
+                <q-item-label lines="1"> Puls </q-item-label>
                 <q-item-label caption>
                   Wert: {{ item.valueQuantity.value }}
                   {{ item.valueQuantity.unit }} ({{
@@ -37,7 +32,9 @@
                 </q-item-label>
                 <q-item-label caption>
                   Datum:
-                  {{ store.formatDate(item.issued) }} ({{ store.fromNow(item.issued) }})
+                  {{ store.formatDate(item.issued) }} ({{
+                    store.fromNow(item.issued)
+                  }})
                 </q-item-label>
               </q-item-section>
               <q-btn
@@ -85,8 +82,14 @@
               >
               </q-btn>
             </q-item>
-            <q-item v-if='store.observationsExpanded' :key='index + "_codeblock"' >
-              <q-item-section clickable @click='store.copyToClipBoard(item, "Observation Resource")'>
+            <q-item
+              v-if="store.observationsExpanded"
+              :key="index + '_codeblock'"
+            >
+              <q-item-section
+                clickable
+                @click="store.copyToClipBoard(item, 'Observation Resource')"
+              >
                 <highlightjs
                   lang="json"
                   :code="JSON.stringify(item, null, 2)"
@@ -118,45 +121,46 @@
   <div style="height: 25px"></div>
 
   <SingleValueObservationChart
-    :data='store.filteredList'
-    :observation-type='"Puls"'
-    :unit='"beats/min"'>
+    :data="store.filteredList"
+    :observation-type="'Puls'"
+    :unit="'beats/min'"
+  >
   </SingleValueObservationChart>
 
   <edit-single-value-dialog
     :visible="showEditDialog"
-    :actionType='"edit"'
-    :observation-type='observationType'
-    :label='"Puls"'
-    :unit='"bpm"'
-    :options='options'
-    :min='20'
-    :max='200'
-    :step='5'
-    :default-value='75'
+    :actionType="'edit'"
+    :observation-type="observationType"
+    :label="'Puls'"
+    :unit="'bpm'"
+    :options="options"
+    :min="20"
+    :max="200"
+    :step="5"
+    :default-value="75"
     @close="onEdit()"
   ></edit-single-value-dialog>
   <edit-single-value-dialog
     :visible="showAddDialog"
-    :actionType='"add"'
-    :observation-type='observationType'
-    :label='"Puls"'
-    :unit='"bpm"'
-    :options='options'
-    :min='20'
-    :max='200'
-    :step='5'
-    :default-value='75'
+    :actionType="'add'"
+    :observation-type="observationType"
+    :label="'Puls'"
+    :unit="'bpm'"
+    :options="options"
+    :min="20"
+    :max="200"
+    :step="5"
+    :default-value="75"
     @close="onEdit()"
   ></edit-single-value-dialog>
   <delete-observation-dialog
     :visible="showDeleteDialog"
-    :observation-type='observationType'
+    :observation-type="observationType"
     @close="onEdit()"
   ></delete-observation-dialog>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
 import DeleteObservationDialog from 'components/midata/DeleteObservationDialog.vue';
 import { ref, computed } from 'vue';
 import SingleValueObservationChart from 'components/midata/Charts/SingleValueObservationChart.vue';
@@ -165,19 +169,19 @@ import EditSingleValueDialog from 'components/midata/EditSingleValueDialog.vue';
 import fhirData from 'src/data/fhirData.json';
 import { useUserStore } from 'stores/user';
 
-const store = useUserStore()
-store.currentFilter = '8867-4'
+const store = useUserStore();
+store.currentFilter = '8867-4';
 
-const showAddDialog = ref(false)
-const showEditDialog = ref(false)
-const showDeleteDialog = ref(false)
-const observationType = ref<ObservationType>(ObservationType.HEART_RATE)
+const showAddDialog = ref(false);
+const showEditDialog = ref(false);
+const showDeleteDialog = ref(false);
+const observationType = ref<ObservationType>(ObservationType.HEART_RATE);
 
 const options = computed(() => {
-  return fhirData.HEART_RATE.map(e => {
-    return e.id
-  })
-})
+  return fhirData.HEART_RATE.map((e) => {
+    return e.id;
+  });
+});
 
 function onEdit() {
   showEditDialog.value = false;

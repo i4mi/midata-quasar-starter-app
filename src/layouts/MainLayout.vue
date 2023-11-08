@@ -116,8 +116,8 @@ const developmentLinksList = [
   {
     title: 'State-Management mit Pinia und Vue-Devtools',
     icon: 'mdi-fruit-pineapple',
-    link: '/pinia'
-  }
+    link: '/pinia',
+  },
 ];
 
 export default defineComponent({

@@ -24,5 +24,5 @@ declare module 'pinia' {
 
 export default store((/* { ssrContext } */) => {
   // You can add Pinia plugins here
-  return createPinia()
-})
+  return createPinia();
+});

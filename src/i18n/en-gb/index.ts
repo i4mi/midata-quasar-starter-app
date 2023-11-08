@@ -24,8 +24,9 @@ export default {
     },
     artBD: {
       label: 'Arterial mean pressure',
-      error: 'The entered arterial blood pressure: {value} mmHg is outside the value range 30-120 mmHg.',
-      empty: 'Enter a value.'
-    }
+      error:
+        'The entered arterial blood pressure: {value} mmHg is outside the value range 30-120 mmHg.',
+      empty: 'Enter a value.',
+    },
   },
 };

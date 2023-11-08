@@ -253,8 +253,7 @@ $ npm -v
   </q-page>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 <style lang="sass" scoped>
 .my-card
   width: 100%

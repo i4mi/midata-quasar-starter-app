@@ -70,10 +70,10 @@
         verwendet wird, um diese Anwendung zu identifizieren. Der
         Anwendungsentwickler muss auch einen öffentlichen Namen für die
         markierte Stelle und eine textuelle Beschreibung angeben, die
-        beschreibt, was sie tut. Für die OAuth 2.0-Anmeldung Ihrer Anwendung müssen
-        Sie die möglichen Redirect-URIs definieren. Ausserdem muss ein geheimer
-        Schlüssel angegeben werden, der der mobilen Anwendung bekannt ist, aber
-        nicht öffentlich gemacht werden sollte.
+        beschreibt, was sie tut. Für die OAuth 2.0-Anmeldung Ihrer Anwendung
+        müssen Sie die möglichen Redirect-URIs definieren. Ausserdem muss ein
+        geheimer Schlüssel angegeben werden, der der mobilen Anwendung bekannt
+        ist, aber nicht öffentlich gemacht werden sollte.
       </p>
       <q-expansion-item
         icon="photo"
@@ -117,10 +117,10 @@
         Andernfalls wählen Sie "Beliebige Rolle".
       </p>
       <p>
-        Wenn Sie "Beliebige Rolle" auswählen, wird auf der OAuth 2.0-Anmeldeseite
-        eine Auswahlliste mit Rollen angezeigt. Wenn Sie beispielsweise
-        "Forscher" auswählen, wird auf der OAuth 2.0-Anmeldeseite eine Auswahlliste
-        für ein Forschungsprojekt angezeigt.
+        Wenn Sie "Beliebige Rolle" auswählen, wird auf der OAuth
+        2.0-Anmeldeseite eine Auswahlliste mit Rollen angezeigt. Wenn Sie
+        beispielsweise "Forscher" auswählen, wird auf der OAuth 2.0-Anmeldeseite
+        eine Auswahlliste für ein Forschungsprojekt angezeigt.
       </p>
 
       <div class="text-h6">Anforderungen</div>
@@ -200,9 +200,10 @@
       <div class="text-h6">Beschreibung</div>
       <p>
         Eine Beschreibung Ihrer Anwendung. Diese kann dem Endbenutzer als Teil
-        der OAuth 2.0-Autorisierung angezeigt werden. Sie kann auch zu den Listen
-        der verfügbaren MIDATA-Apps hinzugefügt werden, falls dies jemals als
-        Funktion zur Plattform hinzugefügt wird. (Internationale Beschreibung)
+        der OAuth 2.0-Autorisierung angezeigt werden. Sie kann auch zu den
+        Listen der verfügbaren MIDATA-Apps hinzugefügt werden, falls dies jemals
+        als Funktion zur Plattform hinzugefügt wird. (Internationale
+        Beschreibung)
       </p>
 
       <div class="text-h6">Name der Organisation</div>
@@ -619,8 +620,7 @@
   </q-page>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <style lang="sass" scoped>
 .img-800

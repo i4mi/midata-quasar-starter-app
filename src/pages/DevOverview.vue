@@ -15,9 +15,12 @@
           fit="contain"
         />
         <div class="q-mt-md text-center text-h3 text-weight-thin">
-          Web- <br/> entwicklung
+          Web- <br />
+          entwicklung
         </div>
-        <q-btn to="/developmentBasics" class="midata-fade text-white">Los gehts!</q-btn>
+        <q-btn to="/developmentBasics" class="midata-fade text-white"
+          >Los gehts!</q-btn
+        >
       </q-carousel-slide>
       <q-carousel-slide :name="2" class="column no-wrap flex-center">
         <q-img
@@ -26,7 +29,9 @@
           fit="contain"
         />
         <div class="q-mt-md text-center text-h3 text-weight-thin">Midata</div>
-        <q-btn to="/midata/introduction" class="midata-fade text-white">Los gehts!</q-btn>
+        <q-btn to="/midata/introduction" class="midata-fade text-white"
+          >Los gehts!</q-btn
+        >
       </q-carousel-slide>
       <template v-slot:control>
         <q-carousel-control
@@ -69,8 +74,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
-const slide = ref(1)
-const autoplay = ref(true)
+const slide = ref(1);
+const autoplay = ref(true);
 </script>

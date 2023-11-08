@@ -1,7 +1,8 @@
 <template>
   <q-page>
     <div class="text-h3 text-weight-thin">
-      Internationalisierung mit Vue-i18n und der Javascript Internationalization API (Intl)
+      Internationalisierung mit Vue-i18n und der Javascript Internationalization
+      API (Intl)
     </div>
     <q-separator spaced class="midata-fade"></q-separator>
 
@@ -161,7 +162,7 @@ return {
           <q-item v-bind="scope.itemProps">
             <q-item-section>
               <q-item-label>{{
-                  i18n.t('interpolation.weather.' + scope.opt.label)
+                i18n.t('interpolation.weather.' + scope.opt.label)
               }}</q-item-label>
             </q-item-section>
           </q-item>
@@ -199,11 +200,16 @@ return {
     <q-separator spaced class="midata-fade"></q-separator>
 
     <div class="q-my-xl">
-      <div class="q-qb-sm text-h5">Lokalisation mit der Javascript Internationalization API (Intl)</div>
+      <div class="q-qb-sm text-h5">
+        Lokalisation mit der Javascript Internationalization API (Intl)
+      </div>
       <p>
-        Javascript besitzt eine eingebaute API, mit der man zum Beispiel Datum-Objekte in verschiedenen Sprachen anzeigen kann.
-        Um ein Datum in verschiedenen Sprachen anzeigen zu können, kann man Statische Funktionen des Intl Objekts zugreifen.
-        Intl kann noch mehr als ein Datum anzeigen, mehr dazu finden sie in der Intl-Dokumentation und unten in den Beispielen.
+        Javascript besitzt eine eingebaute API, mit der man zum Beispiel
+        Datum-Objekte in verschiedenen Sprachen anzeigen kann. Um ein Datum in
+        verschiedenen Sprachen anzeigen zu können, kann man Statische Funktionen
+        des Intl Objekts zugreifen. Intl kann noch mehr als ein Datum anzeigen,
+        mehr dazu finden sie in der Intl-Dokumentation und unten in den
+        Beispielen.
       </p>
       <q-btn
         type="a"
@@ -224,19 +230,31 @@ return {
           icon="today"
         >
           <q-list>
-            <q-item clickable v-close-popup @click="store.changeLanguage('de-ch')">
+            <q-item
+              clickable
+              v-close-popup
+              @click="store.changeLanguage('de-ch')"
+            >
               <q-item-section>
                 <q-item-label>Deutsch (Schweiz)</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="store.changeLanguage('fr-ch')">
+            <q-item
+              clickable
+              v-close-popup
+              @click="store.changeLanguage('fr-ch')"
+            >
               <q-item-section>
                 <q-item-label>Französisch (Schweiz)</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-close-popup @click="store.changeLanguage('en-gb')">
+            <q-item
+              clickable
+              v-close-popup
+              @click="store.changeLanguage('en-gb')"
+            >
               <q-item-section>
                 <q-item-label>Englisch (United Kingdom)</q-item-label>
               </q-item-section>
@@ -272,13 +290,15 @@ return {
         <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: 'currency', currency: 'USD' }).format(123456.789) }}</b></pre>
         <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: "unit", unit: 'kilometer-per-hour', unitDisplay: 'long'}).format(32) }}</b></pre>
         <pre><b>{{ new Intl.NumberFormat(store.currentLanguage, { style: "unit", unit: 'liter', unitDisplay: 'long'}).format(1.5) }}</b></pre>
-    </div>
+      </div>
     </div>
     <div class="q-my-xl text-grey">
       Quellen:
       <ul>
         <li>https://kazupon.github.io/vue-i18n/</li>
-        <li>https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl</li>
+        <li>
+          https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl
+        </li>
       </ul>
     </div>
   </q-page>
@@ -289,8 +309,8 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useUserStore } from 'stores/user';
 
-const i18n = useI18n()
-const store = useUserStore()
+const i18n = useI18n();
+const store = useUserStore();
 
 const rrziel3 = ref(null);
 const model = ref({ label: 'sun' });
@@ -300,5 +320,5 @@ const options = [
   { label: 'rain' },
   { label: 'storm' },
   { label: 'mist' },
-]
+];
 </script>

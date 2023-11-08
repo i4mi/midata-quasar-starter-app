@@ -1,17 +1,22 @@
 <template>
   <q-card>
-    <apexchart :series='series' :options='chartOptions' :height='400' :type='"scatter"' />
+    <apexchart
+      :series="series"
+      :options="chartOptions"
+      :height="400"
+      :type="'scatter'"
+    />
   </q-card>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
 /**
  * Chart designed to use fhir Observations. Its intended usage is one type of
  * Observation that have 2 values. A working example is a Blood pressure
  * graph.
  */
 import { computed } from 'vue';
-import type { PropType } from 'vue'
+import type { PropType } from 'vue';
 import { Observation } from '@i4mi/fhir_r4';
 import { useQuasar } from 'quasar';
 import { useUserStore } from 'stores/user';
@@ -21,36 +26,38 @@ const props = defineProps({
   observationType: String,
   unit: String,
   min: Number,
-  max: Number
-})
+  max: Number,
+});
 
-const $q = useQuasar()
-const store = useUserStore()
+const $q = useQuasar();
+const store = useUserStore();
 
 const labels = computed(() => {
-  if (props.data.length != 0){
-    return [props.data[0].component[0].code.coding[0].display,
-      props.data[0].component[1].code.coding[0].display]
+  if (props.data.length != 0) {
+    return [
+      props.data[0].component[0].code.coding[0].display,
+      props.data[0].component[1].code.coding[0].display,
+    ];
+  } else {
+    return ['', ''];
   }
-  else {
-    return ['', '']
-  }
-})
+});
 const series = computed(() => {
   return [
     {
       name: labels.value[0],
-      data: props.data.map(obs => {
-        return obs.component[0].valueQuantity.value
-      })
+      data: props.data.map((obs) => {
+        return obs.component[0].valueQuantity.value;
+      }),
     },
     {
       name: labels.value[1],
-      data: props.data.map(obs => {
-        return obs.component[1].valueQuantity.value
-      })
-    }]
-})
+      data: props.data.map((obs) => {
+        return obs.component[1].valueQuantity.value;
+      }),
+    },
+  ];
+});
 const chartOptions = computed(() => {
   return {
     chart: {
@@ -62,41 +69,48 @@ const chartOptions = computed(() => {
       offsetY: 15,
     },
     dataLabels: {
-      enabled: false
+      enabled: false,
     },
     markers: {
-      size: $q.screen.lt.sm ? 5 : 10
+      size: $q.screen.lt.sm ? 5 : 10,
     },
     xaxis: {
       labels: {
-        show: false
+        show: false,
       },
       tickPlacement: 'between',
       tooltip: {
-        enabled: false
+        enabled: false,
       },
-      categories: props.data.map(obs => {
-        return new Intl.DateTimeFormat(store.currentLanguage,
-          {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric'
-          }).format(Date.parse(obs.issued))
-      })
+      categories: props.data.map((obs) => {
+        return new Intl.DateTimeFormat(store.currentLanguage, {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+        }).format(Date.parse(obs.issued));
+      }),
     },
     yaxis: {
-      min: $q.screen.lt.md ? undefined : Math.min(...props.data.map(o => o.component[1].valueQuantity.value)),
-      max: $q.screen.lt.md ? undefined : Math.max(...props.data.map(o => o.component[0].valueQuantity.value)),
+      min: $q.screen.lt.md
+        ? undefined
+        : Math.min(
+            ...props.data.map((o) => o.component[1].valueQuantity.value)
+          ),
+      max: $q.screen.lt.md
+        ? undefined
+        : Math.max(
+            ...props.data.map((o) => o.component[0].valueQuantity.value)
+          ),
       title: {
         text: `${props.observationType} in ${props.unit}`,
         align: 'center',
         style: {
           fontSize: '14px',
         },
-      }
-    }
-  }
-})
+      },
+    },
+  };
+});
 </script>

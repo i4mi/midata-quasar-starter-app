@@ -15,23 +15,41 @@ const routes: RouteRecordRaw[] = [
     path: '/developmentBasics',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/development/DevelopmentBasics.vue') },
+      {
+        path: '',
+        component: () => import('pages/development/DevelopmentBasics.vue'),
+      },
     ],
   },
   {
     path: '/quasar',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/QuasarIntro.vue') }],
+    children: [
+      {
+        path: '',
+        component: () => import('pages/development/QuasarIntro.vue'),
+      },
+    ],
   },
   {
     path: '/github',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/GithubIntro.vue') }],
+    children: [
+      {
+        path: '',
+        component: () => import('pages/development/GithubIntro.vue'),
+      },
+    ],
   },
   {
     path: '/pinia',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/PiniaAndDevtools.vue') }],
+    children: [
+      {
+        path: '',
+        component: () => import('pages/development/PiniaAndDevtools.vue'),
+      },
+    ],
   },
   {
     path: '/midata/introduction',
@@ -62,16 +80,25 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/midata/MidataDemo.vue'),
         children: [
           {
-            path: '', redirect: '/midata/demo/bodytemperature'
+            path: '',
+            redirect: '/midata/demo/bodytemperature',
           },
           {
-            path: 'bodytemperature', component: () => import('components/midata/BodyTemperature/MidataBodyTemperature.vue')
+            path: 'bodytemperature',
+            component: () =>
+              import(
+                'components/midata/BodyTemperature/MidataBodyTemperature.vue'
+              ),
           },
           {
-            path: 'heartrate', component: () => import('components/midata/HeartRate/MidataHeartRate.vue')
+            path: 'heartrate',
+            component: () =>
+              import('components/midata/HeartRate/MidataHeartRate.vue'),
           },
           {
-            path: 'bloodpressure', component: () => import('components/midata/BloodPressure/MidataBloodPressure.vue')
+            path: 'bloodpressure',
+            component: () =>
+              import('components/midata/BloodPressure/MidataBloodPressure.vue'),
           },
         ],
       },
@@ -91,7 +118,11 @@ const routes: RouteRecordRaw[] = [
     path: '/internationalization',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/development/InternationalizationIntro.vue') },
+      {
+        path: '',
+        component: () =>
+          import('pages/development/InternationalizationIntro.vue'),
+      },
     ],
   },
   // Always leave this as last one,

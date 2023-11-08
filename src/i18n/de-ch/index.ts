@@ -24,8 +24,9 @@ export default {
     },
     artBD: {
       label: 'Arterieller Mitteldruck',
-      error: 'Der eingegebene arterielle Blutdruck: {value} mmHg liegt ausserhalb des Wertebereichs 30-120 mmHg.',
-      empty: 'Geben Sie einen Wert ein.'
-    }
+      error:
+        'Der eingegebene arterielle Blutdruck: {value} mmHg liegt ausserhalb des Wertebereichs 30-120 mmHg.',
+      empty: 'Geben Sie einen Wert ein.',
+    },
   },
 };

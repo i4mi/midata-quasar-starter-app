@@ -20,9 +20,9 @@
       <p>
         Das Motto von Quasar ist: Hochwertige VueJS-Benutzeroberflächen in
         Rekordzeit erstellen. Dies ist möglich, weil Sie nur eine einzige
-        massgebliche Codequelle für alle Plattformen schreiben müssen: responsive
-        Desktop-/Mobile-Websites (SPA, SSR + SPA-Clientübernahme, SSR +
-        PWA-Clientübernahme), PWAs (Progressive Web Apps), mobile Apps (die
+        massgebliche Codequelle für alle Plattformen schreiben müssen:
+        responsive Desktop-/Mobile-Websites (SPA, SSR + SPA-Clientübernahme, SSR
+        + PWA-Clientübernahme), PWAs (Progressive Web Apps), mobile Apps (die
         nativ aussehen) und Multiplattform-Desktop-Apps (über Electron) sowie
         Browser-Erweiterungen.
       </p>
@@ -205,8 +205,8 @@ $ quasar create <folder_name>"
       </p>
       <p>
         Im Verzeichnis (src/boot/) können Sie beispielsweise eine Boot-Datei
-        plugins.ts erstellen. Für die MIDATA Demo wurde beispielsweise das
-        Modul MidataService als globale Properties deklariert. Dafür wurde eine
+        plugins.ts erstellen. Für die MIDATA Demo wurde beispielsweise das Modul
+        MidataService als globale Properties deklariert. Dafür wurde eine
         Boot-Datei mit dem Namen plugins.ts erstellt.
       </p>
       <highlightjs
@@ -240,8 +240,8 @@ export { midata };
         String 'plugins' ergänzt werden. Dies referenziert beim Boot-Prozess die
         zuvor erstellte plugins.ts Datei. Wie sie am Beispiel unten sehen, sind
         nebst 'plugins' /src/boot/plugins.ts die weiteren Boot-Dateien 'i18n'
-        /src/boot/i18n.ts, 'highlight' /src/boot/highlight.ts und
-        'apexcharts' /src/boot/apexcharts.ts vorhanden.
+        /src/boot/i18n.ts, 'highlight' /src/boot/highlight.ts und 'apexcharts'
+        /src/boot/apexcharts.ts vorhanden.
       </p>
       <highlightjs
         language="javascript"
@@ -278,9 +278,10 @@ module.exports = configure(function (ctx) {
       />
     </div>
 
-    <div class="q-my-xl text-grey">Quelle: https://quasar.dev/start/quasar-cli#introduction</div>
+    <div class="q-my-xl text-grey">
+      Quelle: https://quasar.dev/start/quasar-cli#introduction
+    </div>
   </q-page>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>

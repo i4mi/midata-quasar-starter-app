@@ -1,5 +1,9 @@
 {
-  "sources": ["https://loinc.org/8327-9/", "https://loinc.org/LL3627-8/", "https://loinc.org/41904-4/"],
+  "sources": [
+    "https://loinc.org/8327-9/",
+    "https://loinc.org/LL3627-8/",
+    "https://loinc.org/41904-4/"
+  ],
   "BODY_TEMPERATURE": [
     {
       "id": "Axillary",

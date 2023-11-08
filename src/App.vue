@@ -7,18 +7,15 @@ import { midata } from 'boot/plugins';
 import { useRouter } from 'vue-router';
 import { useUserStore } from 'stores/user';
 
-const router = useRouter()
-const store = useUserStore()
+const router = useRouter();
+const store = useUserStore();
 
 onMounted(() => {
   midata
     .handleAuthResponse()
     .then((response: any) => {
       if (response && midata.isLoggedIn()) {
-        Promise.all([
-          store.restoreFromMidata(),
-          midata.getPatientResource(),
-        ])
+        Promise.all([store.restoreFromMidata(), midata.getPatientResource()])
           .then((results) => {
             const preferredCom = results[1].communication.find((coms) => {
               return coms.preferred;
@@ -37,5 +34,5 @@ onMounted(() => {
       }
     })
     .catch();
-})
+});
 </script>

@@ -24,8 +24,9 @@ export default {
     },
     artBD: {
       label: 'Pression moyenne artérielle',
-      error: 'La pression artérielle saisie : {value} mmHg est en dehors de la plage de valeurs 30-120 mmHg.',
-      empty: 'Entrez une valeur.'
-    }
+      error:
+        'La pression artérielle saisie : {value} mmHg est en dehors de la plage de valeurs 30-120 mmHg.',
+      empty: 'Entrez une valeur.',
+    },
   },
 };

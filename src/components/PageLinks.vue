@@ -1,7 +1,7 @@
 <template>
   <q-item clickable :to="link">
-    <q-item-section v-if="icon" avatar >
-      <q-icon :name="icon"/>
+    <q-item-section v-if="icon" avatar>
+      <q-icon :name="icon" />
     </q-item-section>
 
     <q-item-section>
@@ -23,6 +23,6 @@ defineProps({
   icon: {
     type: String,
     default: '',
-  }
-})
+  },
+});
 </script>
