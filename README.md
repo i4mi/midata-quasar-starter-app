@@ -58,8 +58,15 @@ npx quasar dev
 ```
 
 ### Lint the files
+"Linting" means checking all your code for potential problems or even errors. This helps to reduce bugs and unwanted behaviour.
 ```bash
 npm run lint
+```
+
+### Format your code
+This will automatically format your code and apply a generic code style. This is useful if several people are working on the same code. This way the code will look the same, no matter who wrote it.
+```bash
+npm run format
 ```
 
 ### Build the app for production
