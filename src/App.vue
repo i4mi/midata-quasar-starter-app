@@ -12,12 +12,13 @@ const store = useUserStore();
 
 onMounted(() => {
   midata
+    // If you want to persist the login state, look at the documentation here: https://www.npmjs.com/package/@i4mi/js-on-fhir#1.3-auth
     .handleAuthResponse()
     .then((response: any) => {
       if (response && midata.isLoggedIn()) {
         Promise.all([store.restoreFromMidata(), midata.getPatientResource()])
           .then((results) => {
-            console.log('Patient loaded: ', results);
+            console.log('Patient loaded: ', results[1]);
             router.push('/midata/demo');
           })
           .catch();
