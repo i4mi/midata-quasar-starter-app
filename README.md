@@ -1,6 +1,9 @@
-# Midata Quasar Starter Application
+# Midata Quasar Starter Template
 
-A starter/demo application created with the Quasar CLI and UI Framework. It provides an introduction to web development and shows what MIDATA is and how to set up an application on the MIDATA test server. It also includes a small MIDATA application that showcases the OAuth 2.0 authentication process and implements basic functionality of the npm package [JSonFhir](https://www.npmjs.com/package/@i4mi/js-on-fhir).
+This is the Starter-Template of the demo application. It is based on the starter/demo application (main fork), but now it only contains the components required to start a project with MIDATA. The idea is to use this fork as a starting point and then copying the components
+from the other forks if required for your use-case.
+
+The starter-template provides an introduction to what MIDATA is and how to set up an application on the MIDATA test server. It also includes a small MIDATA application that showcases the OAuth 2.0 authentication process and implements basic functionality of the npm package [JSonFhir](https://www.npmjs.com/package/@i4mi/js-on-fhir).
 
 This starter/demo application is aimed at students and interested parties who are planning to develop a web application with MIDATA. It should give a first insight into the subjects.
 

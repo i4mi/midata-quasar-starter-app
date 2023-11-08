@@ -3,35 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Overview.vue') }],
-  },
-  {
-    path: '/overview',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Overview.vue') }],
-  },
-  {
-    path: '/developmentBasics',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/development/DevelopmentBasics.vue') },
-    ],
-  },
-  {
-    path: '/quasar',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/Quasar.vue') }],
-  },
-  {
-    path: '/github',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/Github.vue') }],
-  },
-  {
-    path: '/pinia',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/development/PiniaAndDevtools.vue') }],
+    redirect: '/midata/introduction',
   },
   {
     path: '/midata/introduction',
@@ -60,38 +32,8 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('pages/midata/MidataDemo.vue'),
-        children: [
-          {
-            path: '', redirect: '/midata/demo/bodytemperature'
-          },
-          {
-            path: 'bodytemperature', component: () => import('components/midata/BodyTemperature/MidataBodyTemperature.vue')
-          },
-          {
-            path: 'heartrate', component: () => import('components/midata/HeartRate/MidataHeartRate.vue')
-          },
-          {
-            path: 'bloodpressure', component: () => import('components/midata/BloodPressure/MidataBloodPressure.vue')
-          },
-        ],
+        children: [],
       },
-    ],
-  },
-  {
-    path: '/midata/generate',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('pages/midata/GenerateData.vue'),
-      },
-    ],
-  },
-  {
-    path: '/internationalization',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/development/Internationalization.vue') },
     ],
   },
   // Always leave this as last one,

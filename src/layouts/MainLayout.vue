@@ -10,7 +10,7 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-        <q-toolbar-title> Demo App </q-toolbar-title>
+        <q-toolbar-title> Demo App (Starter-Template) </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
@@ -19,21 +19,6 @@
     <q-drawer v-model="drawerExpanded" show-if-above bordered>
       <q-list>
         <q-item-label header> Menu </q-item-label>
-        <PageLinks v-for="link in pageLinks" :key="link.title" v-bind="link" />
-
-        <q-expansion-item
-          clickable
-          default-opened
-          icon="code"
-          label="Webentwicklung"
-          :content-inset-level="0.5"
-        >
-          <PageLinks
-            v-for="link in developmentLinks"
-            :key="link.title"
-            v-bind="link"
-          ></PageLinks>
-        </q-expansion-item>
 
         <q-expansion-item
           clickable
@@ -43,7 +28,7 @@
           :content-inset-level="0.5"
         >
           <PageLinks
-            v-for="link in midataPageLinks"
+            v-for="link in midataLinksList"
             :key="link.title"
             v-bind="link"
           />
@@ -57,17 +42,15 @@
   </q-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import PageLinks from 'components/PageLinks.vue';
-import { defineComponent, ref } from 'vue';
+import { ref } from 'vue';
 
-const linksList = [
-  {
-    title: 'Übersicht',
-    icon: 'dashboard',
-    link: '/overview',
-  },
-];
+const drawerExpanded = ref(false);
+
+function toggleLeftDrawer() {
+  drawerExpanded.value = !drawerExpanded.value;
+}
 
 const midataLinksList = [
   {
@@ -85,63 +68,7 @@ const midataLinksList = [
     icon: 'auto_fix_high',
     link: '/midata/demo',
   },
-  {
-    title: 'Daten generieren',
-    icon: 'description',
-    link: '/midata/generate',
-  },
 ];
-
-const developmentLinksList = [
-  {
-    title: 'Basics',
-    icon: 'keyboard_arrow_right',
-    link: '/developmentBasics',
-  },
-  {
-    title: 'Quasar Framework',
-    icon: 'favorite',
-    link: '/quasar',
-  },
-  {
-    title: 'Versionskontrolle und GitHub',
-    icon: 'upload',
-    link: '/github',
-  },
-  {
-    title: 'Internationalisierung mit Vue-i18n und Intl',
-    icon: 'language',
-    link: '/internationalization',
-  },
-  {
-    title: 'State-Management mit Pinia und Vue-Devtools',
-    icon: 'mdi-fruit-pineapple',
-    link: '/pinia'
-  }
-];
-
-export default defineComponent({
-  name: 'MainLayout',
-
-  components: {
-    PageLinks,
-  },
-
-  setup() {
-    const drawerExpanded = ref(false);
-
-    return {
-      pageLinks: linksList,
-      midataPageLinks: midataLinksList,
-      developmentLinks: developmentLinksList,
-
-      drawerExpanded,
-      toggleLeftDrawer() {
-        drawerExpanded.value = !drawerExpanded.value;
-      },
-    };
-  },
-});
 </script>
 
 <style lang="sass" scoped>

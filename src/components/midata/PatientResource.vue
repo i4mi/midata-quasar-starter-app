@@ -28,18 +28,30 @@
             round
             flat
             dense
-            :icon="store.patientResourceExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-            @click="store.patientResourceExpanded = !store.patientResourceExpanded"
+            :icon="
+              store.patientResourceExpanded
+                ? 'keyboard_arrow_up'
+                : 'keyboard_arrow_down'
+            "
+            @click="
+              store.patientResourceExpanded = !store.patientResourceExpanded
+            "
             class="gt-xs"
-          >Vollständige Ressource anzeigen</q-btn
+            >Vollständige Ressource anzeigen</q-btn
           >
           <q-btn
             color="grey"
             round
             flat
             dense
-            :icon="store.patientResourceExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'"
-            @click="store.patientResourceExpanded = !store.patientResourceExpanded"
+            :icon="
+              store.patientResourceExpanded
+                ? 'keyboard_arrow_up'
+                : 'keyboard_arrow_down'
+            "
+            @click="
+              store.patientResourceExpanded = !store.patientResourceExpanded
+            "
             class="lt-sm"
           ></q-btn>
         </q-card-actions>
@@ -49,8 +61,13 @@
             <q-card-section
               class="innerCardScroll"
               clickable
-              @click='store.copyToClipBoard
-              (store.patientResource, "Patienten Resource")'>
+              @click="
+                store.copyToClipBoard(
+                  store.patientResource,
+                  'Patienten Resource'
+                )
+              "
+            >
               <highlightjs
                 lang="json"
                 :code="JSON.stringify(store.patientResource, null, 2)"
@@ -63,11 +80,10 @@
   </q-card>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
 import { useUserStore } from 'stores/user';
 
-const store = useUserStore()
-
+const store = useUserStore();
 </script>
 <style lang="sass" scoped>
 .innerCardScroll

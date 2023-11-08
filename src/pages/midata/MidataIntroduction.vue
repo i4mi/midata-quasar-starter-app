@@ -35,8 +35,7 @@
   </q-page>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <style lang="sass" scoped>
 .img-800
